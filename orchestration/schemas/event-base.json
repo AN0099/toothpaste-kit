@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "orchestration/event-base.json",
+  "title": "EventBase",
+  "type": "object",
+  "required": ["event_id", "timestamp", "thread_id", "from", "to"],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Unique identifier for this event, used for idempotency and threading."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "thread_id": {
+      "type": "string",
+      "description": "Groups events belonging to one orchestration run."
+    },
+    "in_reply_to": {
+      "type": ["string", "null"],
+      "description": "event_id this event responds to, if any."
+    },
+    "from": { "$ref": "#/definitions/agent_ref" },
+    "to": { "$ref": "#/definitions/agent_ref" },
+    "relayed_by": {
+      "type": "array",
+      "description": "Human-relay agents that touched this event en route, in order. Present for auditability when a message crosses more than one relay hop.",
+      "items": { "$ref": "#/definitions/agent_ref" }
+    }
+  },
+  "definitions": {
+    "agent_ref": {
+      "type": "object",
+      "required": ["agent_id", "kind", "surface"],
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "description": "Stable label for this agent within the run, e.g. 'planner', 'implementer', 'reviewer-human'."
+        },
+        "kind": {
+          "enum": ["llm", "human"]
+        },
+        "surface": {
+          "enum": [
+            "chat",
+            "cowork-interactive",
+            "cowork-delegated",
+            "code-interactive",
+            "code-headless-routine",
+            "code-local-routine",
+            "api-raw",
+            "api-agent-sdk",
+            "human-relay",
+            "human-participant"
+          ]
+        },
+        "regime": {
+          "enum": [
+            "interactive-synchronous",
+            "autonomous-asynchronous",
+            "programmatic-contractual"
+          ],
+          "description": "Derived from 'surface' via the lookup table in the surface-regimes skill. Not set independently of surface; present here so a receiving agent without that skill loaded still sees the regime stated explicitly."
+        },
+        "active_skills": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Skill names active by default for this surface, per the surface-regimes skill's activation table. Also derived, not hand-set. A mismatch between this field and a receiving agent's own inference is worth surfacing rather than silently resolving."
+        }
+      }
+    }
+  }
+}

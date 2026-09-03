@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "orchestration/response.json",
+  "title": "ResponseEvent",
+  "allOf": [
+    { "$ref": "event-base.json" },
+    {
+      "type": "object",
+      "required": ["type", "request_id", "success"],
+      "properties": {
+        "type": { "const": "response" },
+        "request_id": {
+          "type": "string",
+          "description": "The request_id from the RequestEvent this responds to."
+        },
+        "success": { "type": "boolean" },
+        "result": { "type": "object", "additionalProperties": true },
+        "error": { "type": "string" },
+        "human_summary": {
+          "type": "string",
+          "description": "One to three lines a human-relay agent can read without parsing the rest of the payload."
+        }
+      }
+    }
+  ]
+}

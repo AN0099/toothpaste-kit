@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "orchestration/request.json",
+  "title": "RequestEvent",
+  "allOf": [
+    { "$ref": "event-base.json" },
+    {
+      "type": "object",
+      "required": ["type", "action", "request_id"],
+      "properties": {
+        "type": { "const": "request" },
+        "action": {
+          "type": "string",
+          "description": "What the target agent is being asked to do. Free text or a controlled vocabulary defined per run."
+        },
+        "request_id": { "type": "string" },
+        "params": { "type": "object", "additionalProperties": true },
+        "timeout_ms": {
+          "type": "integer",
+          "description": "Use only when 'to' is kind=llm. Machine agents operate on millisecond timers."
+        },
+        "expected_response_by": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Use only when 'to' is kind=human. Human agents don't operate on millisecond timers; missed deadlines are a judgment call, not an automatic failure."
+        },
+        "human_summary": {
+          "type": "string",
+          "description": "One to three lines a human-relay agent can read without parsing the rest of the payload, so the message is self-contained if separated from its header."
+        }
+      }
+    }
+  ]
+}
