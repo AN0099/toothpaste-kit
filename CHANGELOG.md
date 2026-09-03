@@ -3,6 +3,32 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
+## 2026-09-03
+
+### Fixed
+
+- `skills/commands/SKILL.md` described a routing mechanism that never existed. It sent readers to
+  sixteen per-command files under `skills/commands/`, naming `commands/AUDIT.md` as the example.
+  No such file has been in any commit. The section is gone and the skill now names
+  `working-preferences` as the source of the definitions, which is where they have always been.
+- Added `skills/commands/CHANGELOG.md`. It was the only skill without one, which
+  `skills/skill-creation/SKILL.md`'s pre-publish checklist requires.
+- Renamed `commands`' closing section from `# Cross-References` to `# Scope Pointer`, one of the
+  two names that checklist permits.
+- `README.md` pointed at `orchestration/request.json` and `orchestration/response.json` in three
+  places. The 2026-09-02 reorganization moved both under `orchestration/schemas/` and was recorded
+  as complete, but did not reach this file. Added the `event-base.json` row while correcting them.
+- `skills/skill-discovery/SKILL.md` called the family six skills in two places. There are seven.
+  The number is load-bearing there, since the gateway-threshold rule in the same file is evaluated
+  against it.
+- `skills/skill-creation/SKILL.md` cited `working-preferences` as roughly 140 lines against a
+  150-line target. It is 149.
+
+### Removed
+
+- An empty `skills/working-preferences/references/templates/` tree. It held no files, was named
+  nowhere in that skill, and was untracked, so it existed on one disk and shipped to no one.
+
 ## 2026-09-02
 
 ### Changed

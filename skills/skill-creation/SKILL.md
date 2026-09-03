@@ -27,7 +27,7 @@ A `CHANGELOG.md` sibling to `SKILL.md` is required, not optional, and not embedd
 
 # Sizing Target and Split Ceiling
 
-Target for `SKILL.md` itself: under roughly 150 lines. The largest live skill, `working-preferences`, runs about 140 lines and covers standing register, prohibitions, six other sections, and a full command vocabulary. That's close to the practical ceiling for a file someone can hold in working memory while editing it.
+Target for `SKILL.md` itself: under roughly 150 lines. The largest live skill, `working-preferences`, runs about 150 lines and covers standing register, prohibitions, six other sections, and a full command vocabulary. That's close to the practical ceiling for a file someone can hold in working memory while editing it.
 
 Ceiling: 250 lines, or the point where a single body section is doing enough independent work that it reads like a second skill wearing this one's frontmatter. Past either trigger, split: move reference material (word lists, templates, detailed tables) into `references/*.md` and `references/templates/`, keep `SKILL.md` as the entry point with pointers. Same two-tier structure `document-standards` already uses.
 

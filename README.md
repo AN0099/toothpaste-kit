@@ -28,8 +28,9 @@ The protocol for passing work between agents on different surfaces.
 |---|---|
 | `orchestration/protocol.md` | The relay protocol itself |
 | `orchestration/taxonomy.md` | Role and surface definitions |
-| `orchestration/request.json` | Request message schema |
-| `orchestration/response.json` | Response message schema |
+| `orchestration/schemas/request.json` | Request message schema |
+| `orchestration/schemas/response.json` | Response message schema |
+| `orchestration/schemas/event-base.json` | Shared event envelope |
 | `orchestration/ingestion/` | Specs for turning vendor data exports into machine-readable digests |
 
 ## Installing the skills
@@ -46,7 +47,7 @@ Skills load on their frontmatter `description`. Read `skills/skill-discovery/SKI
 
 ## Using the orchestration protocol
 
-`orchestration/protocol.md` defines the message flow. `request.json` and `response.json` are the schemas a participating agent reads and writes. `taxonomy.md` maps surfaces to behavioral regimes and is the join key for the `surface-regimes` skill.
+`orchestration/protocol.md` defines the message flow. `orchestration/schemas/request.json` and `orchestration/schemas/response.json` are the schemas a participating agent reads and writes. `taxonomy.md` maps surfaces to behavioral regimes and is the join key for the `surface-regimes` skill.
 
 ## Packing this repo for an LLM
 

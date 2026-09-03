@@ -18,7 +18,7 @@ Score a candidate on four factors before building.
 | Complexity | Is there enough structure here (rules, dials, checklists) to be worth formalizing, or is it a single fact? |
 | Stability | Is this settled enough to write down, or still actively changing session to session? |
 
-Rate each low, medium, or high. Don't build a numeric scale for a six-skill family, that's precision the current scale doesn't need. A candidate scoring low on three or more factors is answered once and left in the conversation. A candidate scoring medium or above on at least three factors is a real skill candidate, run it through `skill-creation`.
+Rate each low, medium, or high. Don't build a numeric scale for a seven-skill family, that's precision the current scale doesn't need. A candidate scoring low on three or more factors is answered once and left in the conversation. A candidate scoring medium or above on at least three factors is a real skill candidate, run it through `skill-creation`.
 
 Low frequency alone doesn't disqualify a candidate that's high on the other three. A rule this stable and this complex is worth capturing the first time it's articulated cleanly, waiting for repetition just means re-deriving it from scratch next time. Low stability is the harder disqualifier: a skill built on a rule still in flux gets stale before it's used, and a stale skill actively misleads in a way an unanswered question doesn't.
 
@@ -26,7 +26,7 @@ This is the missing piece under `document-standards`' Three-Tier Threshold Frame
 
 # Locating an Existing Skill
 
-Given the family's current size, six skills, discovery works by reading frontmatter `description` fields directly rather than through a dedicated routing file. Each skill's `description` already states what it covers and what it explicitly doesn't, with a pointer to whichever sibling does instead. The descriptions collectively function as the index.
+Given the family's current size, seven skills, discovery works by reading frontmatter `description` fields directly rather than through a dedicated routing file. Each skill's `description` already states what it covers and what it explicitly doesn't, with a pointer to whichever sibling does instead. The descriptions collectively function as the index.
 
 Two failure modes worth checking for before concluding no skill covers something:
 

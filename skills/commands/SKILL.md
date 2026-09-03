@@ -1,9 +1,9 @@
 ---
 name: commands
-description: Gateway and index for the project command vocabulary. Routes to individual command definitions and handles the HELP command directly.
+description: Gateway and index for the project command vocabulary. Lists all seventeen commands with one-line summaries and resolves HELP and MAN directly. Does not hold the behavioral rules themselves; those live in working-preferences, which is the source of truth for what each command does.
 ---
 # Scope
-This skill provides a discoverability index for the seventeen commands defined in the project command vocabulary. It lists each command with a one-line summary and directs execution to the appropriate dedicated skill file for the sixteen commands that have them. The HELP command is resolved directly within this skill.
+Discoverability index for the seventeen commands in the project command vocabulary. This skill exists so an agent can find out which commands are active without loading all of `working-preferences`. HELP and MAN resolve here. Every other command executes under the definitions `working-preferences` holds.
 # Command Index
 - AUDIT [scope]: targeted diagnostic pass. Report errors, gaps, and unverified claims. Do not fix; await instruction.
 - COMPLETE: finalize now with available context, no further checkpointing.
@@ -22,10 +22,11 @@ This skill provides a discoverability index for the seventeen commands defined i
 - SCOPE: read-only recap of decisions, facts, and progress so far.
 - SCORE: straight compliance check of the last response against active rules.
 - SOCRATIC: toggle. Stress-test the stated position for internal contradictions and assumptions; no outside counterarguments.
-# Routing
-Sixteen of the seventeen commands route to their own dedicated file under this directory (for example, commands/AUDIT.md). Those files contain the full behavioral rules, edge cases, and execution logic for their respective commands.
-The HELP command does not have a dedicated file. Its function is to list active commands, which is the exact purpose of this gateway skill. When HELP is invoked, this skill command index is the output.
-# Cross-References
-- working-preferences: The source of truth for the command vocabulary and standing behavior rules.
-- skill-creation: Governs how new skills, including the individual command files, are structured and added.
-- skill-discovery: Determines whether a recurring need justifies a new skill.
+# Resolution
+HELP outputs the Command Index above. That index is the complete list of active commands, which is what HELP asks for.
+MAN [command] outputs the index entry for the named command. For FREEZE, FLAG, and RETRACT, read `working-preferences`' `# Session-State Semantics` section first and include what it says. Those three change what the session treats as ground truth, and the one-line index entry understates that.
+Commands do not have dedicated files. Depth on any command belongs in `working-preferences` alongside the rest of its definition, so that a reader who has the vocabulary also has the rules that govern it.
+# Scope Pointer
+- `working-preferences`: source of truth for the command vocabulary, session-state semantics, and standing behavior rules. Anything this index summarizes is defined there in full.
+- `skill-creation`: structure and checklists for adding a skill.
+- `skill-discovery`: whether a recurring need justifies a new skill.
