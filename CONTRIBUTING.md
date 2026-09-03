@@ -41,6 +41,10 @@ The description decides when the skill loads, so it should state what the skill 
 
 ## Commits and pull requests
 
+Configure `user.email` before your first commit. Use the noreply address your forge provides, not a
+personal mailbox. An address in a public commit log is permanent, scraped quickly, and part of the
+commit hash, so correcting it later rewrites history.
+
 One logical change per commit. Commit messages should say what changed and why. Keep generated output, index databases, and packed repository files out of the repo. `.gitignore` covers the known cases.
 
 ## What does not belong here

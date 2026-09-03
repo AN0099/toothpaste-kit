@@ -48,6 +48,25 @@ Skills load on their frontmatter `description`. Read `skills/skill-discovery/SKI
 
 `orchestration/protocol.md` defines the message flow. `request.json` and `response.json` are the schemas a participating agent reads and writes. `taxonomy.md` maps surfaces to behavioral regimes and is the join key for the `surface-regimes` skill.
 
+## Packing this repo for an LLM
+
+`repomix` collapses the whole repo into one file suitable for pasting into a model:
+
+```
+repomix --output repomix-output.xml
+```
+
+Check that the pack covers the tracked tree. The two counts should match:
+
+```
+git ls-files | wc -l
+grep -c '<file path=' repomix-output.xml
+```
+
+The output is gitignored on purpose. It is a near-complete copy of the repository, so committing it
+roughly doubles clone size and produces a full-file diff on every change, and it goes stale
+silently. `repomix --remote` builds one straight from the GitHub URL without a clone.
+
 ## Status
 
 Early. The skills are in daily use and the interfaces still change. The orchestration protocol has run across Claude, local models, and several vendor surfaces.
