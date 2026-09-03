@@ -1,5 +1,45 @@
 # CHANGELOG
 
+## v2
+
+Two internal contradictions removed. Both were found by running the skill against live document
+tasks rather than by reading it, and in both cases the executing agent produced correct output but
+reported that it had guessed, which is the failure worth preventing: a rule that forces a guess
+produces inconsistent behavior across invocations without ever looking broken.
+
+**The Content Read could not be one line.** The step specified a one-line read-back, while a later
+paragraph in the same section required the stated dials to reflect a blend whenever the read names
+two document types. A blend cannot be justified inside the line it modifies. The read is now one
+line with an explicit second sentence for the case where dials depart from the preset or blend two
+types. Keep both halves: shortening it back to a bare one-liner reinstates the contradiction, and
+dropping the one-line constraint invites a paragraph of preamble before every document.
+
+**The completion statement could not be a line.** The pre-flight checklist holds seven items and
+asked for each to be marked done or skipped, in "a short completion line." Seven marks do not fit
+in a line, so the instruction resolved in practice to a summary claim that the checks ran, which is
+precisely what the statement exists to evidence rather than assert. It is now specified as a block,
+one entry per item, with permission to cite an already-visible mechanical trace instead of
+restating it. That last clause matches the equivalent carve-out in `working-preferences`'
+pre-delivery self-audit, so the two files agree on what a mechanical check owes the reader.
+
+**Neither this skill nor `technical-documents` said when to decline to generate.** Two of the three
+eval tasks supplied almost no verifiable specifics, so the pre-flight ban on fake-precise numbers
+correctly forced bracketed placeholders throughout, and both executing agents asked, unprompted,
+whether they should have posed a clarifying question instead. The rules gave them no answer. A new
+`# When Not to Generate Yet` section routes that case to `working-preferences`'
+dialog-before-large-builds gate and requires the chosen path to be stated either way. The template
+exception is deliberate: a document requested as a template has placeholders as its content, and
+folding it into the general rule would gate the one case that should never be gated.
+
+### Measurement
+
+Against three document tasks (runbook, cover letter, hybrid announcement), the skill scored 24/24
+on procedural and output assertions versus 10/24 unassisted. Cost was +51% tokens and +111% wall
+time. Of the marginal token cost, roughly 22% is loading the skill and its reference files, about
+4,600 tokens in total; the remaining 78% is the verification work the skill requires. The reference
+files are cheap and worth keeping whole. Anyone tempted to trim them for cost should trim the
+mandated passes instead, and should expect to lose the checks along with them.
+
 ## v1 (initial generation)
 
 ### Inspiration log

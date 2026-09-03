@@ -24,6 +24,14 @@ skill lives in that skill's own `CHANGELOG.md`.
 - `skills/skill-creation/SKILL.md` cited `working-preferences` as roughly 140 lines against a
   150-line target. It is 149.
 
+### Changed
+
+- `skills/document-standards/SKILL.md` to v2. Removed two internal contradictions that made the
+  skill unfollowable as written, and added a `# When Not to Generate Yet` section for the case
+  where a request is too underspecified to generate against. All three were found by running the
+  skill against live document tasks rather than by reading it. Reasoning is in that skill's own
+  `CHANGELOG.md`.
+
 ### Removed
 
 - An empty `skills/working-preferences/references/templates/` tree. It held no files, was named

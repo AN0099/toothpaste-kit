@@ -41,13 +41,33 @@ Technical document types (runbooks, ADRs, incident postmortems, on-call handoff 
 
 # Content Read
 
-Before generating, state a one-line read: "Reading this as: [document type] for [audience], dials at [F/D/A]." This is a read-back, not a question; proceed unless corrected.
+Before generating, state the read: "Reading this as: [document type] for [audience], dials at [F/D/A]." This is a read-back, not a question; proceed unless corrected.
+
+Keep the read itself to that one line. Where the dials depart from the preset, or blend two document types, add one sentence under it naming what moved and why. That sentence belongs to the read rather than breaking it: a dial value differing from the table is a judgment the reader needs to be able to check, and an unexplained departure is indistinguishable from an error.
 
 This is the document-specific instantiation of `working-preferences`' Ambiguity Handling principle. Document type and target audience are the variables that actually vary per task, so the dial-setting step lives here rather than in the universal file.
 
 `working-preferences`' distilled anti-slop list is a floor that applies everywhere. The full reference-file check below is the required ceiling for any document that triggers this skill; the distilled list never substitutes for it here.
 
-If the descriptive half of the one-line read names more than one document type or register, the stated dial values must reflect an actual blend or an explicit, stated choice between them, not the values for only one of the named types. Check the two halves against each other before proceeding.
+If the descriptive half of the read names more than one document type or register, the stated dial values must reflect an actual blend or an explicit, stated choice between them, rather than the values for only one of the named types. Check the two halves against each other before proceeding, and put the reasoning in the sentence described above.
+
+# When Not to Generate Yet
+
+The ban on fake-precise numbers below has a consequence worth naming. When a request supplies
+almost nothing verifiable, honoring that ban produces a document made largely of bracketed
+placeholders. That is the correct output for the rules as written, and it is usually the wrong
+thing to hand someone: a form asserting the shape of an answer reads as a finished document to
+anyone who skims it.
+
+Before generating, weigh what the document's substance rests on against how much of it the request
+actually supplied. Where placeholders would carry most of that load, the move is
+`working-preferences`' dialog-before-large-builds gate: ask the calibrating questions first, then
+generate once against real values. A document explicitly requested as a template is the exception,
+since placeholders are its content rather than a gap in it.
+
+Either way, say which path you took. "Generating against placeholders for [X] and [Y]" is a read
+the reader can correct before acting on it. Shipping the same document without that line leaves
+them to discover the gap themselves, usually later than they would have chosen.
 
 # Pre-flight Checklist
 
@@ -61,7 +81,7 @@ Run before shipping any document:
 - Every claim traces to something real, stated, or explicitly marked as illustrative.
 - Scoring rubric run (below), threshold met.
 
-State a short completion line at delivery: each item above marked done, or explicitly marked skipped with a reason. Don't leave checklist execution to be inferred from what happens to be visible in the response.
+State the completion at delivery as a short block, one entry per item above, each marked done or explicitly marked skipped with a reason. A block rather than a single line, because seven items compressed into one sentence become a claim that the checks happened, which is the very thing the completion statement exists to evidence. A mechanical check that already left a visible trace, a grep that ran in the transcript, can cite that trace instead of restating it. Don't leave checklist execution to be inferred from what happens to be visible in the response.
 
 # Scoring Rubric
 
