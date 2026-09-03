@@ -1,5 +1,7 @@
 # toothpaste-kit
 
+**[CURRENT WORK IN PROGRESS // PRE-ALPHA]**
+
 A skill library and agent relay protocol for working with Claude.
 
 Maintained by Bridle Works.
