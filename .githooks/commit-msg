@@ -1,0 +1,25 @@
+#!/bin/sh
+# Reject AI attribution trailers in commit messages.
+#
+# Enable once per clone:
+#   git config core.hooksPath .githooks
+#
+# This is a convenience, not the enforcement. Hooks do not travel with a clone
+# and `--no-verify` bypasses them. The binding check is the required status
+# check on the default branch. See CONTRIBUTING.md.
+
+msg_file="$1"
+
+pattern='^Co-Authored-By:.*\(Claude\|Anthropic\)\|^Claude-Session:\|Generated with .*Claude'
+
+if grep -qi "$pattern" "$msg_file"; then
+    echo "commit-msg: rejected, AI attribution trailer found." >&2
+    echo >&2
+    grep -niE 'Co-Authored-By:.*(Claude|Anthropic)|Claude-Session:|Generated with .*Claude' "$msg_file" >&2
+    echo >&2
+    echo "This repository does not carry tool attribution in commit messages." >&2
+    echo "Remove the lines above and commit again." >&2
+    exit 1
+fi
+
+exit 0
