@@ -17,7 +17,8 @@ Two are human-invoked procedures, added 2026-09-03: `redaction-gate` and `sessio
 itself is not a gate, and an agent should not decide a session is over.
 
 `hooks/` carries seven `hookify` rule examples, inert where they sit. `scripts/` carries
-`link-skills.sh` and `reflow-md.py`, the latter with a fixture and `--selftest`.
+`link-skills.sh` and `reflow-md.py`, the latter with a fixture and `--selftest`. `link-skills.sh`
+writes relative symlink targets where `ln -r` exists, so the links survive the tree being moved.
 
 The orchestration protocol has run relay traffic across Claude, local models, and several vendor
 surfaces. Message schemas and the role taxonomy are stable enough to build against.
@@ -31,6 +32,24 @@ Two skill families are specced and not yet built:
 - **content-pipeline**: note-mining, public-writing register, and publishing workflow.
 
 ## Recent changes
+
+- `redaction-gate` went to v2.1, carrying a fix and a feature. The fix restores a Step 4 rule that
+  was present in the maintainer's working copy and described in the CHANGELOG while being absent
+  from the published skill: a redaction is proposed only where the content is unnecessary, and a
+  load-bearing finding halts and warns instead. It was dropped by the pass that generalized the
+  skill for publication, alongside a dated internal statistic that was correctly removed. Anyone
+  running the published skill before v2.1 had a gate weaker than its own documentation. The feature
+  is a Step 3 derived-values check: a corpus pass matches strings, so it cannot see a value computed
+  from restricted content rather than copied out of it, and the check is syntactic rather than an
+  index of known digests, since building that index would assemble the thing it exists to control.
+- The two procedure skills are no longer maintained as separate local copies. `session-close` and
+  `redaction-gate` were real directories in the maintainer's skills folder, diverging from the
+  published versions; both are now symlinks like the other seven, so this repo is the single source
+  for all nine. The `redaction-gate` defect above was found by diffing those copies while retiring
+  them, which is the only reason it surfaced.
+- `session-close` now names `CLAUDE.md` as the place a tree should say where its standing-files list
+  lives. The generic instruction told the reader to substitute their own list and never said where
+  the list should be recorded, which left the pointer nowhere once the tree-specific copy was gone.
 
 - Published. The repository was deleted and recreated to clear AI attribution trailers from three
   commits, since force-pushed commits stay reachable on GitHub by SHA. Three enforcement layers now
@@ -58,6 +77,11 @@ Two skill families are specced and not yet built:
 - No test suite in this repo. An eval harness covering `document-standards` exists in the
   maintainer's own tree and is not ready to ship here. Skills are otherwise validated by use and
   review.
+- No drift detection for this repo's own documents. A checker exists in the maintainer's tree that
+  records a source path and a content hash next to a claim and rehashes on demand, reporting whether
+  a claim's source is current, moved, changed, or gone. It is deterministic, costs no tokens, and is
+  not ready to ship here. The full-repo audit that found six inaccuracies below is the kind of pass
+  it is meant to make unnecessary.
 - No versioning scheme across the skill set. Individual skills carry their own `CHANGELOG.md`.
 - Skill interfaces still change without deprecation notice.
 

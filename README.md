@@ -61,7 +61,7 @@ Two block (a forbidden character in generated content, and a packing command wit
 
 ### `scripts/`
 
-`link-skills.sh` symlinks `skills/` into your Claude skills directory instead of copying, so `git pull` updates them in place.
+`link-skills.sh` symlinks `skills/` into your Claude skills directory instead of copying, so `git pull` updates them in place. Targets are relative where `ln -r` exists, so the links survive the tree being moved, and absolute otherwise; the script reports which it used.
 
 `reflow-md.py` unwraps hard-wrapped Markdown paragraphs to one line each. Markdown collapses single newlines, so a hard wrap changes nothing about how a document renders; what it does change is that the author's column width gets baked into the file and every reader inherits it. Fenced code, tables, front matter, headings, blockquotes, and list indentation are left alone. Use `--check` for a dry run. `--selftest` runs the bundled fixture in `reflow-md.test.md` against `reflow-md.expected.md` and exits nonzero on failure; run it after any change to the script.
 

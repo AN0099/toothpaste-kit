@@ -11,6 +11,10 @@
 #
 # Re-runnable. Existing symlinks are replaced. A real directory of the same name
 # is left alone and reported, so a hand-edited local skill is never clobbered.
+#
+# Link targets are relative where the system supports it, so the links keep
+# working if the tree is moved. GNU coreutils has `ln -r`; BSD and macOS do not,
+# and there the targets are absolute. The script says which it used.
 
 set -eu
 
@@ -24,6 +28,16 @@ if [ ! -d "$src" ]; then
 fi
 
 mkdir -p "$dest"
+
+# Probe once for relative-symlink support rather than assuming a coreutils flag.
+probe="$dest/.link-skills-probe"
+rm -f "$probe"
+if ln -sr "$src" "$probe" 2>/dev/null; then
+    relative=yes
+else
+    relative=no
+fi
+rm -f "$probe"
 
 linked=0
 skipped=0
@@ -39,13 +53,21 @@ for d in "$src"/*/; do
         continue
     fi
 
-    ln -sfn "${d%/}" "$target"
+    if [ "$relative" = yes ]; then
+        ln -sfnr "${d%/}" "$target"
+    else
+        ln -sfn "${d%/}" "$target"
+    fi
     echo "link  $name"
     linked=$((linked + 1))
 done
 
 echo
-echo "$linked linked, $skipped skipped, into $dest"
+if [ "$relative" = yes ]; then
+    echo "$linked linked (relative targets), $skipped skipped, into $dest"
+else
+    echo "$linked linked (absolute targets, ln -r unavailable), $skipped skipped, into $dest"
+fi
 
 if [ "$skipped" -gt 0 ]; then
     echo "Skipped entries are real directories. Move or delete them, then re-run."
