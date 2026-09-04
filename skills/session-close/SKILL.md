@@ -58,9 +58,11 @@ clean.
 
 ## Phase 2: Update the standing files
 
-Your tree should name, in one place, the files that must stay current. Check
-each one and state explicitly whether it needed a change, rather than silently
-skipping it. Substitute your own list here. The shape that has worked:
+Your tree should name, in one place, the files that must stay current, and
+`CLAUDE.md` is where to say which place that is, since it loads into every
+session. Check each one and state explicitly whether it needed a change, rather
+than silently skipping it. Substitute your own list here. The shape that has
+worked:
 
 - The manifest naming what is authoritative versus stale
 - The task or work queue
