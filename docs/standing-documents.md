@@ -1,8 +1,8 @@
 # Standing Documents
 
-`redaction-gate` and `session-close` both name files that are not in this repository. They belong to the knowledge tree the kit was built against. This document describes that structure and how each file works, so the pointers resolve to something a reader can copy rather than to a private layout they have to guess at.
+`redaction-gate` and `session-close` are procedures, and a procedure assumes somewhere to put its output. This document describes the document set those two assume: what each file is for, how the pieces work together, and the sensitivity scheme the redaction procedure depends on.
 
-What follows is the shape. None of the content of those files is here, and none of it is going to be.
+The structure and the mechanics are what is shared. The contents of any working instance of them are not, and will not be. That split is deliberate: how a thread log works is useful to anyone running one, while what is written in a particular thread log is nobody else's business.
 
 ## The organizing principle
 
@@ -20,13 +20,13 @@ Both layers are kept. The failure this prevents is a README that reads like a la
 |---|---|---|
 | `CLAUDE.md` | Instructions loaded into every session rooted in the tree. Conventions that must not be re-derived | Human-facing |
 | `index.md` | Manifest. What is authoritative, what is stale, what was added when. Read first in any session | Human-facing |
-| Operating handoff | Roster, standing conventions, adopted decisions, open items. The document a person or agent reads to take over | Provenance |
-| Work queue | Tasks with status and assignee. Machine-readable, so a session can tell queued work from finished work | Provenance |
-| Open threads | Loose ends raised mid-conversation that do not yet have a task. Each entry states what was flagged, why it matters, and current status | Provenance |
-| Resolved threads | Where an entry moves once it closes, carrying the resolution and its reasoning, not just a status flip | Provenance |
-| Per-project state | One per active project. Current state, what is built, what is not | Human-facing |
+| `lead-handoff.md` | Roster, standing conventions, adopted decisions, open items. The document a person or agent reads to take over | Provenance |
+| `task-queue.json` | Tasks with status and assignee. Machine-readable, so a session can tell queued work from finished work | Provenance |
+| `threads-flagged.md` | Loose ends raised mid-conversation that do not yet have a task. Each entry states what was flagged, why it matters, and current status | Provenance |
+| `threads-resolved.md` | Where an entry moves once it closes, carrying the resolution and its reasoning, not just a status flip | Provenance |
+| `project-state.md` | One per active project. Current state, what is built, what is not | Human-facing |
 | Procedures | One per recurring operation. How to run it, and the reasoning that is not recoverable from the command itself | Human-facing |
-| Postmortems | One per incident or near miss. Kept permanently | Provenance, tiered |
+| `postmortem-*.md` | One per incident or near miss. Kept permanently | Provenance, tiered |
 
 ## How they work together
 
@@ -40,11 +40,19 @@ Both layers are kept. The failure this prevents is a README that reads like a la
 
 ## Sensitivity tiering
 
-The tree the kit was built against sorts material into four tiers by audience, with physical isolation as the primary control rather than filesystem permissions. Two axes are tracked separately: who may read a thing, and whether a system may retain it at all.
+The scheme sorts material into four tiers by audience, with physical isolation as the primary control rather than filesystem permissions. Two axes are tracked separately: who may read a thing, and whether a system may retain it at all.
 
 The content-depth principle is what makes the tiers mean anything. The lower two tiers carry almost nothing sensitive regardless of how wide the audience is, because the concern there is optics rather than access. The third carries operational behavior with entities abstracted into categories. Only the fourth carries actual reasoning and real named entities.
 
 The consequence that matters for `redaction-gate`: moving a fact to a lower tier means stripping the reasoning, not only deleting the names. A paragraph with every proper noun removed can still be restricted content.
+
+## Why these filenames are here at all
+
+The names above are real. The contents are not, and that is not an oversight in one direction or the other.
+
+A filename either names a **role** or names a **subject**. A role name says what the file does for the system: a manifest, a work queue, a thread log. Every system organized this way has one, so the name discloses nothing except that you are organized. A subject name says what the file is about, and it is a fact about you before anyone opens it. An inventory of where credentials live, a ledger of who contributed what, a postmortem titled after the specific thing that went wrong: each of those leaks in the filename alone, and none of them appears here.
+
+The same test applies to anything else leaving a private tree. Publish role names freely; treat a subject name as content, and redact it as content.
 
 ## Adapting this
 
