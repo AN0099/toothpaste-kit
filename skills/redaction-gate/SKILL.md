@@ -71,9 +71,51 @@ self-narrating asides tend to arrive together with decision archaeology. Their
 presence is a signal that provenance material has leaked into a human-facing
 document.
 
+### Derived values
+
+A corpus match cannot see a value computed from restricted content rather than
+copied out of it. A documentation drift checker records a hash of a cited passage
+inside the document that cites it, so a document can carry a fingerprint of
+material its reader is not cleared for while containing none of that material's
+words. The Step 2 pass never flags it, because the hash matches no string in the
+corpus.
+
+Check syntactically instead. Block any citation comment in the candidate whose
+source path does not resolve inside the outbound set:
+
+```
+<!-- cite: src=<path>#<anchor> sha256=<digest> seen=<date> -->
+```
+
+A citation pointing outside what is being published references material the
+recipient is not receiving, and its digest was computed from that material.
+Strip it. The check needs no index of known digests, and assembling one would
+collect the very fingerprints it exists to control.
+
+Carry the general shape past this one case. A value derived from higher-tier
+content travels under the tier of what it came from, and the ones a gate can
+actually catch are those a regex recognizes by their own syntax.
+
 ## Step 4: Report and hand off the decision
 
 Produce a findings list: each hit, its tier, and a specific proposed redaction.
+
+**Propose a redaction only where the content is unnecessary.** Necessary and
+load-bearing content is never quietly removed or genericized, even when it is
+sensitive. Where a finding is load-bearing, halt and warn: state what it is, why
+it is sensitive, and what removing it would cost, then let the human decide.
+
+The failure this prevents is a gate reporting a clean result because it silently
+broke the thing it was checking. Genericizing an example, a path, or a procedure
+until a reader cannot act on it is a redaction on paper and a deletion in effect.
+If a document stops working without a passage, that passage is a decision for the
+human rather than a match for the gate to resolve.
+
+A worked case from the first real run: the pass genericized a repomix allow-list
+into placeholder directory names, which cost every adopter a working example and
+bought no security, since the directory names were not sensitive. A dated
+coverage statistic in the same file was correctly removed. Same file, same pass,
+and the difference was necessity rather than sensitivity.
 
 Do not perform the outward action. Do not describe the content as cleared.
 Confirmation authority for anything sensitive is shared with the human, not

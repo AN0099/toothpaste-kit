@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## v2.1
+
+Restored the Step 4 rule on load-bearing content, which was absent from the
+published copy while present in the maintainer's live copy and described in this
+file as though it shipped. The rule was lost during the pass that generalized the
+skill for publication: a dated internal statistic in the same region was
+correctly removed, and the rule went with it.
+
+The rule that went missing is the rule against removing load-bearing content, and
+its own worked example is a redaction pass over-applying. Adopters between v1 and
+v2.1 had a gate weaker than the one it documents. Recorded rather than quietly
+corrected, because a silent restore leaves no trace that the published and live
+copies can diverge at all.
+
+## v2
+
+Step 3 gained a derived-values check. A corpus pass matches strings, so it cannot
+see a value computed from restricted content rather than copied from it. The case
+that prompted it: a documentation drift checker records a hash of a cited passage
+inside the document that cites it, which puts a fingerprint of the cited material
+wherever the citing document goes while none of that material's words travel with
+it.
+
+The check is syntactic and blocks any citation comment whose source path does not
+resolve inside the outbound set. Building it the other way, as an index of known
+digests to match against, would assemble a collection of fingerprints of
+restricted material in an unprotected file. That is the same trap the run-time
+corpus derivation in Step 2 avoids, arriving by a different route.
+
 ## v1 (initial)
 
 Pre-publish redaction pass, run before content crosses a sensitivity boundary
