@@ -47,6 +47,61 @@ commit hash, so correcting it later rewrites history.
 
 One logical change per commit. Commit messages should say what changed and why. Keep generated output, index databases, and packed repository files out of the repo. `.gitignore` covers the known cases.
 
+**No tool attribution in commit messages or pull request bodies.** No
+`Co-Authored-By` line naming an AI, no session links, no generated-with footers.
+A commit message records what changed and why; which editor, model, or agent was
+in the loop is not part of that and is not something a reader can act on.
+
+Three layers enforce this, and only the third binds:
+
+1. If you use Claude Code, `.claude/settings.json` in this repo sets
+   `attribution` to empty and disables the session link. Nothing to remember.
+2. A `commit-msg` hook lives in `.githooks/`. Enable it once per clone:
+
+   ```
+   git config core.hooksPath .githooks
+   ```
+
+   Git does not transmit hooks on clone, so this is opt-in, and `--no-verify`
+   walks past it. Treat it as a fast local failure rather than a guarantee.
+3. The `commit-attribution` workflow scans every commit in a pull request and is
+   a required check on `main`. This one you cannot bypass, so a branch that
+   reaches review with a trailer in its history needs those messages rewritten
+   and the branch force-pushed.
+
+Human co-author trailers are fine and expected. The rule is about tools.
+
+## Hook rules
+
+`hooks/` holds `hookify` rules as examples. They are inert where they sit and do
+nothing until copied into a `.claude/` directory.
+
+A rule is one `.local.md` file: YAML frontmatter defining the match, then a
+Markdown body that is shown to the agent when it fires. The body is the part that
+matters. A rule that blocks without explaining why gets worked around or disabled,
+so the body should name what tripped, why the rule exists, and what to do instead.
+Several rules here cite the specific failure that motivated them for that reason.
+
+Adding one:
+
+- `action: block` stops the tool call. `action: warn` lets it through and adds a
+  notice. Reach for `warn` unless the thing being prevented is unrecoverable.
+  Most of the rules here warn, because reading sensitive material is normal work
+  and the thing worth catching is what happens afterward.
+- Match on command position, not bare substrings, for anything matching shell
+  commands. A rule that fires on a tool name inside a quoted heredoc makes writing
+  documentation about that tool impossible.
+- Give the rule a false-positive escape and say what it is. If a contributor
+  cannot get legitimate work past a rule, they will disable it, and a disabled
+  rule protects nothing.
+- Exempt by filename, not by weakening the pattern. Two rules here exempt files
+  that must quote the thing they forbid.
+- State the rule's limits in its own body. Every pattern-based rule has ways
+  around it. Saying so is what keeps it from being mistaken for a boundary.
+
+Test a rule against three cases before adding it: something that must trip it,
+something legitimate that must not, and the rule's own documentation.
+
 ## What does not belong here
 
 Operational and business material lives outside this repository entirely and is never committed to it. Anything that names a client, an internal process, or a person's private details is out of scope for this repo regardless of where you found it. If you cannot tell which side of that line something falls on, ask before pushing.

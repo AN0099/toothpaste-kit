@@ -2,15 +2,40 @@
 
 **[CURRENT WORK IN PROGRESS // PRE-ALPHA]**
 
-A skill library and agent relay protocol for working with Claude.
+A skill library and agent relay protocol for working with Claude. Tack, not centaurs.
 
 Maintained by Bridle Works.
+
+## Why this exists
+
+A centaur is one organism, and working with a capable agent is not that. It will
+not be until a human and a machine are literally fused. What you actually have is
+a rider and a horse: two wills, one of them in charge, joined by tack.
+
+The tack is the job. A rider does not think the horse forward. They apply pressure
+through equipment, the horse interprets it, and the result depends almost entirely
+on the quality of that equipment and on the hands holding the reins. When the tack
+is bad the rider ends up going where the horse chose to go, which is the failure
+this repository exists to prevent.
+
+Model capability improves without us and is somebody else's product. What is here
+is tack: the skills, protocols, and gates through which a person's intent reaches
+a capable system, and through which that system's state comes back legible. Every
+piece of it is judged on control fidelity rather than capability. Can you tell
+where you are going, correct early, and stop.
+
+One consequence worth stating plainly, because it shapes what gets accepted here:
+an interface is only an interface for people who can operate it. Reins you cannot
+feel are not reins.
 
 ## What is here
 
 ### `skills/`
 
-Seven skills that govern agent behavior.
+Nine skills, in two classes.
+
+Seven govern agent behavior continuously. An agent loads them on its own when the
+frontmatter `description` matches what it is doing.
 
 | Skill | Covers |
 |---|---|
@@ -21,6 +46,40 @@ Seven skills that govern agent behavior.
 | `skill-creation` | Naming, required structure, and checklists for adding a skill |
 | `skill-discovery` | Whether a recurring need is worth a skill, and finding one that already exists |
 | `commands` | Index for the seventeen-command vocabulary |
+
+Two are procedures a person invokes. Both set `disable-model-invocation`, so an
+agent cannot trigger them. That is the point in each case: a gate a model can
+invoke to satisfy itself is not a gate, and an agent should not decide that a
+session is over.
+
+| Skill | Runs |
+|---|---|
+| `redaction-gate` | Before content crosses a sensitivity boundary outward. Reports findings, hands the decision to a person |
+| `session-close` | At the end of a working session. Captures reasoning that exists nowhere on disk, then updates the standing documents |
+
+### `docs/`
+
+`docs/standing-documents.md` describes the document structure that
+`redaction-gate` and `session-close` assume: what each standing file does, how
+they work together, and the sensitivity tiering the redaction procedure depends
+on. Read it if either skill's pointers look like they lead nowhere.
+
+`docs/project-state.md` is where the kit itself stands.
+
+### `hooks/`
+
+Seven `hookify` rules, as examples rather than live configuration. Copy the ones
+you want into your own `.claude/` directory; they do nothing where they sit.
+
+Two block (a forbidden character in generated content, and a packing command
+without an allow-list). The rest warn on reads that pull sensitive material into
+context, so a later publish step knows the session is derived from it. They
+assume a tiered directory scheme; adapt the patterns before enabling them.
+
+### `scripts/`
+
+`link-skills.sh` symlinks `skills/` into your Claude skills directory instead of
+copying, so `git pull` updates them in place.
 
 ### `orchestration/`
 
@@ -43,7 +102,13 @@ Copy the directories under `skills/` into your Claude skills directory:
 cp -r skills/* ~/.claude/skills/
 ```
 
-Each skill is one `SKILL.md` plus an optional `references/`. They cross-reference each other by name, so copy all seven or expect broken pointers.
+Each skill is one `SKILL.md` and a `CHANGELOG.md`, plus an optional `references/`. They cross-reference each other by name, so copy all nine or expect broken pointers.
+
+To symlink instead of copy, so that a `git pull` updates them in place:
+
+```
+scripts/link-skills.sh
+```
 
 Skills load on their frontmatter `description`. Read `skills/skill-discovery/SKILL.md` for how that resolution works.
 

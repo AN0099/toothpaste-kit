@@ -7,7 +7,8 @@ Last updated 2026-09-03.
 
 ## Live
 
-Seven skills, all in daily use:
+Nine skills. Seven govern agent behavior and are in daily use; two are
+human-invoked procedures (`redaction-gate`, `session-close`) added 2026-09-03:
 
 `working-preferences`, `document-standards`, `technical-documents`, `surface-regimes`,
 `skill-creation`, `skill-discovery`, `commands`.

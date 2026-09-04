@@ -26,7 +26,7 @@ This is the missing piece under `document-standards`' Three-Tier Threshold Frame
 
 # Locating an Existing Skill
 
-Given the family's current size, seven skills, discovery works by reading frontmatter `description` fields directly rather than through a dedicated routing file. Each skill's `description` already states what it covers and what it explicitly doesn't, with a pointer to whichever sibling does instead. The descriptions collectively function as the index.
+Given the family's current size, nine skills, discovery works by reading frontmatter `description` fields directly rather than through a dedicated routing file. Each skill's `description` already states what it covers and what it explicitly doesn't, with a pointer to whichever sibling does instead. The descriptions collectively function as the index.
 
 Two failure modes worth checking for before concluding no skill covers something:
 

@@ -5,6 +5,43 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ## 2026-09-03
 
+### Added
+
+- `skills/redaction-gate/` and `skills/session-close/`, bringing the library to nine. Both set
+  `disable-model-invocation`, which makes them a different class from the other seven: procedures a
+  person invokes rather than behavior an agent loads on its own. `README.md` now separates the two
+  classes rather than listing nine rows under a heading that says the skills govern agent behavior.
+- `hooks/`, seven `hookify` rules as examples rather than live configuration. They sit inert where
+  they are and must be copied into a `.claude/` directory to do anything. Deliberately not placed in
+  this repo's `.claude/`, since several assume a tiered directory scheme this repository does not
+  have and would fire as false positives on contributors.
+- `scripts/link-skills.sh`, an alternative to the README's `cp -r`. Symlinking means a `git pull`
+  updates the installed skills instead of leaving a stale copy. Re-runnable, and it refuses to
+  replace a real directory so a hand-edited local skill is never clobbered.
+- `.github/workflows/commit-attribution.yml` and `.githooks/commit-msg`, rejecting AI attribution
+  trailers in commit messages. `CONTRIBUTING.md` documents all three enforcement layers and is
+  explicit that only the required status check binds: a client hook is opt-in per clone and
+  `--no-verify` walks past it.
+- `.claude/settings.json`, setting `attribution` to empty and disabling the session link, so Claude
+  Code adds no trailer to begin with.
+- `docs/standing-documents.md`. `redaction-gate` and `session-close` both reference files that are
+  not in this repository, and the pointers previously led nowhere for anyone else. This describes
+  the structure and how the pieces work, without any of their content: the two-layer split between
+  provenance and human-facing documents, the role each standing file plays, and the sensitivity
+  tiering the redaction procedure assumes.
+- A "Hook rules" section in `CONTRIBUTING.md` covering how to add one: block versus warn, matching
+  on command position rather than substrings, giving every rule a stated escape and stated limits,
+  and testing against a true positive, a false positive, and the rule's own documentation.
+- A "Why this exists" section in `README.md` and an "Operable by more than one kind of person"
+  section in `philosophy.md`.
+
+### Changed
+
+- Skill count corrected from seven to nine in `README.md`, `docs/project-state.md`, and
+  `skills/skill-discovery/SKILL.md`. The last is the one that mattered: it argues that discovery
+  works without a routing file *given the family's current size*, so the number is load-bearing
+  rather than decorative.
+
 ### Fixed
 
 - `skills/commands/SKILL.md` described a routing mechanism that never existed. It sent readers to
