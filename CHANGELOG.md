@@ -3,6 +3,45 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
+## 2026-09-04
+
+### Added
+
+- `scripts/reflow-md.py`, which unwraps hard-wrapped Markdown paragraphs to one line each. Markdown
+  collapses single newlines, so a hard wrap changes nothing about how a document renders; what it
+  changes is that the author's column width gets baked into the file and every reader inherits it,
+  at 200% zoom, in a narrow split, or through a screen reader. Fenced code, front matter, tables,
+  blockquotes, headings, and list indentation are left alone. `--check` is a dry run. Every rewrite
+  verifies that the whitespace-normalized token stream is unchanged before writing, and a file that
+  fails is left untouched.
+- `scripts/reflow-md.test.md` and `scripts/reflow-md.expected.md`, run by `--selftest`, which also
+  checks idempotence. The fixture earned its place immediately: it caught two bugs that the token
+  check could not see, because that check normalizes whitespace. A nested list item was losing its
+  indentation, which promotes it to top level, and a hard break was losing the two trailing spaces
+  that create it. Both changed the rendered document while preserving every word.
+- A "Why these filenames are here at all" section in `docs/standing-documents.md`. A filename either
+  names a role or names a subject. A role name says what the file does for the system and every tree
+  organized this way has one, so publishing it discloses nothing. A subject name is a fact about you
+  before anyone reads a word, and gets treated as content.
+
+### Changed
+
+- `README.md`'s framing section rewritten. It now defines the centaur and reverse-centaur terms
+  rather than assuming them, and rests the argument on determinism: the analogy was built for
+  systems where the same input gives the same output, and a non-deterministic system has something
+  it has no slot for. The accessibility consequence is stated as fitment rather than accommodation,
+  since tack already varies by rider and horse and nobody calls a different bit an accommodation.
+  The intro line dropped a slogan that only parsed after reading the section it summarized.
+- `README.md`, `CONTRIBUTING.md`, and `docs/standing-documents.md` reflowed to one line per
+  paragraph, matching the nine other prose files in the repo that were already soft-wrapped. The
+  three had been the outliers. `CHANGELOG.md` and `docs/project-state.md` are left wrapped.
+- `docs/standing-documents.md` opening reframed. It previously read as an apology for pointers that
+  led nowhere, which stopped being true once the structure became something deliberately shared. Six
+  table rows now carry real filenames instead of generic role descriptions.
+- `skills/session-close/` to v2. Phase 1 item 6 gained two named cases, and the phase now says a
+  reference sweep has to drive its own directory walk rather than trusting a recursive grep that may
+  honor ignore files and report clean.
+
 ## 2026-09-03
 
 ### Added

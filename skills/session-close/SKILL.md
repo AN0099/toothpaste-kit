@@ -38,12 +38,23 @@ Read back over the session and ask, explicitly and separately for each category:
 5. **Open questions.** Anything raised and not resolved. These belong in
    `threads-flagged.md`, not in a summary that disappears.
 6. **Superseded material.** Anything on disk that this session made stale.
+   Two cases are easy to miss. A file that **moved between sensitivity tiers**
+   leaves its old path behind in every document that referenced it, and a
+   sentence describing what is in that file is content wherever it sits, not only
+   where the file now lives. A document whose **framing was overtaken** still
+   reads correctly line by line while arguing a position the session has since
+   changed; its opening paragraph is usually where this shows.
 
 For each item found, decide its layer before writing it. Provenance material
 (reasoning, decision archaeology, session residue) goes to
 `agents/claude/context/` or the appropriate sensitivity tier. Human-facing
 material (README, CONTRIBUTING, project state, skill files) goes to the repo,
 lean and without archaeology. Never mix the two in one file.
+
+When a sweep in this phase means searching for references by name, drive the walk
+yourself as phase 3 does. A bare recursive grep may honor ignore files, which
+excludes exactly the trees a tier-move sweep most needs to reach, and returns
+clean.
 
 ## Phase 2: Update the standing files
 

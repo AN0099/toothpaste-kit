@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2
+
+Phase 1 item 6 gained two named cases, both found by missing them. A file moved between sensitivity tiers leaves stale paths in every document that referenced it, and a description of its contents is content wherever that description sits. A document whose framing was overtaken still reads correctly sentence by sentence while arguing a superseded position.
+
+Also added: a sweep for references by name has to drive its own directory walk. A recursive grep that honors ignore files will skip the tier tree and report clean, which is the failure mode where a check looks like coverage.
+
 ## v1 (initial)
 
 End-of-session capture. Sweeps a session for reasoning, decisions, near misses,
