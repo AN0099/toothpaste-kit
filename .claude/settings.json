@@ -2,6 +2,7 @@
   "attribution": {
     "commit": "",
     "pr": "",
-    "sessionUrl": false
+    "sessionUrl": false,
+    "commitTrailers": false
   }
 }
