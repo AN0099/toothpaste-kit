@@ -2,7 +2,9 @@
 
 **[CURRENT WORK IN PROGRESS // PRE-ALPHA]**
 
-A skill library and agent relay protocol for working with Claude. Judged on control fidelity: legible state, cheap correction, a reliable halt.
+A skill library and agent relay protocol for working with Claude.
+
+Judged on control fidelity: legible state, cheap correction, a reliable halt.
 
 Maintained by Bridle Works.
 
