@@ -3,15 +3,21 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-09-03.
+Last updated 2026-09-04.
 
 ## Live
 
-Nine skills. Seven govern agent behavior and are in daily use; two are
-human-invoked procedures (`redaction-gate`, `session-close`) added 2026-09-03:
+Nine skills in two classes.
 
-`working-preferences`, `document-standards`, `technical-documents`, `surface-regimes`,
-`skill-creation`, `skill-discovery`, `commands`.
+Seven govern agent behavior and are in daily use: `working-preferences`, `document-standards`,
+`technical-documents`, `surface-regimes`, `skill-creation`, `skill-discovery`, `commands`.
+
+Two are human-invoked procedures, added 2026-09-03: `redaction-gate` and `session-close`. Both set
+`disable-model-invocation`, which is the point in each case. A gate a model can invoke to satisfy
+itself is not a gate, and an agent should not decide a session is over.
+
+`hooks/` carries seven `hookify` rule examples, inert where they sit. `scripts/` carries
+`link-skills.sh` and `reflow-md.py`, the latter with a fixture and `--selftest`.
 
 The orchestration protocol has run relay traffic across Claude, local models, and several vendor
 surfaces. Message schemas and the role taxonomy are stable enough to build against.
@@ -25,6 +31,16 @@ Two skill families are specced and not yet built:
 - **content-pipeline**: note-mining, public-writing register, and publishing workflow.
 
 ## Recent changes
+
+- Published. The repository was deleted and recreated to clear AI attribution trailers from three
+  commits, since force-pushed commits stay reachable on GitHub by SHA. Three enforcement layers now
+  cover it, and only the third binds: `.claude/settings.json` suppressing the trailers at source, an
+  opt-in `commit-msg` hook, and a `commit-attribution` status check that must be set as required in
+  a ruleset on the default branch. See `CONTRIBUTING.md`.
+- `docs/standing-documents.md` added, describing the document set `redaction-gate` and
+  `session-close` assume. Structure and mechanics are shared; contents are not.
+- `README.md`'s framing section rewritten around determinism rather than around fusion being
+  impossible, and the accessibility consequence stated as fitment rather than accommodation.
 
 - A full-repo audit found six inaccuracies and fixed them. The largest: `commands` routed to
   sixteen per-command files that never existed in any commit. `README.md` still pointed at the
