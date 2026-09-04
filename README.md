@@ -2,31 +2,25 @@
 
 **[CURRENT WORK IN PROGRESS // PRE-ALPHA]**
 
-A skill library and agent relay protocol for working with Claude. Tack, not centaurs.
+A skill library and agent relay protocol for working with Claude. Judged on control fidelity: legible state, cheap correction, a reliable halt.
 
 Maintained by Bridle Works.
 
 ## Why this exists
 
-A centaur is one organism, and working with a capable agent is not that. It will
-not be until a human and a machine are literally fused. What you actually have is
-a rider and a horse: two wills, one of them in charge, joined by tack.
+The "centaur" analogy of automation theory imagines a human-machine collaboration where a person uses technology as a powerful, tireless assistant to execute tasks while retaining ultimate control over judgment and decision-making: a human orchestrator directing an automated agent, each unable to complete the work without the other. The reverse-centaur inverts the roles. An automated orchestrator directs a human agent, the person in the loop only because the machine has no fleshy appendages of its own to do the work.
 
-The tack is the job. A rider does not think the horse forward. They apply pressure
-through equipment, the horse interprets it, and the result depends almost entirely
-on the quality of that equipment and on the hands holding the reins. When the tack
-is bad the rider ends up going where the horse chose to go, which is the failure
-this repository exists to prevent.
+The analogy holds best with deterministic automated systems, computers and machines where the same input produces the same output every time and 1 + 1 is always 2. Such systems have no will of their own to negotiate with. Applied to a non-deterministic system the centaur gets portrayed as one organism, and it will not be one until human and machine are literally fused. More accurately, what you have is a rider and a horse: two wills, one of them in charge, joined by riding tack.
 
-Model capability improves without us and is somebody else's product. What is here
-is tack: the skills, protocols, and gates through which a person's intent reaches
-a capable system, and through which that system's state comes back legible. Every
-piece of it is judged on control fidelity rather than capability. Can you tell
-where you are going, correct early, and stop.
+The tack is the interface. A rider does not think the horse forward. They apply pressure through equipment, the horse interprets it, and the result depends almost entirely on the quality of that equipment and the operator's skill. The horse acts non-deterministically, and retraining it is not on the table, so tack and skill are the only levers left for improving how reliably it does what was asked. When the tack is bad, even a skilled rider ends up going where the horse chose to go, which is the failure this repository exists to prevent.
 
-One consequence worth stating plainly, because it shapes what gets accepted here:
-an interface is only an interface for people who can operate it. Reins you cannot
-feel are not reins.
+Model capability improves or degrades without us and is somebody else's product. What is here is tack: the skills, protocols, and gates through which a person's intent reaches a capable system, and through which that system's state comes back legible. Every piece of it is judged on control fidelity rather than capability: can you tell where you are going, correct early, and stop.
+
+One consequence shapes what gets accepted here. An interface is only an interface for the people who can operate it. Reins you cannot feel are not reins.
+
+This is not a separate concern bolted onto the design. Tack already comes in many forms because riders and horses vary, and nobody treats a different bit or a different saddle as an accommodation; it is the same equipment fitted to the hands actually holding it. An interface that assumes one input method, one output channel, or one kind of attention has not been fitted to anyone. It has been fitted to an average that does not exist.
+
+The practical result is the one every curb cut demonstrates. Fitting the interface to the widest range of operators produces something better for all of them.
 
 ## What is here
 
@@ -34,8 +28,7 @@ feel are not reins.
 
 Nine skills, in two classes.
 
-Seven govern agent behavior continuously. An agent loads them on its own when the
-frontmatter `description` matches what it is doing.
+Seven govern agent behavior continuously. An agent loads them on its own when the frontmatter `description` matches what it is doing.
 
 | Skill | Covers |
 |---|---|
@@ -47,10 +40,7 @@ frontmatter `description` matches what it is doing.
 | `skill-discovery` | Whether a recurring need is worth a skill, and finding one that already exists |
 | `commands` | Index for the seventeen-command vocabulary |
 
-Two are procedures a person invokes. Both set `disable-model-invocation`, so an
-agent cannot trigger them. That is the point in each case: a gate a model can
-invoke to satisfy itself is not a gate, and an agent should not decide that a
-session is over.
+Two are procedures a person invokes. Both set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide that a session is over.
 
 | Skill | Runs |
 |---|---|
@@ -59,27 +49,19 @@ session is over.
 
 ### `docs/`
 
-`docs/standing-documents.md` describes the document structure that
-`redaction-gate` and `session-close` assume: what each standing file does, how
-they work together, and the sensitivity tiering the redaction procedure depends
-on. Read it if either skill's pointers look like they lead nowhere.
+`docs/standing-documents.md` describes the document structure that `redaction-gate` and `session-close` assume: what each standing file does, how they work together, and the sensitivity tiering the redaction procedure depends on. Read it if either skill's pointers look like they lead nowhere.
 
 `docs/project-state.md` is where the kit itself stands.
 
 ### `hooks/`
 
-Seven `hookify` rules, as examples rather than live configuration. Copy the ones
-you want into your own `.claude/` directory; they do nothing where they sit.
+Seven `hookify` rules, as examples rather than live configuration. Copy the ones you want into your own `.claude/` directory; they do nothing where they sit.
 
-Two block (a forbidden character in generated content, and a packing command
-without an allow-list). The rest warn on reads that pull sensitive material into
-context, so a later publish step knows the session is derived from it. They
-assume a tiered directory scheme; adapt the patterns before enabling them.
+Two block (a forbidden character in generated content, and a packing command without an allow-list). The rest warn on reads that pull sensitive material into context, so a later publish step knows the session is derived from it. They assume a tiered directory scheme; adapt the patterns before enabling them.
 
 ### `scripts/`
 
-`link-skills.sh` symlinks `skills/` into your Claude skills directory instead of
-copying, so `git pull` updates them in place.
+`link-skills.sh` symlinks `skills/` into your Claude skills directory instead of copying, so `git pull` updates them in place.
 
 ### `orchestration/`
 
@@ -131,9 +113,7 @@ git ls-files | wc -l
 grep -c '<file path=' repomix-output.xml
 ```
 
-The output is gitignored on purpose. It is a near-complete copy of the repository, so committing it
-roughly doubles clone size and produces a full-file diff on every change, and it goes stale
-silently. `repomix --remote` builds one straight from the GitHub URL without a clone.
+The output is gitignored on purpose. It is a near-complete copy of the repository, so committing it roughly doubles clone size and produces a full-file diff on every change, and it goes stale silently. `repomix --remote` builds one straight from the GitHub URL without a clone.
 
 ## Status
 
