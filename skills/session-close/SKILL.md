@@ -85,6 +85,26 @@ grep -rlP '\x{2014}' --include='*.md' . | grep -v -e em-dash -e banned-words
 Any file listed is a violation of the standing dash convention and must be fixed
 before close. The two excluded filenames quote the character deliberately.
 
+**That command covers one of the two characters the convention bans.** Run the
+second one too, and read its result differently:
+
+```
+find . -name '*.md' -not -name '*em-dash*' -not -name '*banned-words*' \
+  -exec grep -lP '\x{2013}' {} +
+```
+
+The first command is a gate: an em dash is a violation wherever it appears. The
+second is a review prompt: an en dash is a violation when it separates clauses and
+correct when it joins a range, and **no pattern tested here separates those two
+uses**. A rule flagging en dashes outside digit pairs was measured against this
+tree and flagged `Mar 15 - Aug 30` and `Apr-Jun 2026`, which are ranges, so it
+would have taught its reader to dismiss it.
+
+So report the count and look at the hits. Do not gate on them, and do not report
+zero en dashes when the check was never run, which is what this skill did until
+2026-09-04. A check that silently covers half its rule is the failure this phase
+warns about two paragraphs above, and it was in this file.
+
 **Verify the sweep before trusting a clean result.** A search that returns
 nothing is indistinguishable from a search that is silently broken, which is the
 failure mode where a check "looks like coverage" and is worse than no check.

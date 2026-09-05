@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## v3
+
+Phase 3's dash sweep covered the em dash only, while the convention it enforces
+bans an em dash and any punctuation substituting for the same grammatical
+function. Measured on the maintainer's tree 2026-09-04: 100 files carried an em
+dash and the check found them, 73 carried an en dash and the check reported clean
+on every one. The skill that warns about a check looking like coverage contained
+one.
+
+The fix is a second command reported as a review prompt rather than a gate.
+**Alternative considered and rejected:** widening the pattern to flag en dashes
+outside digit pairs. Measured before adopting, and it flagged `Mar 15 - Aug 30`
+and `Apr-Jun 2026` across 54 files. Those are ranges. A gate that is mostly false
+positives gets ignored inside a week, which is the standing finding from the
+register-metric work. Ranges and separators were not mechanically separable here,
+so the human reads the hits.
+
 ## v2
 
 Phase 1 item 6 gained two named cases, both found by missing them. A file moved between sensitivity tiers leaves stale paths in every document that referenced it, and a description of its contents is content wherever that description sits. A document whose framing was overtaken still reads correctly sentence by sentence while arguing a superseded position.
