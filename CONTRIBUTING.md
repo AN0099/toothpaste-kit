@@ -54,7 +54,7 @@ Three layers enforce this, and only the third binds:
    ```
 
    Git does not transmit hooks on clone, so this is opt-in, and `--no-verify` walks past it. Treat it as a fast local failure rather than a guarantee.
-3. The `commit-attribution` workflow scans every commit in a pull request and is a required check on `main`. This one you cannot bypass, so a branch that reaches review with a trailer in its history needs those messages rewritten and the branch force-pushed.
+3. The `commit-attribution` workflow scans every commit in a pull request. It is the layer that binds, provided the maintainer has set it as a required status check in the ruleset on `main`. Without that setting it reports a failure and blocks nothing. Where it is required, a branch that reaches review with a trailer in its history needs those messages rewritten and the branch force-pushed.
 
 Human co-author trailers are fine and expected. The rule is about tools.
 

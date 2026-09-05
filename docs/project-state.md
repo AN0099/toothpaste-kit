@@ -52,10 +52,12 @@ Two skill families are specced and not yet built:
   the list should be recorded, which left the pointer nowhere once the tree-specific copy was gone.
 
 - Published. The repository was deleted and recreated to clear AI attribution trailers from three
-  commits, since force-pushed commits stay reachable on GitHub by SHA. Three enforcement layers now
-  cover it, and only the third binds: `.claude/settings.json` suppressing the trailers at source, an
-  opt-in `commit-msg` hook, and a `commit-attribution` status check that must be set as required in
-  a ruleset on the default branch. See `CONTRIBUTING.md`.
+  commits, since force-pushed commits stay reachable on GitHub by SHA. Three enforcement layers are
+  built: `.claude/settings.json` suppressing the trailers at source, an opt-in `commit-msg` hook,
+  and a `commit-attribution` workflow. The first two are bypassable by anyone who has not opted in.
+  The third binds only while it is set as a required status check in a ruleset on the default
+  branch. Whether that ruleset is configured on this repository is unverified as of 2026-09-04.
+  See `CONTRIBUTING.md`.
 - `docs/standing-documents.md` added, describing the document set `redaction-gate` and
   `session-close` assume. Structure and mechanics are shared; contents are not.
 - `README.md`'s framing section rewritten around determinism rather than around fusion being
