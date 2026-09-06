@@ -133,6 +133,14 @@ entire clearance for persisting Restricted content, so a single edited line
 relocates every future write outside the tier controls, silently and with no
 error. See `system/agent-memory-procedure.md`.
 
+**That command reads a declaration, not the running server.** A memory server
+registered outside this file, at user scope or anywhere else the harness accepts
+one, keeps running while the grep goes on passing against a config that no longer
+governs it. This is the same shape as the half-covered dash sweep earlier in this
+phase: the command still succeeds, and its success has stopped meaning anything.
+If the store was ever moved out of `.mcp.json`, query the live server instead and
+correct this line, rather than reading the file that is easy to reach.
+
 Then read the store itself, not just its size. Aggregation is what a per-write
 check cannot see: individually ordinary observations can reconstruct reasoning
 that no single one states.
@@ -151,3 +159,19 @@ method. The human makes the close call.
 
 State plainly anything you could not complete and why, rather than leaving it
 implied by omission.
+
+# Scope Pointer
+
+- `session-log`: the cheap mid-session counterpart, for the compaction boundary. It captures
+  reasoning and touches nothing else, so a log written there does not discharge this procedure.
+- `daily-dashboard`: the other half of this loop, run at the start of a session
+  rather than the end. It reads back what this procedure writes and checks it
+  against the working trees instead of trusting it. Anything it finds unrecorded
+  belongs to this skill, not that one.
+- `redaction-gate`: the pre-publish check phase 3 defers to. This procedure
+  decides whether that gate still needs to run; it does not perform the check.
+- `document-standards`: governs the prose of anything phases 1 and 2 write to
+  disk. It does not govern this procedure's own closing report, which is chat
+  output rather than a generated document.
+- `working-preferences`: source of truth for the standing conventions that phase
+  1 item 4 asks you to test the session's unwritten rules against.

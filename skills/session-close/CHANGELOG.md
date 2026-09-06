@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## v4
+
+Two additions, both found by shipping `daily-dashboard` and running this repo's
+own integration checklist against the result.
+
+**A closing cross-reference section, which this file never had.** `skill-creation`
+names it required and last in every `SKILL.md`. This skill shipped without one
+through v3 and nobody noticed, because nothing checks. The immediate reason to add
+it now is that `daily-dashboard` is the other half of this procedure's loop, and a
+skill that does not name its counterpart leaves a reader no way to find out that
+what it writes is meant to be read back. The section also names `session-log`,
+shipped the same day, whose whole risk is being mistaken for a cheaper version of
+this procedure. Three other skills in the repo are still
+missing the same section; that is logged as an open thread rather than fixed here,
+since each one needs its own boundaries stated rather than a template pasted in.
+
+**A caveat on phase 3's memory containment check.** The check greps
+`MEMORY_FILE_PATH` out of `.mcp.json` and confirms the path lands inside the
+restricted tier. It reads a declaration, not the running server. A memory server
+registered anywhere else the harness accepts one keeps running while this grep
+passes against a config that no longer governs it, and the result is a check that
+succeeds without meaning anything.
+
+That is the same defect v3 fixed one section earlier in the same phase, in a
+different disguise, which is the argument for writing it down rather than trusting
+that the lesson generalized. The fix here is a caveat rather than a new command,
+because the correct command depends on where the server was moved to, and a
+specific one guessed now would be the third version of this same mistake.
+
 ## v3
 
 Phase 3's dash sweep covered the em dash only, while the convention it enforces

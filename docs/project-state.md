@@ -3,25 +3,30 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-09-04.
+Last updated 2026-09-05.
 
 ## Live
 
-Nine skills in two classes.
+Eleven skills in two classes.
 
 Seven govern agent behavior and are in daily use: `working-preferences`, `document-standards`,
 `technical-documents`, `surface-regimes`, `skill-creation`, `skill-discovery`, `commands`.
 
-Two are human-invoked procedures, added 2026-09-03: `redaction-gate` and `session-close`. Both set
-`disable-model-invocation`, which is the point in each case. A gate a model can invoke to satisfy
-itself is not a gate, and an agent should not decide a session is over.
+Four are human-invoked procedures: `redaction-gate` and `session-close`, added 2026-09-03, and
+`daily-dashboard` and `session-log`, added 2026-09-05. All four set `disable-model-invocation`, which is the point in
+each case. A gate a model can invoke to satisfy itself is not a gate, and an agent should not decide
+on its own that a session is over or that a working day has started.
 
 `hooks/` carries seven `hookify` rule examples, inert where they sit. `scripts/` carries
 `link-skills.sh` and `reflow-md.py`, the latter with a fixture and `--selftest`. `link-skills.sh`
 writes relative symlink targets where `ln -r` exists, so the links survive the tree being moved.
 
 The orchestration protocol has run relay traffic across Claude, local models, and several vendor
-surfaces. Message schemas and the role taxonomy are stable enough to build against.
+surfaces. The message schema was inverted on 2026-09-05 so that a seven-field capability profile is
+required and normative and a product name is a label resolved through `orchestration/registry/`.
+Existing relay traffic stays wire-valid, since the eight Anthropic surface strings are unchanged and
+became the seed entries of `registry/anthropic.json`. Build against `capability` rather than against
+`surface`.
 
 ## In progress
 
@@ -32,6 +37,25 @@ Two skill families are specced and not yet built:
 - **content-pipeline**: note-mining, public-writing register, and publishing workflow.
 
 ## Recent changes
+
+- The orchestration event schema now requires a `capability` profile and the `regime` derived from
+  it, and treats `surface` as an optional namespaced string resolved against a new `registry/`
+  directory. Human agents carry `kind` and a `role` of `relay` or `participant`, which retires the
+  two human members of the old surface enum and with them the meaningless combination `kind: llm`
+  with `surface: human-relay`. Every registry entry carries `confidence`, `verified_on`, and
+  `sources`, so a capability claim about a product that ships weekly has its own expiry date.
+  `anthropic.json` holds eight surfaces; `openai.json`, `google.json`, and `local.json` are empty and
+  are the intended first-contribution surface. Reasoning in `orchestration/CHANGELOG.md`.
+- `surface-regimes` went to v3, deriving regime from the capability profile and re-keying its
+  activation table from seven product-name rows to three regime rows. No activation decision changed
+  for any of the seven original rows. The Failure-Mode Note carried forward verbatim.
+- `orchestration/ingestion/` lost a duplicate. `VENDOR-AGNOSTIC-DIGEST-SPEC-UPGRADE.md` was a strict
+  superset of its base file and was folded into it, which also picked up a typo fix and a run-on
+  that had swallowed a heading.
+- Five repository documents are drafted and **uncommitted**: `SECURITY.md`, `CODE_OF_CONDUCT.md`,
+  `CITATION.cff`, `.github/ISSUE_TEMPLATE/` (four files), and a `README.md` Contributing section.
+  The code of conduct carries a deliberate placeholder for its reporting contact. See
+  `.agents/claude/threads-flagged.md`.
 
 - `redaction-gate` went to v2.1, carrying a fix and a feature. The fix restores a Step 4 rule that
   was present in the maintainer's working copy and described in the CHANGELOG while being absent
@@ -78,16 +102,28 @@ Two skill families are specced and not yet built:
 
 - No test suite in this repo. An eval harness covering `document-standards` exists in the
   maintainer's own tree and is not ready to ship here. Skills are otherwise validated by use and
-  review.
+  review. A six-gate CI workflow is specced and verified against the tree but not installed; it
+  would close the more embarrassing half of this gap, which is that `CONTRIBUTING.md` documents two
+  mechanical checks and nothing enforces either. See
+  `.agents/claude/context/design-note-ci-gates.md`.
 - No drift detection for this repo's own documents. A checker exists in the maintainer's tree that
   records a source path and a content hash next to a claim and rehashes on demand, reporting whether
   a claim's source is current, moved, changed, or gone. It is deterministic, costs no tokens, and is
   not ready to ship here. The full-repo audit that found six inaccuracies below is the kind of pass
   it is meant to make unnecessary.
-- No versioning scheme across the skill set. Individual skills carry their own `CHANGELOG.md`.
+- No versioning scheme across the skill set. Individual skills carry their own `CHANGELOG.md`. This
+  now blocks two other things: an OpenSSF Best Practices Badge, which requires unique version
+  numbering and per-release notes, and a Zenodo DOI, which needs a tagged release. `CITATION.cff`
+  ships with `version` and `date-released` commented out for the same reason.
 - Skill interfaces still change without deprecation notice.
 
 ## Open questions
+
+- Whether `orchestration/registry/` stays JSON or moves to YAML. It was authored as JSON for
+  consistency with `schemas/`, without weighing that against the declarative-configuration
+  conventions the target audience works in. Needs dev-2.
+- Which entity holds the copyright. The committed `LICENSE` names Bridle Works and the working tree
+  names an individual; the change predates the 2026-09-05 session.
 
 - Whether `commands` should split, since the seventeen-command vocabulary has grown informal
   extensions that were never audited against the original set.
