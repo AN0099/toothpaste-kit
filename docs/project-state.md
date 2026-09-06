@@ -122,8 +122,13 @@ Two skill families are specced and not yet built:
 - Whether `orchestration/registry/` stays JSON or moves to YAML. It was authored as JSON for
   consistency with `schemas/`, without weighing that against the declarative-configuration
   conventions the target audience works in. Needs dev-2.
-- Which entity holds the copyright. The committed `LICENSE` names Bridle Works and the working tree
-  names an individual; the change predates the 2026-09-05 session.
+- ~~Which entity holds the copyright.~~ Resolved 2026-09-05. Bridle Works is the name of this
+  project and is not a formed entity, so it cannot hold a copyright. Copyright rests with the
+  individual authors, currently one person, and `LICENSE` names that person. `README.md` and
+  `CONTRIBUTING.md` were corrected on 2026-09-06 for the same reason, having claimed the kit was
+  maintained by an entity that does not exist. Forming Bridle Works later and moving the copyright
+  to it would require a written assignment from every individual holder, which is a formality today
+  and a collection problem once outside contributors land.
 
 - Whether `commands` should split, since the seventeen-command vocabulary has grown informal
   extensions that were never audited against the original set.
