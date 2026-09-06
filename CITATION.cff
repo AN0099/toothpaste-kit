@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+title: toothpaste-kit
+message: If you use this project or its orchestration protocol in your work, please cite it.
+type: software
+abstract: >-
+  A skill library and agent relay protocol for working with large language model
+  agents, judged on control fidelity: legible state, cheap correction, a reliable
+  halt. Includes a vendor-independent capability taxonomy, a message schema for
+  relaying work between agents and humans across surfaces, and a routing rule that
+  gates dispatch on content sensitivity.
+authors:
+  - family-names: Naveja
+    given-names: Aidan
+repository-code: https://github.com/AN0099/toothpaste-kit
+url: https://github.com/AN0099/toothpaste-kit
+license: MIT
+keywords:
+  - large-language-models
+  - agent-orchestration
+  - human-in-the-loop
+  - provenance
+  - research-software
+  - accessibility
+
+# version and date-released are deliberately absent. This project has no version
+# numbering scheme yet (see docs/project-state.md) and has cut no release. Add both,
+# plus an identifiers block carrying the Zenodo DOI, at the first tagged release:
+#
+# version: 0.1.0
+# date-released: YYYY-MM-DD
+# identifiers:
+#   - type: doi
+#     value: 10.5281/zenodo.XXXXXXX
+#     description: Concept DOI for all versions

@@ -1,0 +1,33 @@
+name: Finding or disagreement
+description: Something looks wrong, inconsistent, or wrongly decided, and you want it raised rather than quietly fixed.
+labels: ["finding"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        `CONTRIBUTING.md` asks that findings be raised instead of quietly resolved, because a
+        unilateral fix hides the disagreement that prompted it. This form is that channel. Design
+        disagreements are in scope, not only errors.
+
+  - type: textarea
+    id: finding
+    attributes:
+      label: What you found
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: What breaks, misleads, or costs someone time if it stays as it is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternative
+    attributes:
+      label: What you would do instead
+      description: Optional. A finding without a proposed fix is still worth filing.
+    validations:
+      required: false

@@ -1,0 +1,41 @@
+name: Defect
+description: Something in a skill, the protocol, a schema, or a script does not do what it says.
+labels: ["defect"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If the defect is a control that fails open, a leak, or a destructive script path, close this
+        and use private vulnerability reporting instead. `SECURITY.md` says which is which.
+
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: The file, and the section or line if you have it.
+      placeholder: skills/redaction-gate/SKILL.md, step 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What the document says should happen
+      description: Quote it if you can. A mismatch between a document and its behavior is the defect.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to see it
+      description: A command, a sequence, or the input that produced it. A maintainer should be able to run this.
+    validations:
+      required: false

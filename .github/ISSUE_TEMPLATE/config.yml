@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a vulnerability
+    url: https://github.com/AN0099/toothpaste-kit/security/advisories/new
+    about: Private reporting for a gate that fails open, a leak, or a destructive script path. Read SECURITY.md first. Do not file these as public issues.

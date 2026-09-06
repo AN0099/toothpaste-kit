@@ -1,0 +1,65 @@
+name: Registry addition
+description: Add or correct a vendor surface in orchestration/registry/.
+labels: ["registry"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read `orchestration/registry/README.md` first. A pull request is welcome and usually faster
+        than an issue; this form exists for cases where you know the capability values but not the
+        file format, or where you think an existing entry is wrong.
+
+  - type: input
+    id: surface
+    attributes:
+      label: Surface identifier
+      description: Namespaced, lowercase, vendor colon surface.
+      placeholder: google:gemini-cli
+    validations:
+      required: true
+
+  - type: textarea
+    id: capability
+    attributes:
+      label: Capability values
+      description: |
+        All seven. Values are listed in `orchestration/registry/README.md`.
+      value: |
+        interface:
+        autonomy:
+        human_presence:
+        workspace:
+        tool_execution:
+        egress:
+        audit:
+    validations:
+      required: true
+
+  - type: dropdown
+    id: confidence
+    attributes:
+      label: Confidence
+      options:
+        - verified (checked against a cited source)
+        - derived (inferred from observed behavior, no citation)
+        - unverified (imported, not checked)
+    validations:
+      required: true
+
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: URLs supporting the values above. Required if you selected verified.
+    validations:
+      required: false
+
+  - type: textarea
+    id: shaky
+    attributes:
+      label: Which fields are shaky, and why
+      description: |
+        An honest `unknown` is more useful than a confident guess, particularly for `audit`. Say what
+        you could not establish.
+    validations:
+      required: false
