@@ -19,17 +19,17 @@ intent: request | response | handoff | broadcast
   "in_reply_to": "<event_id or null>",
   "from": {
     "agent_id": "<...>",
-    "kind": "llm | human",
-    "surface": "<one of the taxonomy surfaces>",
-    "regime": "<looked up from surface-regimes skill, not typed freely>",
-    "active_skills": ["<looked up from surface-regimes skill's activation table>"]
+    "kind": "llm",
+    "surface": "<vendor:surface, resolvable in orchestration/registry/>",
+    "capability": "<the seven-field profile that surface resolves to, copied from the registry>",
+    "regime": "<derived from capability by taxonomy.md's three-clause rule, not typed freely>",
+    "active_skills": ["<operator-side config identifiers; empty array is valid>"]
   },
   "to": {
     "agent_id": "<...>",
-    "kind": "llm | human",
-    "surface": "<one of the taxonomy surfaces>",
-    "regime": "<looked up from surface-regimes skill, not typed freely>",
-    "active_skills": ["<looked up from surface-regimes skill's activation table>"]
+    "kind": "human",
+    "role": "relay | participant",
+    "comment": "human agents carry kind and role, and no surface, capability, or regime"
   },
   "type": "request | response",
 

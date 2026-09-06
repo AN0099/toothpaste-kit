@@ -18,7 +18,7 @@
         "error": { "type": "string" },
         "human_summary": {
           "type": "string",
-          "description": "One to three lines a human-relay agent can read without parsing the rest of the payload."
+          "description": "One to three lines a human relay agent can read without parsing the rest of the payload."
         }
       }
     }

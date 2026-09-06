@@ -26,7 +26,7 @@
         },
         "human_summary": {
           "type": "string",
-          "description": "One to three lines a human-relay agent can read without parsing the rest of the payload, so the message is self-contained if separated from its header."
+          "description": "One to three lines a human relay agent can read without parsing the rest of the payload, so the message is self-contained if separated from its header."
         }
       }
     }

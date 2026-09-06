@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "orchestration/registry/surface-descriptor.schema.json",
+  "title": "SurfaceRegistryFile",
+  "type": "object",
+  "required": ["vendor", "surfaces"],
+  "properties": {
+    "vendor": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Namespace prefix. Every surface id in this file starts with it."
+    },
+    "surfaces": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/surface_descriptor" }
+    }
+  },
+  "definitions": {
+    "surface_descriptor": {
+      "type": "object",
+      "required": [
+        "id",
+        "display_name",
+        "capability",
+        "regime",
+        "confidence",
+        "verified_on",
+        "sources"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$"
+        },
+        "display_name": { "type": "string" },
+        "capability": {
+          "$ref": "../schemas/event-base.json#/definitions/capability_profile"
+        },
+        "regime": {
+          "enum": [
+            "interactive-synchronous",
+            "autonomous-asynchronous",
+            "programmatic-contractual"
+          ],
+          "description": "Derived from capability by the three-clause rule in taxonomy.md. Recorded here so the derivation can be checked mechanically."
+        },
+        "confidence": {
+          "enum": ["verified", "derived", "unverified"],
+          "description": "'verified' means every capability field was checked against a cited source on verified_on. 'derived' means inferred from observed product behavior with no citation recorded. 'unverified' means imported and not checked."
+        },
+        "verified_on": {
+          "type": "string",
+          "format": "date",
+          "description": "The date the capability fields were last checked. Product surfaces change faster than any document about them, so an entry without a recent date is a claim about the past."
+        },
+        "sources": {
+          "type": "array",
+          "items": { "type": "string", "format": "uri" },
+          "description": "URLs supporting the capability claims. An empty array is permitted only when confidence is 'derived' or 'unverified'."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Anything a consumer of this entry should know, including which specific fields are shaky."
+        }
+      }
+    }
+  }
+}

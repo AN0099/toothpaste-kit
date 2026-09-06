@@ -18,7 +18,7 @@ intent: request | response | handoff | broadcast
 ​```
 ```
 
-The header exists so a `human-relay` agent never has to parse JSON to know where a message goes or, roughly, what it says. The JSON exists so any receiving LLM agent, or downstream tooling, can parse the message deterministically rather than re-deriving intent from prose. Neither half is optional. A message with only the header loses machine-parseability; a message with only JSON defeats the point of having a human-relay role at all.
+The header exists so a human relay agent never has to parse JSON to know where a message goes or, roughly, what it says. The JSON exists so any receiving LLM agent, or downstream tooling, can parse the message deterministically rather than re-deriving intent from prose. Neither half is optional. A message with only the header loses machine-parseability; a message with only JSON defeats the point of having a human relay role at all.
 
 ## Turn-taking
 
@@ -30,7 +30,7 @@ A `broadcast` intent has no single `to`. It is addressed to all agents in the th
 
 ## Timing
 
-Machine agents use `timeout_ms`. Human agents do not operate on millisecond timers, so a request addressed to a `human-relay` or `human-participant` agent should set `expected_response_by` instead, and the sending agent should not treat silence past that point as failure the way it would treat a machine timeout. Escalation on a missed human response is a judgment call for whoever is monitoring the thread, not an automatic protocol event.
+Machine agents use `timeout_ms`. Human agents do not operate on millisecond timers, so a request addressed to an agent with `kind: "human"` should set `expected_response_by` instead, and the sending agent should not treat silence past that point as failure the way it would treat a machine timeout. Escalation on a missed human response is a judgment call for whoever is monitoring the thread, not an automatic protocol event.
 
 ## State handoff
 
@@ -42,10 +42,10 @@ Second, `thread_id` is the unit of continuity, not any single agent's memory. No
 
 ## Relay fidelity
 
-A `human-relay` agent forwards the JSON payload byte for byte. If a human needs to add a note, correct an error, or make a decision while relaying, that addition goes in a separate, clearly marked block appended after the original payload, not edited into it, and the `relayed_by` field on the next event in the thread should record that the human acted in a `human-participant` capacity for that hop. Silent edits during relay are the single most likely failure mode in this system, since they are invisible to both the sending and receiving LLM agents unless flagged.
+A human agent with `role: "relay"` forwards the JSON payload byte for byte. If a human needs to add a note, correct an error, or make a decision while relaying, that addition goes in a separate, clearly marked block appended after the original payload, not edited into it, and the `relayed_by` field on the next event in the thread should record that the human acted with `role: "participant"` for that hop. Silent edits during relay are the single most likely failure mode in this system, since they are invisible to both the sending and receiving LLM agents unless flagged.
 
 ## What this protocol does not solve
 
 It does not resolve conflicting instructions arriving from two agents in the same thread; that remains a judgment call for whoever holds the token next.
 
-It does not enforce that a human-relay agent actually behaves as a relay rather than a participant. That enforcement is social, not technical: the format makes deviation visible after the fact, by comparing the payload to what got pasted, but it does not prevent it.
+It does not enforce that a human agent claiming `role: "relay"` actually behaves as one rather than as a participant. That enforcement is social, not technical: the format makes deviation visible after the fact, by comparing the payload to what got pasted, but it does not prevent it.

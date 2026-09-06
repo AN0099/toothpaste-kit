@@ -1,0 +1,149 @@
+{
+  "vendor": "anthropic",
+  "surfaces": [
+    {
+      "id": "anthropic:chat",
+      "display_name": "Claude chat",
+      "capability": {
+        "interface": "conversational",
+        "autonomy": "none",
+        "human_presence": "required",
+        "workspace": "session",
+        "tool_execution": "sandboxed",
+        "egress": "vendor-cloud",
+        "audit": "vendor-attested"
+      },
+      "regime": "interactive-synchronous",
+      "confidence": "derived",
+      "verified_on": "2026-09-04",
+      "sources": [],
+      "notes": "Tool calls are made and returned within a single turn; no autonomous execution between turns. Audit coverage stated for enterprise plans. Imported from taxonomy.md's original grounding pass; source URLs were not recorded at the time and should be filled on the next verification pass."
+    },
+    {
+      "id": "anthropic:cowork-interactive",
+      "display_name": "Cowork, interactive",
+      "capability": {
+        "interface": "conversational",
+        "autonomy": "redirectable",
+        "human_presence": "required",
+        "workspace": "local",
+        "tool_execution": "host",
+        "egress": "vendor-cloud",
+        "audit": "unknown"
+      },
+      "regime": "interactive-synchronous",
+      "confidence": "derived",
+      "verified_on": "2026-09-04",
+      "sources": [],
+      "notes": "Audit and compliance coverage is reported inconsistently across sources: one describes Cowork activity as recently added to Compliance API and audit log coverage, an earlier one describes it as excluded with conversation history kept locally. The audit field is deliberately 'unknown' rather than guessed. Recheck before it becomes load-bearing."
+    },
+    {
+      "id": "anthropic:cowork-delegated",
+      "display_name": "Cowork, delegated",
+      "capability": {
+        "interface": "conversational",
+        "autonomy": "full",
+        "human_presence": "absent",
+        "workspace": "local",
+        "tool_execution": "host",
+        "egress": "vendor-cloud",
+        "audit": "unknown"
+      },
+      "regime": "autonomous-asynchronous",
+      "confidence": "derived",
+      "verified_on": "2026-09-04",
+      "sources": [],
+      "notes": "Same audit uncertainty as anthropic:cowork-interactive. Functionally closest to a Code headless run, confined to knowledge-work tools rather than a code environment."
+    },
+    {
+      "id": "anthropic:code-interactive",
+      "display_name": "Claude Code, interactive",
+      "capability": {
+        "interface": "conversational",
+        "autonomy": "redirectable",
+        "human_presence": "required",
+        "workspace": "local",
+        "tool_execution": "host",
+        "egress": "vendor-cloud",
+        "audit": "vendor-attested"
+      },
+      "regime": "interactive-synchronous",
+      "confidence": "derived",
+      "verified_on": "2026-09-04",
+      "sources": [],
+      "notes": "Terminal or IDE session with a human present turn by turn."
+    },
+    {
+      "id": "anthropic:code-headless-routine",
+      "display_name": "Claude Code, headless routine",
+      "capability": {
+        "interface": "conversational",
+        "autonomy": "full",
+        "human_presence": "absent",
+        "workspace": "remote",
+        "tool_execution": "host",
+        "egress": "vendor-cloud",
+        "audit": "vendor-attested"
+      },
+      "regime": "autonomous-asynchronous",
+      "confidence": "derived",
+      "verified_on": "2026-09-04",
+      "sources": [],
+      "notes": "Runs on vendor-managed cloud infrastructure. Scheduled, API-triggered, or event-triggered. The operator's machine does not need to be on."
+    },
+    {
+      "id": "anthropic:code-local-routine",
+      "display_name": "Claude Code, local routine",
+      "capability": {
+        "interface": "conversational",
+        "autonomy": "full",
+        "human_presence": "absent",
+        "workspace": "local",
+        "tool_execution": "host",
+        "egress": "vendor-cloud",
+        "audit": "vendor-attested"
+      },
+      "regime": "autonomous-asynchronous",
+      "confidence": "derived",
+      "verified_on": "2026-09-04",
+      "sources": [],
+      "notes": "Same unattended-execution profile as the headless routine, but requires the local machine to stay on. Note that egress is still vendor-cloud: running the scheduler locally does not keep the content local."
+    },
+    {
+      "id": "anthropic:api-raw",
+      "display_name": "Messages API, direct",
+      "capability": {
+        "interface": "programmatic",
+        "autonomy": "none",
+        "human_presence": "optional",
+        "workspace": "none",
+        "tool_execution": "none",
+        "egress": "vendor-cloud",
+        "audit": "operator-attested"
+      },
+      "regime": "programmatic-contractual",
+      "confidence": "derived",
+      "verified_on": "2026-09-04",
+      "sources": [],
+      "notes": "Single request, single response. Any autonomy across multiple calls is built and owned by the calling application. 'operator-attested' here means the vendor attests nothing about the caller's application: whatever audit record exists is the caller's to produce."
+    },
+    {
+      "id": "anthropic:api-agent-sdk",
+      "display_name": "Agent SDK",
+      "capability": {
+        "interface": "programmatic",
+        "autonomy": "full",
+        "human_presence": "absent",
+        "workspace": "local",
+        "tool_execution": "host",
+        "egress": "vendor-cloud",
+        "audit": "operator-attested"
+      },
+      "regime": "autonomous-asynchronous",
+      "confidence": "derived",
+      "verified_on": "2026-09-04",
+      "sources": [],
+      "notes": "Packages the same autonomous multi-step tool-using loop that powers Code into a library the calling application controls. Falls under 'API' by product naming while behaving like a headless routine, which is why the regime is derived from capability rather than from the product family."
+    }
+  ]
+}

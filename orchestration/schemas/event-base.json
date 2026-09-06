@@ -32,7 +32,7 @@
   "definitions": {
     "agent_ref": {
       "type": "object",
-      "required": ["agent_id", "kind", "surface"],
+      "required": ["agent_id", "kind", "capability", "regime"],
       "properties": {
         "agent_id": {
           "type": "string",
@@ -41,19 +41,18 @@
         "kind": {
           "enum": ["llm", "human"]
         },
+        "role": {
+          "enum": ["relay", "participant"],
+          "description": "Required when kind=human, absent when kind=llm. Replaces the human-relay and human-participant members of the pre-registry surface enum, which allowed the meaningless combination kind=llm with surface=human-relay."
+        },
         "surface": {
-          "enum": [
-            "chat",
-            "cowork-interactive",
-            "cowork-delegated",
-            "code-interactive",
-            "code-headless-routine",
-            "code-local-routine",
-            "api-raw",
-            "api-agent-sdk",
-            "human-relay",
-            "human-participant"
-          ]
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*$",
+          "description": "Namespaced vendor:surface identifier resolvable in orchestration/registry/. Descriptive label for humans and for registry lookup. Where it disagrees with 'capability', capability governs and the mismatch is worth surfacing rather than silently resolving. Omit for kind=human."
+        },
+        "capability": {
+          "$ref": "#/definitions/capability_profile",
+          "description": "Normative. Every routing and gating decision in this system reads these fields rather than the surface name."
         },
         "regime": {
           "enum": [
@@ -61,12 +60,61 @@
             "autonomous-asynchronous",
             "programmatic-contractual"
           ],
-          "description": "Derived from 'surface' via the lookup table in the surface-regimes skill. Not set independently of surface; present here so a receiving agent without that skill loaded still sees the regime stated explicitly."
+          "description": "Derived from 'capability' by the three-clause rule in taxonomy.md. Stated explicitly so a receiving agent without the surface-regimes skill still sees it, and so the derivation is checkable against the capability profile rather than asserted."
         },
         "active_skills": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Skill names active by default for this surface, per the surface-regimes skill's activation table. Also derived, not hand-set. A mismatch between this field and a receiving agent's own inference is worth surfacing rather than silently resolving."
+          "description": "Operator-side behavioral configuration identifiers active for this agent. Format is vendor-defined. An empty array is valid and expected for vendors with no skill mechanism. A mismatch between this field and a receiving agent's own inference is worth surfacing rather than silently resolving."
+        }
+      }
+    },
+    "capability_profile": {
+      "type": "object",
+      "description": "Vendor-independent predicates. Any surface from any vendor scores on all seven.",
+      "required": [
+        "interface",
+        "autonomy",
+        "human_presence",
+        "workspace",
+        "tool_execution",
+        "egress",
+        "audit"
+      ],
+      "properties": {
+        "interface": {
+          "enum": ["conversational", "programmatic"],
+          "description": "Whether the surface presents a conversational loop or is driven by a caller-owned program."
+        },
+        "autonomy": {
+          "enum": ["none", "redirectable", "full"],
+          "description": "Autonomous multi-step execution between human turns. 'redirectable' means the human can interrupt and steer mid-task."
+        },
+        "human_presence": {
+          "enum": ["required", "optional", "absent"],
+          "description": "Whether a human is present during execution."
+        },
+        "workspace": {
+          "enum": ["none", "session", "local", "remote"],
+          "description": "Persistent file workspace. 'session' means state exists but is lost at session end."
+        },
+        "tool_execution": {
+          "enum": ["none", "sandboxed", "host"],
+          "description": "Whether the surface executes tools, and whether execution reaches the host filesystem. Read by the routing rule's standing tool-call exclusion."
+        },
+        "egress": {
+          "enum": ["local", "operator-hosted", "vendor-cloud"],
+          "description": "Where content goes when this surface processes it. This is the sensitivity gate's join key: a routing rule can read this field instead of relying on an operator remembering which faculties are cloud-hosted."
+        },
+        "audit": {
+          "enum": [
+            "none",
+            "local-only",
+            "vendor-attested",
+            "operator-attested",
+            "unknown"
+          ],
+          "description": "Who, if anyone, attests to a record of what this surface did. 'unknown' is a legitimate and common value; do not guess."
         }
       }
     }

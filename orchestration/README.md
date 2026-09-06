@@ -2,7 +2,7 @@
 
 ## Purpose
 
-A protocol for coordinating work across Claude's four product surfaces (chat, Cowork, Code, API) and human participants, treating both LLM instances and humans as addressable nodes in a single orchestration graph. The human acts as the relay layer between agent instances that cannot otherwise reach each other directly: a chat window has no channel to another chat window, and a human closes that gap by copying output from one and pasting it into another.
+A protocol for coordinating work across agent surfaces and human participants, treating both LLM instances and humans as addressable nodes in a single orchestration graph. Agents are typed by what they can do rather than by which vendor sells them, so a thread can span products from more than one vendor. The human acts as the relay layer between agent instances that cannot otherwise reach each other directly: a chat window has no channel to another chat window, and a human closes that gap by copying output from one and pasting it into another.
 
 ## When to use this
 
@@ -12,7 +12,8 @@ Do not use this system for tasks a single session already handles well. The rela
 
 ## File index
 
-- `taxonomy.md`: agent role definitions across the four surfaces, their sub-roles, and the two human roles (relay vs. participant), plus a capability matrix.
+- `taxonomy.md`: the seven-field capability vector every surface is scored on, the rule deriving a regime from it, the two human roles (relay vs. participant), and a capability matrix.
+- `registry/`: one file per vendor namespace, mapping surface identifiers to capability profiles. Each entry carries its own evidence and expiry date. This is where support for a new vendor gets added.
 - `protocol.md`: the relay mechanism (human-readable header wrapping a JSON payload), turn-taking rules, and state handoff rules.
 - `schemas/`: JSON Schema definitions for events exchanged between agents (`event-base.json`, `request.json`, `response.json`).
 - `templates/relay-message.md`: the literal template a human copies, fills, and pastes to move a message from one agent's surface to another.
@@ -23,8 +24,8 @@ Do not use this system for tasks a single session already handles well. The rela
 
 ## Quick start
 
-1. Identify the agents in the run and assign each an `agent_id`, `kind` (`llm` or `human`), and `surface` (see `taxonomy.md`).
-2. Open one surface per LLM agent: a chat window, a Cowork session, a Code session, or an API-driven process.
+1. Identify the agents in the run. Give each LLM agent an `agent_id`, `kind: "llm"`, a `surface` identifier from `registry/`, and the `capability` and `regime` that identifier resolves to. Give each human agent an `agent_id`, `kind: "human"`, and a `role` of `relay` or `participant`. If a surface you use is missing from the registry, add it (see `registry/README.md`).
+2. Open one surface per LLM agent: a chat window, a desktop agent session, a coding session, or an API-driven process, from whichever vendors the run uses.
 3. For each message that needs to cross a surface boundary, the sending agent (or the human, on the LLM's behalf, if the LLM cannot produce the format directly) fills `templates/relay-message.md`.
 4. The human, acting as relay, pastes the filled template into the receiving agent's surface. A relay human's job is to move the payload intact, not to edit its content.
 5. At the end of a run or a session boundary, whoever is finishing their turn fills `templates/handoff-note.md` so the next agent, human or LLM, can resume without re-deriving context.
