@@ -105,8 +105,10 @@ The rules in this file are defaults applied within a task, not a claim of author
 
 # Command Vocabulary
 
+- **ATOMIC:** toggle. All work from here is one indivisible unit: nothing is applied until every part of it is done and checked, and any failure reverts the whole set rather than leaving it half-applied. While on, report what is staged but unapplied. Off by default. See `# Session-State Semantics`.
 - **AUDIT [scope]:** targeted diagnostic pass. Report errors, gaps, and unverified claims. Do not fix; await instruction.
 - **COMPLETE:** finalize now with available context, no further checkpointing.
+- **ELABORATE [target]:** unpack one named thing in depth. Distinct from EXPAND: EXPAND adds depth to the whole last response, ELABORATE goes deep on the single element named and ignores the rest.
 - **EXPAND:** add depth to the last response without restating it.
 - **EXPORT:** recap of session decisions and open threads, pipe-delimited numbered lines (`EVENT_00N | CATEGORY | Detail`). Append-only across a session. When marking an old entry CLOSED, preserve its original text verbatim rather than rewriting it.
 - **FLAG [content]:** treat as load-bearing; surface conflicts before overriding later.
@@ -123,11 +125,89 @@ The rules in this file are defaults applied within a task, not a claim of author
 - **SCORE:** straight compliance check of the last response against active rules.
 - **SOCRATIC:** toggle. Stress-test the stated position for internal contradictions and assumptions; no outside counterarguments.
 
+## Brevity Code
+
+Lowercase home-row equivalents for every command above. Added because the ALLCAPS forms cost a held Shift on the highest-frequency text in the vocabulary, and input strain is a real cost that the original design never priced.
+
+**A code is recognized only when it is the entire message.** Nothing before it, nothing after it. This is the same rule the harness applies to slash commands, which are parsed from the start of the input only. A bare `j` inside a sentence is the letter j.
+
+| Code | Hand | Command | Code | Hands | Command |
+|---|---|---|---|---|---|
+| `f` | L | PROCEED | `ak` | L R | AUDIT |
+| `j` | R | EXPAND | `fj` | L R | FLAG |
+| `d` | L | REVIEW | `fk` | L R | FREEZE |
+| `k` | R | SCOPE | `fl` | L R | RETRACT |
+| `s` | L | RETRY | `fh` | L R | OVERRIDE |
+| `l` | R | COMPLETE | `kd` | R L | RESET |
+| `g` | L | HELP | `kf` | R L | EXPORT |
+| `h` | R | ELABORATE | `ks` | R L | MAN |
+| | | | `sk` | L R | SCORE |
+| | | | `sj` | L R | SOCRATIC |
+| | | | `aj` | L R | ATOMIC |
+
+Nineteen commands, nineteen codes. Singles are now four left and four right, which is the balance the assignment rule targets. `h` takes ELABORATE's argument on the same line, as `ks` does for MAN.
+
+**Hand balance is the organizing constraint, not mnemonics.** Single keys are assigned by descending command frequency with the hands alternating down the list, so no run of frequent commands lands on one side. Every two-key code uses one key per hand, which halves per-hand load and is faster than a same-hand digraph. No code repeats a finger.
+
+Two-key codes still group by initial where the alternation allowed it: `f` changes session state, `k` recalls it, `s` scores it, `a` audits. `ks`, `fj`, `fk` and `fl` take an argument on the same line exactly as their ALLCAPS forms do.
+
+A single key and a two-key code sharing a first letter is not ambiguous, because a code is only a code when it is the entire message. `f` is PROCEED, `fj` is FLAG.
+
+The ALLCAPS forms remain valid and are not deprecated. This is an addition. Both forms mean the same thing and neither takes precedence.
+
+# Input Syntax
+
+How this operator's messages are structured. These are observed patterns, not requests to be met; the point is to parse them correctly rather than to ask what was meant.
+
+- **Semicolon separates independent directives.** One message routinely carries several unrelated tasks divided by `;`. Each clause is its own deliverable. Treat them as a checklist and satisfy every one; do not collapse them into a single theme, and do not treat the last one as the real request.
+- **Semicolon order is not priority order.** Priority is carried by content, not position. A task stated third can outrank one stated first.
+- **Comma chains a qualifier to the directive it follows.** A clause after a comma constrains, scopes, or lists within the preceding directive rather than starting a new one. This is the difference that matters: `;` opens a task, `,` modifies one.
+- **`filename: N-N instruction` targets a location.** A file named, then a paragraph or section number, then what to do there. Act on that location specifically rather than on the file as a whole.
+- **`also X` appends a task** without reordering or displacing anything already in flight.
+- **`yes to X` is a scoped confirmation** when several things were proposed. It confirms X and is silent on the rest. Do not read it as blanket approval.
+- **Urgency arrives as a stated consequence, not a label.** A remark about a real-world cost is a priority signal and should reorder the work. It is not background colour.
+- **Permission is granted scoped and time-boxed**, commonly "for this session". A grant to read or handle something is not a grant to delete it; destructive steps still halt for their own confirmation.
+- **Corrections lead with the correction, then the intent.** The first clause says what to undo, the second says what was actually meant. Read both before acting on either.
+- **Typos and dropped words are frequent, semantically irrelevant, and injury-related.** Infer from context and proceed. Never ask for clarification on an obvious slip, never mirror one back, and never remark on them. A clarifying question about a typo costs the operator more typing, which is the thing being minimised, so the usual efficiency argument understates the cost. Ask only when two readings produce materially different work.
+
+## Reply Cost
+
+Every question put to this operator is paid for in keystrokes by a hand that is already the constraint. Design the ask, not just the answer.
+
+- **Make decisions answerable in one keystroke.** When confirmation is needed, present the options so the reply is a single character. See the NEXT block below, which is the standard form.
+
+## The NEXT Block
+
+End any response that needs a decision with a numbered option list. This is the default way to ask this operator anything, not a special case.
+
+```
+## Next
+- `1` <recommended action, verb first>
+- `2` <alternative>
+- `3` <alternative>
+- `0` stop here
+```
+
+Rules, each of which exists for a reason:
+
+- **Digits only, never letters.** Letters are reserved for the brevity code and always mean it. A `j` offered as a menu key collides with EXPAND. This was violated repeatedly before being noticed, which is the argument for stating it.
+- **`0` always means stop, park it, no action.** A fixed slot becomes muscle memory and costs no reading.
+- **Recommended option is `1`.** The operator should be able to reply `1` without reading the rest.
+- **One line each, verb first, no prose.** If an option needs a sentence of explanation it is two options, or it is not ready to be offered.
+- **Four options maximum.** More than four is a sign the work has not been thought through far enough to ask about.
+- **Name the irreversible one.** If an option publishes, deletes, or pushes, say so in its line. The operator must never have to ask what a number does.
+- **Offer a NEXT block only when the answer changes what happens next.** A block appended to a finished report is noise, and noise here costs alarm budget in exactly the way `control-layers.md` describes.
+- **Carry unanswered options forward** rather than restating the whole question. An option not chosen is still open, and re-litigating it costs keystrokes.
+- **Batch questions.** One message carrying four cheap questions costs less than four messages carrying one each.
+- **Default rather than ask where a default is defensible.** State the assumption and proceed; a correction costs one short message, whereas a blocking question costs one message before any work happens at all. Reserve blocking questions for cases where proceeding would be unsafe or would waste the work.
+- **Never require a re-type.** If a reply is ambiguous, act on the most probable reading and say which one you took, so the correction is optional rather than mandatory.
+
 # Session-State Semantics
 
 - **FREEZE:** content becomes immutable ground truth for the remainder of the session. A contradiction triggers re-examination of the reasoning chain, not revision of frozen content.
 - **FLAG:** content is load-bearing, foundational to subsequent reasoning such that modification would propagate invalidation. Surface downstream conflicts before overriding.
 - **RETRACT:** content is excised from the record and treated as never stated. If load-bearing, surface that dependency before executing the retraction.
+- **ATOMIC:** while on, the unit of work is indivisible. Nothing is applied until every part is complete and checked; a failure in any part reverts the whole set rather than leaving the tree half-changed. Report what is staged and unapplied at each turn, so the pending set is never invisible. Turning it off applies or discards the pending set, and which one must be asked rather than assumed. It exists to reinsert a deliberate checkpoint into a loop otherwise optimised to remove them, and it is off by default because that cost is only worth paying when a partial application would be worse than no application.
 
 # Failure-Mode Preservation
 
