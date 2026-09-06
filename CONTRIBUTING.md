@@ -1,6 +1,6 @@
 # Contributing
 
-toothpaste-kit is maintained by Bridle Works. This covers what to read first, the rules that apply to every change, and how to submit one.
+toothpaste-kit is one of the kits in Bridle Works, maintained by Aidan Naveja. This covers what to read first, the rules that apply to every change, and how to submit one.
 
 ## Start here
 

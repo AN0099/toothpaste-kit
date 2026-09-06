@@ -6,7 +6,7 @@ A skill library and agent relay protocol for working with Claude.
 
 Judged on control fidelity: legible state, cheap correction, a reliable halt.
 
-Maintained by Bridle Works.
+One of the kits in Bridle Works. Maintained by Aidan Naveja.
 
 ## Why this exists
 
@@ -28,7 +28,7 @@ The practical result is the one every curb cut demonstrates. Fitting the interfa
 
 ### `skills/`
 
-Nine skills, in two classes.
+Eleven skills, in two classes.
 
 Seven govern agent behavior continuously. An agent loads them on its own when the frontmatter `description` matches what it is doing.
 
@@ -42,16 +42,18 @@ Seven govern agent behavior continuously. An agent loads them on its own when th
 | `skill-discovery` | Whether a recurring need is worth a skill, and finding one that already exists |
 | `commands` | Index for the seventeen-command vocabulary |
 
-Two are procedures a person invokes. Both set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide that a session is over.
+Four are procedures a person invokes. All four set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started.
 
 | Skill | Runs |
 |---|---|
 | `redaction-gate` | Before content crosses a sensitivity boundary outward. Reports findings, hands the decision to a person |
 | `session-close` | At the end of a working session. Captures reasoning that exists nowhere on disk, then updates the standing documents |
+| `daily-dashboard` | At the start of a working session. Reads those documents back, verifies carry-over against the working trees, and ends on questions |
+| `session-log` | Mid-session, before context is compacted. Captures the reasoning from the recent stretch to one append-only file, and nothing else |
 
 ### `docs/`
 
-`docs/standing-documents.md` describes the document structure that `redaction-gate` and `session-close` assume: what each standing file does, how they work together, and the sensitivity tiering the redaction procedure depends on. Read it if either skill's pointers look like they lead nowhere.
+`docs/standing-documents.md` describes the document structure that `redaction-gate`, `session-close`, and `daily-dashboard` assume: what each standing file does, how they work together, and the sensitivity tiering the redaction procedure depends on. Read it if a skill's pointers look like they lead nowhere.
 
 `docs/project-state.md` is where the kit itself stands.
 
@@ -119,6 +121,14 @@ grep -c '<file path=' repomix-output.xml
 
 The output is gitignored on purpose. It is a near-complete copy of the repository, so committing it roughly doubles clone size and produces a full-file diff on every change, and it goes stale silently. `repomix --remote` builds one straight from the GitHub URL without a clone.
 
+## Contributing
+
+Read `CONTRIBUTING.md`. It covers the rules that apply to every change, the structure a skill has to follow, and how this repo handles commit attribution.
+
+The lowest-friction first contribution is a surface descriptor in `orchestration/registry/`. It adds support for a vendor this project does not cover yet, cannot break anyone else's traffic, and needs no knowledge of the rest of the protocol. `orchestration/registry/README.md` has the format.
+
+`CODE_OF_CONDUCT.md` applies in every project space. `SECURITY.md` says what counts as a vulnerability in a repository that ships no service, which is narrower and stranger than the usual list; read it before filing a public issue about a gate.
+
 ## Status
 
 Early. The skills are in daily use and the interfaces still change. The orchestration protocol has run across Claude, local models, and several vendor surfaces.
@@ -130,3 +140,5 @@ See `philosophy.md`.
 ## License
 
 MIT. See `LICENSE`.
+
+`CITATION.cff` carries citation metadata for anyone referencing this work. It has no version or DOI yet; both get added at the first tagged release.
