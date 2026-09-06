@@ -1,14 +1,32 @@
-# toothpaste-kit
+# Toothpaste Kit: tp-kit`
 
 **[CURRENT WORK IN PROGRESS // PRE-ALPHA]**
 
-A skill library and agent relay protocol for working with Claude.
+A Bridle Works project. Maintained by Aidan Naveja.
 
-Judged on control fidelity: legible state, cheap correction, a reliable halt.
+This is a set of documentation both for the user and the agent; an information corpus, a skill library, and agent relay protocol for working with multiple agents. Currently it is designed with Claude being the lead orchestrator in mind, but vendor-agnostic and vendor-specific variants are on the roadmap.
 
-One of the kits in Bridle Works. Maintained by Aidan Naveja.
+## Why this exists and Who it's for
 
-## Why this exists
+### Toothpaste Repairman: Automation Engineering
+
+In the 2005 film-adaption of Charlie and the Chocolate Factory, Mr. Bucket screws caps onto toothpaste
+tubes until the factory buys a machine that does it faster, and he is let go. He ends the story
+hired back to repair the machine that replaced him. That second job is the one this repository is
+about. It is harder than the first in every way that matters. Capping tubes needed his hands.
+Repairing the capper needs him to understand what the machine is doing and to notice when it stops
+doing it, which is the one part of the work the machine cannot take over, because the job is
+knowing whether the machine is working.
+
+Everything here is built for the repairman rather than for someone operating a finished product. A
+repairman is judged on whether the machine runs, not on how impressive it looks while running, and
+that is why this project measures itself on control fidelity instead of capability: legible state,
+cheap correction, a reliable halt. It is also why so much of what is here is checks that fail
+loudly rather than features that succeed quietly. Nobody keeps a repairman who cannot tell when the
+machine is broken, and a check that reports clean because it was never wired up is worse than no
+check at all, since it spends the attention that would have found the fault.
+
+### Riding Tack: User Interface & Experience
 
 The "centaur" analogy of automation theory imagines a human-machine collaboration where a person uses technology as a powerful, tireless assistant to execute tasks while retaining ultimate control over judgment and decision-making: a human orchestrator directing an automated agent, each unable to complete the work without the other. The reverse-centaur inverts the roles. An automated orchestrator directs a human agent, the person in the loop only because the machine has no fleshy appendages of its own to do the work.
 
