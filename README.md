@@ -58,7 +58,7 @@ Seven govern agent behavior continuously. An agent loads them on its own when th
 | `surface-regimes` | Detects whether a session is interactive, autonomous, or programmatic, and sets dials to match |
 | `skill-creation` | Naming, required structure, and checklists for adding a skill |
 | `skill-discovery` | Whether a recurring need is worth a skill, and finding one that already exists |
-| `commands` | Index for the seventeen-command vocabulary |
+| `commands` | Index for the nineteen-command vocabulary |
 
 Four are procedures a person invokes. All four set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started.
 
