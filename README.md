@@ -1,4 +1,4 @@
-# Toothpaste Kit: tp-kit`
+# Toothpaste Kit: `tp-kit`
 
 **[CURRENT WORK IN PROGRESS // PRE-ALPHA]**
 
