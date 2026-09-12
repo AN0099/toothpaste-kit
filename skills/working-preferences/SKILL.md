@@ -108,15 +108,20 @@ The rules in this file are defaults applied within a task, not a claim of author
 - **ATOMIC:** toggle. All work from here is one indivisible unit: nothing is applied until every part of it is done and checked, and any failure reverts the whole set rather than leaving it half-applied. While on, report what is staged but unapplied. Off by default. See `# Session-State Semantics`.
 - **AUDIT [scope]:** targeted diagnostic pass. Report errors, gaps, and unverified claims. Do not fix; await instruction.
 - **COMPLETE:** finalize now with available context, no further checkpointing.
-- **ELABORATE [target]:** unpack one named thing in depth. Distinct from EXPAND: EXPAND adds depth to the whole last response, ELABORATE goes deep on the single element named and ignores the rest.
-- **EXPAND:** add depth to the last response without restating it.
+- **CONFIRM:** yes to the thing proposed. Answers a proposal; PROCEED advances a stage.
+- **DECLINE:** no to the thing proposed. Rejects that one option without stopping the work.
+- **DEEPEN [target]:** add depth. With a target, go deep on that element only and ignore the rest; with none, add depth to the whole last response without restating it. Replaces EXPAND and ELABORATE, which merged.
 - **EXPORT:** recap of session decisions and open threads, pipe-delimited numbered lines (`EVENT_00N | CATEGORY | Detail`). Append-only across a session. When marking an old entry CLOSED, preserve its original text verbatim rather than rewriting it.
 - **FLAG [content]:** treat as load-bearing; surface conflicts before overriding later.
 - **FREEZE [content]:** treat as fixed; don't revise without flagging conflict first.
 - **HELP:** list active commands.
 - **MAN [command]:** full definition of one command.
+- **MEASURE:** stop reasoning about it and go count it.
+- **NUDGE:** toggle the teaching register.
 - **OVERRIDE:** drop an active pushback thread on one point.
+- **PARK:** move it to a register; do not do it now.
 - **PROCEED:** current stage is good, advance without recap.
+- **QUEUE:** do not run it; log it for a runner.
 - **RESET:** restate current task, active preferences, and current position.
 - **RETRACT [content]:** treat specified content as unsaid going forward.
 - **RETRY:** redo the last response in compliance, no acknowledgment of the miss.
@@ -124,6 +129,9 @@ The rules in this file are defaults applied within a task, not a claim of author
 - **SCOPE:** read-only recap of decisions, facts, and progress so far.
 - **SCORE:** straight compliance check of the last response against active rules.
 - **SOCRATIC:** toggle. Stress-test the stated position for internal contradictions and assumptions; no outside counterarguments.
+- **SOURCE [claim]:** show the evidence for that specific claim.
+- **STAGE:** edit and stage, never commit. The commit-triage case of QUEUE.
+- **WHY:** rationale only, without expanding the whole response.
 
 ## Brevity Code
 
@@ -131,27 +139,32 @@ Lowercase home-row equivalents for every command above. Added because the ALLCAP
 
 **A code is recognized only when it is the entire message.** Nothing before it, nothing after it. This is the same rule the harness applies to slash commands, which are parsed from the start of the input only. A bare `j` inside a sentence is the letter j.
 
-| Code | Hand | Command | Code | Hands | Command |
+| Tier | Code | Command | Tier | Code | Command |
 |---|---|---|---|---|---|
-| `f` | L | PROCEED | `ak` | L R | AUDIT |
-| `j` | R | EXPAND | `fj` | L R | FLAG |
-| `d` | L | REVIEW | `fk` | L R | FREEZE |
-| `k` | R | SCOPE | `fl` | L R | RETRACT |
-| `s` | L | RETRY | `fh` | L R | OVERRIDE |
-| `l` | R | COMPLETE | `kd` | R L | RESET |
-| `g` | L | HELP | `kf` | R L | EXPORT |
-| `h` | R | ELABORATE | `ks` | R L | MAN |
-| | | | `sk` | L R | SCORE |
-| | | | `sj` | L R | SOCRATIC |
-| | | | `aj` | L R | ATOMIC |
+| 1 | `f` | CONFIRM | 2 | `fj` | MEASURE |
+| 1 | `j` | DEEPEN | 2 | `kf` | QUEUE |
+| 1 | `d` | DECLINE | 2 | `ls` | PARK |
+| 1 | `k` | FLAG | 2 | `dj` | WHY |
+| 1 | `s` | REVIEW | 2 | `sl` | NUDGE |
+| 1 | `l` | HELP | 2 | `jf` | STAGE |
+| 2 | `fk` | PROCEED | 2 | `lf` | SOURCE |
+| 2 | `jd` | ATOMIC | 3 | `sdj` | FREEZE |
+| 2 | `sk` | SCOPE | 3 | `sdk` | RETRACT |
+| 2 | `dl` | AUDIT | 3 | `dfj` | OVERRIDE |
+| 2 | `fl` | COMPLETE | 3 | `dfk` | SOCRATIC |
+| 2 | `js` | RESET | 3 | `sfj` | EXPORT |
+| 2 | `kd` | MAN | 3 | `sfk` | RETRY |
+| 2 | `sj` | SCORE | | | |
 
-Nineteen commands, nineteen codes. Singles are now four left and four right, which is the balance the assignment rule targets. `h` takes ELABORATE's argument on the same line, as `ks` does for MAN.
+Twenty-seven commands, twenty-seven codes, in three tiers. **Tier is assigned by measured frequency, not by guess**: tier 1 is a single key for the six most used, tier 2 is two keys, tier 3 is three keys for the least used. A new command starts at tier 2 until it has data. The singles are three per hand.
 
-**Hand balance is the organizing constraint, not mnemonics.** Single keys are assigned by descending command frequency with the hands alternating down the list, so no run of frequent commands lands on one side. Every two-key code uses one key per hand, which halves per-hand load and is faster than a same-hand digraph. No code repeats a finger.
+**Codes changed meaning when the table was retiered.** `fj` was FLAG and is now MEASURE; `f` was PROCEED and is now CONFIRM. Read a code against this table, never against memory of an earlier one.
 
-Two-key codes still group by initial where the alternation allowed it: `f` changes session state, `k` recalls it, `s` scores it, `a` audits. `ks`, `fj`, `fk` and `fl` take an argument on the same line exactly as their ALLCAPS forms do.
+**Hand balance is the organizing constraint, not mnemonics.** Singles alternate hands down the frequency list, so no run of frequent commands lands on one side. Every two-key code uses one key per hand, which halves per-hand load and is faster than a same-hand digraph. Three-key codes take two keys on one hand and one on the other. No code repeats a finger.
 
-A single key and a two-key code sharing a first letter is not ambiguous, because a code is only a code when it is the entire message. `f` is PROCEED, `fj` is FLAG.
+`j`, `k`, `kd`, `lf`, `sdj` and `sdk` take an argument on the same line exactly as their ALLCAPS forms do.
+
+A single key and a longer code sharing a first letter is not ambiguous, because a code is only a code when it is the entire message. `f` is CONFIRM, `fk` is PROCEED.
 
 The ALLCAPS forms remain valid and are not deprecated. This is an addition. Both forms mean the same thing and neither takes precedence.
 
@@ -190,7 +203,7 @@ End any response that needs a decision with a numbered option list. This is the 
 
 Rules, each of which exists for a reason:
 
-- **Digits only, never letters.** Letters are reserved for the brevity code and always mean it. A `j` offered as a menu key collides with EXPAND. This was violated repeatedly before being noticed, which is the argument for stating it.
+- **Digits only, never letters.** Letters are reserved for the brevity code and always mean it. A `j` offered as a menu key collides with DEEPEN. This was violated repeatedly before being noticed, which is the argument for stating it.
 - **`0` always means stop, park it, no action.** A fixed slot becomes muscle memory and costs no reading.
 - **Recommended option is `1`.** The operator should be able to reply `1` without reading the rest.
 - **One line each, verb first, no prose.** If an option needs a sentence of explanation it is two options, or it is not ready to be offered.

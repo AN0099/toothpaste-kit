@@ -13,9 +13,10 @@ would create exactly the drift the pairing is meant to avoid.
 
 Three surfaces, which had never been described together:
 
-1. **Command vocabulary.** Seventeen closed commands, defined in `working-preferences`, indexed in
+1. **Command vocabulary.** Twenty-seven closed commands, defined in `working-preferences`, indexed in
    `skills/commands`.
-2. **Brevity code.** Lowercase home-row equivalents for all seventeen. New 2026-09-06.
+2. **Brevity code.** Lowercase home-row equivalents for all twenty-seven. New 2026-09-06, retiered by
+   measured frequency 2026-09-08.
 3. **Input syntax.** How a message is segmented into tasks and qualifiers, and how the model should
    parse it. New 2026-09-06, and previously unwritten anywhere despite being in constant use.
 
@@ -26,12 +27,12 @@ project and no document described them, so every session rediscovered them by in
 
 | Element | State | Where it lives |
 |---|---|---|
-| Seventeen ALLCAPS commands | Live, unchanged | `working-preferences`, `commands` |
-| Brevity code, 17 codes | **Promoted 2026-09-06** | `working-preferences` |
+| Twenty-seven ALLCAPS commands | **Live, retiered 2026-09-08** | `working-preferences`, `commands` |
+| Brevity code, 27 codes in three tiers | **Promoted 2026-09-06, retiered 2026-09-08** | `working-preferences` |
 | Input syntax, 10 rules | **Promoted 2026-09-06** | `working-preferences` |
 | Reply-cost rules, 4 | **Promoted 2026-09-06** | `working-preferences` |
-| `commands` index updated with codes | **Open** | Nothing yet |
-| `CHANGELOG.md` entry for the above | **Open** | Nothing yet |
+| `commands` index updated with codes | **Done** | `commands` |
+| `CHANGELOG.md` entry for the above | **Done** | both skills' `CHANGELOG.md` |
 | Q1-3 format compliance | **Open, see 5-2** | `working-preferences` `# Format` |
 
 ## 3. The brevity code, and the constraint that shaped it
@@ -69,9 +70,10 @@ Full statement is in `working-preferences`. The shape, for orientation:
 
 ## 5. Open items
 
-5-1. **`skills/commands/SKILL.md` still lists only the ALLCAPS forms.** It is the discoverability
-index, so a code absent from it is a code an agent cannot find. This is the same failure the kit
-already documents elsewhere: written but not mounted, one step short of not existing.
+5-1. ~~**`skills/commands/SKILL.md` still lists only the ALLCAPS forms.**~~ **Closed.** The index
+now carries every command with its code. It had also fallen two commands behind the vocabulary
+before the retiering, listing seventeen while `working-preferences` defined nineteen, which is the
+drift this pairing exists to catch.
 
 5-2. **The `# Format` rule requiring three follow-up questions after every response was not being
 honoured during the session that wrote this document.** Found by reading the skill in order to edit
@@ -79,7 +81,7 @@ it, which is the only reason it surfaced. Two readings are possible and they lea
 the rule is live and compliance lapsed, or the rule has fallen out of use and should be retired. It
 is the operator's call and it is not made here.
 
-5-3. **Whether the brevity code should extend beyond the seventeen.** The commands are conversational
+5-3. **Whether the brevity code should extend beyond the twenty-seven.** The commands are conversational
 control verbs. Procedures are slash commands and were deliberately excluded from the vocabulary. If
 typing `/session-close` is itself a cost worth removing, that is a separate decision about slash
 commands, not an extension of this code.
@@ -99,8 +101,8 @@ this question was asked.
 - **Two mirrored variants, or one that is mechanically mirrorable.** Handedness is not predictable
   and a single-hand layout that assumes the left excludes half its users.
 - **Same-hand digraphs throughout**, which is the exact inverse of the current rule. One hand's home
-  row is five keys, giving five singles and twenty-five ordered pairs, so seventeen commands fit
-  inside one hand's home position with room left.
+  row is five keys, giving five singles and twenty-five ordered pairs, so twenty-seven commands fit
+  inside one hand's home position with three to spare before any three-key code is needed.
 - **Inward rolls preferred, same-finger repeats forbidden.** With four usable fingers on five keys
   this constrains harder than the two-handed case and is the part that needs real care.
 - **Sequential, never chorded.** Simultaneity is the thing a single hand cannot cheaply do.

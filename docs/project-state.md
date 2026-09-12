@@ -130,7 +130,7 @@ Two skill families are specced and not yet built:
   to it would require a written assignment from every individual holder, which is a formality today
   and a collection problem once outside contributors land.
 
-- Whether `commands` should split, since the seventeen-command vocabulary has grown informal
+- Whether `commands` should split, since the twenty-seven-command vocabulary has grown informal
   extensions that were never audited against the original set.
 - Whether skills should declare version compatibility with each other, given how often they
   cross-reference by name.

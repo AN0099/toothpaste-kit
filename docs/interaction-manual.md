@@ -29,7 +29,7 @@ so its effect varies, and when it varies you cannot tell whether the model misbe
 instruction was empty.
 
 Fix this by defining a small set of words that mean exactly one thing, and using them for the moves
-you make constantly. This project uses seventeen. The exact list matters far less than three
+you make constantly. This project uses twenty-seven. The exact list matters far less than three
 properties of it:
 
 - **Closed.** New words are added deliberately, not invented mid-conversation.
@@ -110,7 +110,7 @@ that has not will usually answer the last one.
 Interface cost is a real constraint and it is routinely designed out of view.
 
 This project discovered its own command vocabulary was the most physically expensive text its
-operator typed: seventeen commands, all capitalised, meaning a held modifier key on the highest
+operator typed: seventeen commands at the time, all capitalised, meaning a held modifier key on the highest
 frequency input in the system. It had been designed for legibility to the machine, and its cost to
 the human had never been counted.
 

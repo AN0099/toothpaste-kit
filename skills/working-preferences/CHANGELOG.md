@@ -48,3 +48,15 @@ Source: nine-finding audit of a NAS migration checklist and companion script, gr
 
 - **Scope Pointer:** corrected the `document-standards` line, which still described it as narrowly technical, to reflect the actual split, `document-standards` generic, `technical-documents` extending it for a technical audience, both loading together, preset priority decided by `technical-documents`' own trigger conditions rather than by surface.
 - **Scope Pointer:** added a `surface-regimes` cross-reference, matching the existing pattern of pointing to a sibling skill rather than restating its content here.
+
+## v4 (command vocabulary retiered by measured use)
+
+The command vocabulary was revised on 2026-09-08 and this file did not pick it up. The kit went on describing nineteen commands for four days after the live set became twenty-seven.
+
+- **Merged EXPAND and ELABORATE into DEEPEN.** A target narrows it to one element; no target applies it to the whole last response. The distinction the two commands carried survives as the presence or absence of an argument.
+- **Added nine commands:** CONFIRM, DECLINE, MEASURE, QUEUE, PARK, WHY, NUDGE, STAGE, SOURCE. Each is one line, as the vocabulary states it. Depth gets added here when use shows a command needs more, not in advance.
+- **Retiered the brevity code by measured frequency** into three tiers: six single keys, fifteen two-key codes, six three-key codes. Tiers came from counting commands in session transcripts rather than from judgment. A new command starts at tier 2 until it has data.
+- **Breaking for anyone who learned the old table.** Several codes changed meaning: `f` was PROCEED and is CONFIRM, `fj` was FLAG and is MEASURE, `j` was EXPAND and is DEEPEN. The skill now says so beside the table, because a code read against memory of the old table does the wrong thing without any error.
+- **Removed the paragraph grouping two-key codes by initial.** It described the old table and is false of the new one.
+- **Not ported: left-hand-only aliases.** The source vocabulary carries one per command. They are fitted to one person, and `docs/interface-contract.md` 5-4 argues that any one-handed variant must be mirrorable. Held back by decision until the one-handed codes are refined.
+- **NEXT block rule:** the letter-collision example now names DEEPEN.
