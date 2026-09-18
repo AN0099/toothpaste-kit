@@ -50,8 +50,13 @@ Reporters are credited unless they ask not to be.
 
 ## Supported versions
 
-`main` only. This project has no version numbering scheme yet, so there is no earlier release to
-patch. See `docs/project-state.md`.
+**`main` and the latest release.** Nothing earlier. This is a one-maintainer project, so a promise
+to backport into older releases is one it could not keep, and `docs/releasing.md` explains the
+versioning scheme the releases follow.
+
+In practice that means a fix lands on `main` and appears in the next release. If you are pinned to
+an older tag, the upgrade is the fix. Report against the version you are running and say which it
+is, because the answer to "is this still present" depends on it.
 
 ## What this project does not promise
 
