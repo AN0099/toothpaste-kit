@@ -83,7 +83,7 @@ corpus.
 Check syntactically instead. Block any citation comment in the candidate whose
 source path does not resolve inside the outbound set:
 
-```
+```text
 <!-- cite: src=<path>#<anchor> sha256=<digest> seen=<date> -->
 ```
 

@@ -193,7 +193,7 @@ Every question put to this operator is paid for in keystrokes by a hand that is 
 
 End any response that needs a decision with a numbered option list. This is the default way to ask this operator anything, not a special case.
 
-```
+```text
 ## Next
 - `1` <recommended action, verb first>
 - `2` <alternative>
