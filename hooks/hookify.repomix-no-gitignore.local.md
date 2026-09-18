@@ -23,7 +23,7 @@ the command output.
 
 **If this flag is genuinely needed**, mirror the deny-list first:
 
-```
+```sh
 cp .gitignore .repomixignore
 ```
 
