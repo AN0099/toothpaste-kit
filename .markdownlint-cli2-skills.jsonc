@@ -1,0 +1,64 @@
+// markdownlint-cli2 configuration for skills/ only.
+// CI only. Nothing here is installed at a contributor's desk.
+//
+// scripts/mdlint.py reimplements these same nineteen rules in the standard
+// library. This file exists so the real tool checks the same rule set, because
+// a clean result from an implementation's own author is a self-audit.
+// A disagreement between the two is a defect in scripts/mdlint.py.
+//
+// Identical to .markdownlint-cli2.jsonc except that MD025 is off. A skill file
+// uses one top level heading per section, and skills/skill-creation/SKILL.md's
+// Required Sections rule depends on that shape. The other eighteen rules apply
+// here exactly as they do everywhere else.
+{
+  "config": {
+    "default": false,
+
+    "MD001": true,  // heading levels increment by one
+    "MD011": true,  // reversed link syntax
+    "MD012": true,  // multiple consecutive blank lines
+    "MD018": true,  // no space after hash in an ATX heading
+    "MD019": true,  // multiple spaces after hash in an ATX heading
+    "MD023": true,  // headings start at the beginning of the line
+    "MD025": false, // one h1 per section is the skill format, see above
+    "MD034": true,  // bare URL used
+    "MD036": true,  // emphasis used instead of a heading
+    "MD040": true,  // fenced code blocks have a language
+    "MD042": true,  // no empty links
+    "MD045": true,  // images have alternate text
+    "MD047": true,  // file ends with a single newline
+    "MD051": true,  // link fragments resolve to a heading in the same file
+    "MD056": true,  // table column count is consistent
+
+    // PARAMETER ALIGNMENT. Four rules have defaults that differ from
+    // scripts/mdlint.py. Each value below was read from that rule's own
+    // documentation in the markdownlint source, and exists so the two
+    // implementations agree rather than so one is lenient.
+    //
+    // MD009 default allows two trailing spaces as a hard break. br_spaces 0
+    // disallows any trailing whitespace, which is what mdlint.py does and what
+    // scripts/reflow-md.py produces.
+    "MD009": { "br_spaces": 0 },
+    // MD010 default reports hard tabs inside code blocks. mdlint.py does not,
+    // because a tab is significant in some languages this repository shows in
+    // examples.
+    "MD010": { "code_blocks": false },
+    // MD059 default prohibits four link texts. mdlint.py prohibits thirteen.
+    "MD059": { "prohibited_texts": ["here", "click here", "this", "this page", "link", "more", "read more", "learn more", "see more", "details", "info", "this link", "see here"] },
+
+    // The skill format and the hook format carry the document's title as a
+    // name key rather than a title key. markdownlint's own front_matter_title
+    // option takes a regex, so this widens the default pattern instead of
+    // disabling the rule.
+    "MD041": { "front_matter_title": "^\\s*(title|name)\\s*[:=]" }
+  },
+
+  "globs": ["skills/**/*.md"],
+
+  // reflow-md's fixtures are the input and expected output of its own test.
+  // A linter that corrects them destroys the test.
+  "ignores": [
+    "scripts/reflow-md.test.md",
+    "scripts/reflow-md.expected.md"
+  ]
+}

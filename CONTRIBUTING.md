@@ -10,7 +10,7 @@ Read `README.md` for what the project does and `philosophy.md` for why it works 
 
 **No em dashes in AI-generated text.** This is a hard rule. If you drafted anything here with an agent, check the output mechanically before committing:
 
-```
+```sh
 grep -rnP '\x{2014}' .
 ```
 
@@ -18,13 +18,43 @@ grep -rnP '\x{2014}' .
 
 **Use public task IDs only.** This project runs two task queues. The public one uses `TK-` ids (`TK-014`). The private queue and its open items use a phase-and-number form and an OPEN-prefixed form, spelled out in the pattern below. Neither appears in this repo. An id in the private format is a signal that private context came with it, so check what else the sentence carries:
 
-```
+```sh
 grep -rnE '\b(P[0-9]+-[0-9]+|OPEN_[0-9]+)\b' .
 ```
 
 That check must return nothing. The two formats cannot collide, so a single grep catches drift.
 
 **Raise findings instead of quietly resolving them.** If something looks wrong or inconsistent, say so in the issue or the pull request. A unilateral fix hides the disagreement that prompted it.
+
+Three more rules, all mechanical and all enforced by the checks below:
+
+**Every `.json` in the repo must parse.**
+
+**A registry entry must be self-consistent.** Its `regime` must equal what its `capability` derives under the rule in `orchestration/taxonomy.md`, its `id` must sit under its file's `vendor` namespace, and `confidence: verified` requires a non-empty `sources` array.
+
+**Every `skills/*/SKILL.md` must carry `name` and `description` in frontmatter.**
+
+**Markdown structure is checked.** `scripts/mdlint.py` enforces nineteen rules using markdownlint's own rule IDs. Four of them are accessibility rules rather than tidiness: heading structure, image alt text, descriptive link text, and table column consistency. Run it on its own while editing:
+
+```sh
+scripts/mdlint.py path/to/file.md
+```
+
+It states its own coverage in its header, including the thirty-four markdownlint rules it does not implement and why.
+
+**markdownlint itself runs in CI, and it is not the same check.** `scripts/mdlint.py` is this project's own reimplementation, so a clean result from it is a self-audit, and the standing rule here is that a completion claim is not fact until a party other than the one making it verifies it. The `markdownlint` job in `.github/workflows/gates.yml` runs the real tool against the same rule IDs for exactly that reason. Nothing is installed at your desk to make this work, and you are not expected to run it locally. If the two ever disagree, the defect is in `scripts/mdlint.py`: report the disagreement rather than editing the document to satisfy whichever one complained. Configuration, and the two rules the CI copy cannot check, are in `.markdownlint-cli2.jsonc`.
+
+## Run the checks the way CI runs them
+
+```sh
+./scripts/gates.sh --selftest
+```
+
+That is the same script `.github/workflows/gates.yml` runs, which is the point: a check whose local copy and CI copy are separate texts can drift apart, and you find out when a clean local run is rejected by CI. It covers all seven mechanical rules above, including the two greps quoted earlier in this document.
+
+`--selftest` first plants a positive for each gate and confirms the gate fires on it, then runs the real pass. A gate that has never returned a hit has not been shown capable of returning one, so a clean result on its own is weak evidence.
+
+**What these gates do not cover**, stated because a check that does not state its coverage is not a check: en dashes, which stay a review prompt because a range and a clause separator are not mechanically separable; prose quality; internal link validity; whether a skill's closing section is last; and whether any document's claims are true.
 
 ## Skills
 
@@ -49,7 +79,7 @@ Three layers enforce this, and only the third binds:
 1. If you use Claude Code, `.claude/settings.json` in this repo sets `attribution` to empty and disables the session link. Nothing to remember.
 2. A `commit-msg` hook lives in `.githooks/`. Enable it once per clone:
 
-   ```
+   ```sh
    git config core.hooksPath .githooks
    ```
 
@@ -82,7 +112,7 @@ Operational and business material lives outside this repository entirely and is 
 
 Docs here are written for a person with a task. State what a thing does, how to use it, and what it does not cover. Skip the archaeology: which options were weighed, what a previous version got wrong, how the decision felt at the time.
 
-That material is worth keeping and is kept, in a separate provenance layer outside this repo. Two exceptions live here on purpose. A skill's `CHANGELOG.md` records why that skill is shaped the way it is, because a later editor needs it to avoid silently undoing a deliberate choice. The repo-level `CHANGELOG.md` records what changed. Neither is a session log.
+That material is kept, in a separate provenance layer outside this repository. `docs/document-layers.md` states the rule and the tests for applying it. Two exceptions live here on purpose: a skill's `CHANGELOG.md` records why that skill is shaped the way it is, because a later editor needs it to avoid silently undoing a deliberate choice, and the repository's `CHANGELOG.md` records what changed. Neither is a session log.
 
 Practical test before you commit a doc: could a contributor who has never spoken to the maintainers act on it? If a sentence only makes sense to someone who was in the room, it belongs in the provenance layer.
 
