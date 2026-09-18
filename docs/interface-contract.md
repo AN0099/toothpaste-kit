@@ -1,6 +1,6 @@
 # Interface Contract
 
-**Working doc for an effort in flight, started 2026-09-06.** Machine-facing half of a pair; the
+**Status: working document, effort in flight.** Machine-facing half of a pair; the
 human-facing half is `interaction-manual.md`.
 
 **This document is not normative and is designed to be deleted.** `skills/working-preferences/SKILL.md`
@@ -15,10 +15,10 @@ Three surfaces, which had never been described together:
 
 1. **Command vocabulary.** Twenty-seven closed commands, defined in `working-preferences`, indexed in
    `skills/commands`.
-2. **Brevity code.** Lowercase home-row equivalents for all twenty-seven. New 2026-09-06, retiered by
-   measured frequency 2026-09-08.
+2. **Brevity code.** Lowercase home-row equivalents for all twenty-seven, tiered by
+   measured frequency of use.
 3. **Input syntax.** How a message is segmented into tasks and qualifiers, and how the model should
-   parse it. New 2026-09-06, and previously unwritten anywhere despite being in constant use.
+   parse it.
 
 Item 3 is the one worth noticing. The separators had been used consistently for the whole life of the
 project and no document described them, so every session rediscovered them by inference or failed to.
@@ -27,10 +27,10 @@ project and no document described them, so every session rediscovered them by in
 
 | Element | State | Where it lives |
 |---|---|---|
-| Twenty-seven ALLCAPS commands | **Live, retiered 2026-09-08** | `working-preferences`, `commands` |
-| Brevity code, 27 codes in three tiers | **Promoted 2026-09-06, retiered 2026-09-08** | `working-preferences` |
-| Input syntax, 10 rules | **Promoted 2026-09-06** | `working-preferences` |
-| Reply-cost rules, 4 | **Promoted 2026-09-06** | `working-preferences` |
+| Twenty-seven ALLCAPS commands | **Live** | `working-preferences`, `commands` |
+| Brevity code, 27 codes in three tiers | **Live** | `working-preferences` |
+| Input syntax, 10 rules | **Live** | `working-preferences` |
+| Reply-cost rules, 4 | **Live** | `working-preferences` |
 | `commands` index updated with codes | **Done** | `commands` |
 | `CHANGELOG.md` entry for the above | **Done** | both skills' `CHANGELOG.md` |
 | Q1-3 format compliance | **Open, see 5-2** | `working-preferences` `# Format` |
@@ -86,7 +86,7 @@ control verbs. Procedures are slash commands and were deliberately excluded from
 typing `/session-close` is itself a cost worth removing, that is a separate decision about slash
 commands, not an extension of this code.
 
-5-4. **FLAGGED 2026-09-06: a one-handed variant of the brevity code. Scoped here, deliberately not
+5-4. **OPEN: a one-handed variant of the brevity code. Scoped here, not
 built.**
 
 *What breaks.* The current code's organising constraint is hand alternation, and for a one-handed
