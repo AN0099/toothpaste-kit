@@ -2,7 +2,7 @@
 
 Fill this out before ending a turn, a session, or handing a thread to a different agent, human or LLM. This is the state-handoff artifact referenced in `protocol.md`.
 
-```
+```text
 ## Handoff: <thread_id>
 
 **From:** <agent_id> (<surface>)

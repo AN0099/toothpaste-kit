@@ -9,14 +9,14 @@ Purpose: a repeatable procedure for turning Claude data-export JSON (project exp
 Before doing anything else, identify which of these you have. They are structurally distinct and require different handling.
 
 ### 1.1 Project export (`{project_uuid}.json`)
-```
+```json
 {uuid, name, description, is_private, is_starter_project, prompt_template,
  created_at, updated_at, creator, docs: [{uuid, filename, content}, ...]}
 ```
 `docs` is the project's knowledge base (static reference files, not conversation. Content is plain text/markdown/JSON-as-string. **No conversation content lives here.** Two different projects can carry byte-identical doc content if the human copy-pasted a doc set between projects/accounts) check for this before assuming two projects are independent (string-compare doc content, not just filenames).
 
 ### 1.2 Conversation export (`conversations.json`)
-```
+```json
 [{uuid, name, summary, created_at, updated_at, account,
   chat_messages: [{sender, content: [...], attachments: [...], files: [...]}, ...]}, ...]
 ```
@@ -30,7 +30,7 @@ A flat list of conversations, each already linear (no tree/branching to resolve:
 `summary` (top-level, per conversation) is a vendor-generated abstractive summary of that conversation, usually several paragraphs, present on most but not all conversations (some (very short, or oddly-terminated ones) have an empty string. **Read every summary before deciding whether to open the full transcript**) for many conversations the summary is sufficient and a full read is wasted effort.
 
 ### 1.3 Memory export (account-level, filename is an account UUID)
-```
+```json
 {conversations_memory: "<markdown-ish prose, account-wide>",
  project_memories: {"<project_uuid>": "<markdown-ish prose, scoped to that project>", ...},
  memory_files: [{path, content, updated_at}, ...],
@@ -39,7 +39,7 @@ A flat list of conversations, each already linear (no tree/branching to resolve:
 `conversations_memory` and each `project_memories` entry are vendor-synthesized narrative summaries (headed sections like "Work context," "Current state," "Key learnings"), not raw fact lists. `memory_files` are the newer structured-memory-filesystem documents (frontmatter + `[stated]`-tagged bullets, matching the format Claude itself now writes to under the persistent-memory system); these are higher-fidelity than the prose summaries and should be preferred where both exist and conflict.
 
 ### 1.4 Reflections export (also account-level)
-```
+```json
 {account_uuid, reflections: [{period, content: {hero_title, hero_body, stats,
   topics: [...], about_your_time: [...], expanding_your_skills: [...],
   worth_thinking_about: [...]}, created_at, updated_at}, ...], feedback: [...]}
