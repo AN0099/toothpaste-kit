@@ -1,46 +1,49 @@
 # Toothpaste Kit: `tp-kit`
 
-**[CURRENT WORK IN PROGRESS // PRE-ALPHA]**
+A skill library, an agent relay protocol, and a set of mechanical gates for
+running multi-agent work with a person in charge of it. Judged on control
+fidelity rather than capability: legible state, cheap correction, a reliable
+halt.
 
-A Bridle Works project. Maintained by Aidan Naveja.
+**Status: work in progress, pre-alpha.** The skills are in daily use and the
+interfaces still change.
 
-This is a set of documentation both for the user and the agent; an information corpus, a skill library, and agent relay protocol for working with multiple agents. Currently it is designed with Claude being the lead orchestrator in mind, but vendor-agnostic and vendor-specific variants are on the roadmap.
+[![gates workflow status](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml/badge.svg?branch=main)](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml) [![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
-## Why this exists and Who it's for
+**Accessibility is a requirement here, not an afterthought.** The documents this
+repository ships are authored against
+[WCAG techniques for Markdown, with the technique IDs stated](docs/document-accessibility.md),
+and `scripts/mdlint.py` enforces the mechanically checkable half of them. The
+other side, [the accessibility of the interface this work is done through](docs/accessibility.md),
+is documented with it.
 
-### Toothpaste Repairman: Automation Engineering
+A Bridle Works project, maintained by Aidan Naveja.
 
-In the 2005 film-adaption of Charlie and the Chocolate Factory, Mr. Bucket screws caps onto toothpaste
-tubes until the factory buys a machine that does it faster, and he is let go. He ends the story
-hired back to repair the machine that replaced him. That second job is the one this repository is
-about. It is harder than the first in every way that matters. Capping tubes needed his hands.
-Repairing the capper needs him to understand what the machine is doing and to notice when it stops
-doing it, which is the one part of the work the machine cannot take over, because the job is
-knowing whether the machine is working.
+## Index
 
-Everything here is built for the repairman rather than for someone operating a finished product. A
-repairman is judged on whether the machine runs, not on how impressive it looks while running, and
-that is why this project measures itself on control fidelity instead of capability: legible state,
-cheap correction, a reliable halt. It is also why so much of what is here is checks that fail
-loudly rather than features that succeed quietly. Nobody keeps a repairman who cannot tell when the
-machine is broken, and a check that reports clean because it was never wired up is worse than no
-check at all, since it spends the attention that would have found the fault.
+Where to go, by what you came for.
 
-### Riding Tack: User Interface & Experience
+- [What this kit is](#what-this-kit-is), if you want the one-paragraph version
+- [What is here](#what-is-here), a directory-by-directory tour of the repository
+- [Installing the skills](#installing-the-skills), the fastest path to using it
+- [Using the orchestration protocol](#using-the-orchestration-protocol), for relaying work between agents
+- [Packing this repo for an LLM](#packing-this-repo-for-an-llm), to paste the whole thing into a model
+- [Contributing](#contributing), including the lowest-friction first contribution
+- [Project documents](#project-documents), governance, security, releases and accessibility
+- [Why this exists](#why-this-exists), the reasoning behind every choice above
+- [License and citation](#license-and-citation)
 
-The "centaur" analogy of automation theory imagines a human-machine collaboration where a person uses technology as a powerful, tireless assistant to execute tasks while retaining ultimate control over judgment and decision-making: a human orchestrator directing an automated agent, each unable to complete the work without the other. The reverse-centaur inverts the roles. An automated orchestrator directs a human agent, the person in the loop only because the machine has no fleshy appendages of its own to do the work.
+## What this kit is
 
-The analogy holds best with deterministic automated systems, computers and machines where the same input produces the same output every time and 1 + 1 is always 2. Such systems have no will of their own to negotiate with. Applied to a non-deterministic system the centaur gets portrayed as one organism, and it will not be one until human and machine are literally fused. More accurately, what you have is a rider and a horse: two wills, one of them in charge, joined by riding tack.
+This is documentation for both the user and the agent. It holds an information
+corpus, a skill library, a vendor-independent capability taxonomy, a message
+schema for relaying work between agents and humans across surfaces, and a
+routing rule that gates dispatch on content sensitivity.
 
-The tack is the interface. A rider does not think the horse forward. They apply pressure through equipment, the horse interprets it, and the result depends almost entirely on the quality of that equipment and the operator's skill. The horse acts non-deterministically, and retraining it is not on the table, so tack and skill are the only levers left for improving how reliably it does what was asked. When the tack is bad, even a skilled rider ends up going where the horse chose to go, which is the failure this repository exists to prevent.
-
-Model capability improves or degrades without us and is somebody else's product. What is here is tack: the skills, protocols, and gates through which a person's intent reaches a capable system, and through which that system's state comes back legible. Every piece of it is judged on control fidelity rather than capability: can you tell where you are going, correct early, and stop.
-
-One consequence shapes what gets accepted here. An interface is only an interface for the people who can operate it. Reins you cannot feel are not reins.
-
-This is not a separate concern bolted onto the design. Tack already comes in many forms because riders and horses vary, and nobody treats a different bit or a different saddle as an accommodation; it is the same equipment fitted to the hands actually holding it. An interface that assumes one input method, one output channel, or one kind of attention has not been fitted to anyone. It has been fitted to an average that does not exist.
-
-The practical result is the one every curb cut demonstrates. Fitting the interface to the widest range of operators produces something better for all of them.
+It is currently designed around a local Claude Code instance as the lead
+orchestrator. Most of it is Agent Skills compatible, plain shell and Python
+scripts, and Markdown, so it stays portable across vendors. A modular,
+vendor-agnostic framework is on the roadmap.
 
 ## What is here
 
@@ -104,15 +107,15 @@ The protocol for passing work between agents on different surfaces.
 
 Copy the directories under `skills/` into your Claude skills directory:
 
-```
+```sh
 cp -r skills/* ~/.claude/skills/
 ```
 
-Each skill is one `SKILL.md` and a `CHANGELOG.md`, plus an optional `references/`. They cross-reference each other by name, so copy all nine or expect broken pointers.
+Each skill is one `SKILL.md` and a `CHANGELOG.md`, plus an optional `references/`. They cross-reference each other by name, so copy all eleven or expect broken pointers.
 
 To symlink instead of copy, so that a `git pull` updates them in place:
 
-```
+```sh
 scripts/link-skills.sh
 ```
 
@@ -126,13 +129,13 @@ Skills load on their frontmatter `description`. Read `skills/skill-discovery/SKI
 
 `repomix` collapses the whole repo into one file suitable for pasting into a model:
 
-```
+```sh
 repomix --output repomix-output.xml
 ```
 
 Check that the pack covers the tracked tree. The two counts should match:
 
-```
+```sh
 git ls-files | wc -l
 grep -c '<file path=' repomix-output.xml
 ```
@@ -147,16 +150,31 @@ The lowest-friction first contribution is a surface descriptor in `orchestration
 
 `CODE_OF_CONDUCT.md` applies in every project space. `SECURITY.md` says what counts as a vulnerability in a repository that ships no service, which is narrower and stranger than the usual list; read it before filing a public issue about a gate.
 
-## Status
+## Project documents
 
-Early. The skills are in daily use and the interfaces still change. The orchestration protocol has run across Claude, local models, and several vendor surfaces.
+| Document | What it answers |
+|---|---|
+| [Governance](GOVERNANCE.md) | Who decides, how a change lands, and what is never delegated |
+| [Contribution guide](CONTRIBUTING.md) | The rules every change passes, and the script that enforces them |
+| [Security policy](SECURITY.md) | What counts as a vulnerability here, and how to report one privately |
+| [Security posture](docs/security-posture.md) | Every control, its state, and the evidence for each |
+| [Versioning and releases](docs/releasing.md) | The version scheme and the steps to cut a release |
+| [Code of conduct](CODE_OF_CONDUCT.md) | Expected conduct, and who a report reaches |
+| [Project state](docs/project-state.md) | Where the kit itself stands right now |
+| [Standing documents](docs/standing-documents.md) | The document structure the procedure skills assume |
+| [Interface accessibility](docs/accessibility.md) | Accessibility of the interface the work is done through |
+| [Document accessibility](docs/document-accessibility.md) | WCAG techniques applied to the Markdown this repository ships |
+| [Document layers](docs/document-layers.md) | How a requirement is marked, and what belongs in this repository at all |
+| [References and prior work](references.md) | Every external standard this kit depends on or borrows from |
 
-## Philosophy
+## Why this exists
 
-See `philosophy.md`.
+The reasoning, the two images this project thinks in, and what it refuses to
+optimise for are in [the philosophy document](philosophy.md).
 
-## License
+## License and citation
 
-MIT. See `LICENSE`.
+MIT. See [the licence](LICENSE).
 
-`CITATION.cff` carries citation metadata for anyone referencing this work. It has no version or DOI yet; both get added at the first tagged release.
+[`CITATION.cff`](CITATION.cff) carries citation metadata for anyone referencing
+this work.
