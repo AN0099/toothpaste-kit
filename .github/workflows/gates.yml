@@ -28,7 +28,7 @@ jobs:
       # Pinned by tag, not by digest. Digest pinning is the stricter
       # practice and is tracked in docs/security-posture.md rather than
       # guessed at here.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # --selftest proves each gate can fail against a planted positive
       # before the clean result is trusted. A gate that has never returned a
@@ -50,7 +50,7 @@ jobs:
   markdownlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # An exact version, and no third party action: an action runs with the
       # workflow's token, a pinned package in a throwaway runner does not.
