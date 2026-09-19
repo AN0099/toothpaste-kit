@@ -103,7 +103,12 @@ VAGUE = {
 # quadratically on a long heading. `(.*)$` with rstrip in Python is the same
 # result in linear time, and the trailing whitespace it used to swallow is
 # MD009's business, which reports it a few lines earlier.
-HEADING = re.compile(r'^(#{1,6})(\s*)(.*)$')
+# The gap after the hashes is split in Python rather than captured. Two
+# regexes have now been wrong here: '(.*?)\s*$' backtracked quadratically, and
+# its replacement '(\s*)(.*)$' did too, because \s and . both match a space, so
+# a long run of spaces has many ways to divide between the two groups. '(.*)$'
+# is one greedy group with nothing after it, so there is nothing to divide.
+HEADING = re.compile(r'^(#{1,6})(.*)$')
 FENCE = re.compile(r'^(\s*)(`{3,}|~{3,})\s*(\S+)?')
 IMAGE = re.compile(r'!\[([^\]]*)\]\(([^)]*)\)')
 LINK = re.compile(r'(?<!!)\[([^\]]*)\]\(([^)]+)\)')
@@ -257,8 +262,10 @@ def check(path, text):
 
         m = HEADING.match(raw)
         if m:
-            level, gap = len(m.group(1)), m.group(2)
-            title = m.group(3).rstrip()
+            rest = m.group(2)
+            stripped = rest.lstrip()
+            level, gap = len(m.group(1)), rest[:len(rest) - len(stripped)]
+            title = stripped.rstrip()
             if gap == '':
                 bad(i, 'MD018', 'no space after hash')
             elif len(gap) > 1:

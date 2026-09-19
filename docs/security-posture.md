@@ -7,7 +7,7 @@ rows say "yes" with nothing behind them is the same unverifiable clean result
 this project's own conventions reject. Every row below either names a file that
 exists or says plainly that the thing is absent.
 
-## How to re-check this document
+## 1. How to re-check this document
 
 ```sh
 ./scripts/gates.sh --selftest
@@ -21,47 +21,47 @@ that it exists. A `SECURITY.md` that says nothing useful passes an existence
 check. Judgment of adequacy is a reader's, and the point of naming the file is
 that a reader can go and form one.
 
-## Documentation and process
+## 2. Documentation and process
 
 | Control | State | Evidence |
 |---|---|---|
-| Licence, OSI approved | Present | `LICENSE`, MIT, names the individual holder |
-| Security policy | Present | `SECURITY.md`. Defines a vulnerability for a repository that ships no service, names private GitHub reporting as primary with an email fallback, and commits to an initial response within seven days |
-| Code of conduct | Present | `CODE_OF_CONDUCT.md`, with a real reporting address. States plainly that there is one maintainer and no independent escalation body, and asks a reporter to name an acceptable third party if the report concerns the maintainer |
-| Contribution guide | Present | `CONTRIBUTING.md`, which names the script that enforces its own mechanical rules |
-| Governance, decision process, roles | Present | `GOVERNANCE.md`. One maintainer, bus factor one stated as a known risk, merges and tags and pushes not delegated |
-| Citation metadata | Present, incomplete by design | `CITATION.cff`, with `version` and `date-released` commented out until a release exists. See `docs/releasing.md` step 3 |
-| Issue templates | Present | Four files under `.github/ISSUE_TEMPLATE/` |
-| Project state, current | Present | `docs/project-state.md`, which carries its own last-updated date so a reader can judge staleness |
+| 2.1 Licence, OSI approved | Present | `LICENSE`, MIT, names the individual holder |
+| 2.2 Security policy | Present | `SECURITY.md`. Defines a vulnerability for a repository that ships no service, names private GitHub reporting as primary with an email fallback, and commits to an initial response within seven days |
+| 2.3 Code of conduct | Present | `CODE_OF_CONDUCT.md`, with a real reporting address. States plainly that there is one maintainer and no independent escalation body, and asks a reporter to name an acceptable third party if the report concerns the maintainer |
+| 2.4 Contribution guide | Present | `CONTRIBUTING.md`, which names the script that enforces its own mechanical rules |
+| 2.5 Governance, decision process, roles | Present | `GOVERNANCE.md`. One maintainer, bus factor one stated as a known risk, merges and tags and pushes not delegated |
+| 2.6 Citation metadata | Present, incomplete by design | `CITATION.cff`, with `version` and `date-released` commented out until a release exists. See `docs/releasing.md` step 3 |
+| 2.7 Issue templates | Present | Four files under `.github/ISSUE_TEMPLATE/` |
+| 2.8 Project state, current | Present | `docs/project-state.md`, which carries its own last-updated date so a reader can judge staleness |
 
-## Build, release and provenance
-
-| Control | State | Evidence |
-|---|---|---|
-| Versioning scheme | **Defined, not yet applied** | `docs/releasing.md`: repo-wide semver, annotated tags |
-| Tagged release | **Absent** | `git tag` returns nothing as of 2026-09-18. This is the single blocker under both target schemes |
-| Release notes | Mechanism exists, no release to note | `CHANGELOG.md` at repository level, plus one per skill |
-| Signed releases | Configured 2026-09-18 | SSH commit and tag signing, with a signing key held separately from the authentication key. `commit.gpgsign` and `tag.gpgsign` are both true. Every commit in the 0.1.0 set verifies as a good signature locally, and the default branch ruleset carries `required_signatures`, so an unsigned commit is rejected at the remote rather than merely discouraged. Twelve commits were rejected on the first push attempt for exactly this reason |
-| Reproducible build | Not applicable | The kit ships documents and two scripts. There is no build |
-| Dependency declaration | Present, and small by nature | `.github/dependabot.yml`, github-actions only. The repository ships no package manifest, so the surface is this small |
-| Actions pinned by digest | **Not done** | Both workflows use `actions/checkout@v4`, a tag rather than a digest. Tag pinning is mutable. Resolving it needs the current digest, which has to be read from the upstream repository rather than guessed |
-
-## Automated checks
+## 3. Build, release and provenance
 
 | Control | State | Evidence |
 |---|---|---|
-| Mechanical gates in CI | Present | `.github/workflows/gates.yml`, calling `scripts/gates.sh`. Seven gates: em dash ban, private task ID ban, JSON wellformedness, registry self-consistency, skill frontmatter, the reflow script's selftest, and markdown structure |
-| Those gates proved able to fail | Yes | `scripts/gates.sh --selftest` plants a positive for each of the first five gates and confirms it fires before the real run. Gate six carries three fixture assertions, gate seven plants one positive per markdown rule. Last run 2026-09-18: five of five plants fired, gate seven's rules all fired, then seven of seven gates passed |
-| Commit hygiene check | Present | `.github/workflows/commit-attribution.yml` rejects AI attribution trailers |
-| Least-privilege workflow tokens | Present | Both workflows declare `permissions: contents: read`. `commit-attribution.yml` declared none until 2026-09-18, when CodeQL's `actions/missing-workflow-permissions` found it. The gap had been recorded in this table before the scanner found it, and the record alone did not close it |
-| Static analysis | Present for Python and Actions, absent for shell | CodeQL default setup, languages `python` and `actions`, threat model remote and local. First analysis 2026-09-18. `scripts/gates.sh` and `scripts/link-skills.sh` are shell and therefore unanalysed, which is the remaining gap in this row |
-| Checks actually binding | **Unverified, and this is the important row** | A workflow gates nothing until it is a required status check in the ruleset on the default branch. That is a host setting and is not visible from the tree. Unverified for all three jobs. The names to select are the **job** names, which are `gates`, `markdownlint` and `check`, not the workflow names |
-| Second party check on the markdown gate | Present, and it has caught two defects | `markdownlint-cli2` runs the real tool against the same rule IDs as `scripts/mdlint.py`. On its first run, 2026-09-18, it found `MD034` at `CODE_OF_CONDUCT.md` line 52 where `mdlint.py` reported the file clean: our rule fired on a whitespace delimited bare URL and not on one inside parentheses, and its only planted positive used the delimited shape, so the selftest proved the rule could fire rather than that it covered its field. Both are fixed, and MD034 now carries two differently shaped plants. The second defect is in the row below |
-| The second party check on `skills/` | **Never ran, from the day it was added until 2026-09-18** | The job's second step passed `--config .markdownlint-cli2-skills.jsonc`, a filename `markdownlint-cli2` 0.14.0 refuses, so the step failed before reading any markdown. Correcting the name was not sufficient, because `--config` carries rules and not globs: the file's own `skills/**/*.md` was discarded and the root options file's `!skills/**` then excluded every file the step existed to check. Both were invisible because the step above it was failing on the bare URL in the row above. Now a directory-level options file run with `skills/` as the working directory, verified at the desk on the pinned version: 28 files linted, a planted bare URL reported, and a second top level heading correctly not reported |
-| Code scanning alerts triaged with a recorded reason | Present | First CodeQL analysis, 2026-09-18, returned three alerts on the default branch. `actions/missing-workflow-permissions` was fixed. Two `py/path-injection` alerts in `scripts/reflow-md.py` lines 229 and 253 were dismissed as false positives: the flagged flow is an argparse positional reaching `open()`, so the path is operator input rather than untrusted data, and no containment check exists that would not also break the intended use |
-| Alerts outstanding on the release branch | **Three dismissed, seven mitigated and awaiting re-analysis** | Ten high security severity alerts in `scripts/mdlint.py`, from the first analysis to run against the release commits. The three `py/path-injection` alerts were dismissed as false positives on 2026-09-18, on the same reasoning as the `reflow-md.py` pair: `sys.argv` paths reach `os.walk` and `open`, so the path is operator input rather than untrusted data. The seven `py/polynomial-redos` were not dismissible on that reasoning, because this linter parses contributor markdown inside a required check and a pathological input can hang the gate. One regex was rewritten to a linear form with identical output; the other six are bounded by a 2000 character limit that reports `MDLINT001` rather than skipping silently. Whether CodeQL reads that limit as a barrier is decided by the next analysis, and the fallback is a dismissal citing a mitigation that exists |
+| 3.1 Versioning scheme | **Defined, not yet applied** | `docs/releasing.md`: repo-wide semver, annotated tags |
+| 3.2 Tagged release | **Absent** | `git tag` returns nothing as of 2026-09-18. This is the single blocker under both target schemes |
+| 3.3 Release notes | Mechanism exists, no release to note | `CHANGELOG.md` at repository level, plus one per skill |
+| 3.4 Signed releases | Configured 2026-09-18 | SSH commit and tag signing, with a signing key held separately from the authentication key. `commit.gpgsign` and `tag.gpgsign` are both true. Every commit in the 0.1.0 set verifies as a good signature locally, and the default branch ruleset carries `required_signatures`, so an unsigned commit is rejected at the remote rather than merely discouraged. Twelve commits were rejected on the first push attempt for exactly this reason |
+| 3.5 Reproducible build | Not applicable | The kit ships documents and two scripts. There is no build |
+| 3.6 Dependency declaration | Present, and small by nature | `.github/dependabot.yml`, github-actions only. The repository ships no package manifest, so the surface is this small |
+| 3.7 Actions pinned by digest | **Not done** | Both workflows use `actions/checkout@v4`, a tag rather than a digest. Tag pinning is mutable. Resolving it needs the current digest, which has to be read from the upstream repository rather than guessed |
 
-## What the README's badges claim
+## 4. Automated checks
+
+| Control | State | Evidence |
+|---|---|---|
+| 4.1 Mechanical gates in CI | Present | `.github/workflows/gates.yml`, calling `scripts/gates.sh`. Seven gates: em dash ban, private task ID ban, JSON wellformedness, registry self-consistency, skill frontmatter, the reflow script's selftest, and markdown structure |
+| 4.2 Those gates proved able to fail | Yes | `scripts/gates.sh --selftest` plants a positive for each of the first five gates and confirms it fires before the real run. Gate six carries three fixture assertions, gate seven plants one positive per markdown rule. Last run 2026-09-18: five of five plants fired, gate seven's rules all fired, then seven of seven gates passed |
+| 4.3 Commit hygiene check | Present | `.github/workflows/commit-attribution.yml` rejects AI attribution trailers |
+| 4.4 Least-privilege workflow tokens | Present | Both workflows declare `permissions: contents: read`. `commit-attribution.yml` declared none until 2026-09-18, when CodeQL's `actions/missing-workflow-permissions` found it. The gap had been recorded in this table before the scanner found it, and the record alone did not close it |
+| 4.5 Static analysis | Present for Python and Actions, absent for shell | CodeQL default setup, languages `python` and `actions`, threat model remote and local. First analysis 2026-09-18. `scripts/gates.sh` and `scripts/link-skills.sh` are shell and therefore unanalysed, which is the remaining gap in this row |
+| 4.6 Checks actually binding | **Unverified, and this is the important row** | A workflow gates nothing until it is a required status check in the ruleset on the default branch. That is a host setting and is not visible from the tree. Unverified for all three jobs. The names to select are the **job** names, which are `gates`, `markdownlint` and `check`, not the workflow names |
+| 4.7 Second party check on the markdown gate | Present, and it has caught two defects | `markdownlint-cli2` runs the real tool against the same rule IDs as `scripts/mdlint.py`. On its first run, 2026-09-18, it found `MD034` at `CODE_OF_CONDUCT.md` line 52 where `mdlint.py` reported the file clean: our rule fired on a whitespace delimited bare URL and not on one inside parentheses, and its only planted positive used the delimited shape, so the selftest proved the rule could fire rather than that it covered its field. Both are fixed, and MD034 now carries two differently shaped plants. The second defect is in the row below |
+| 4.8 The second party check on `skills/` | **Never ran, from the day it was added until 2026-09-18** | The job's second step passed `--config .markdownlint-cli2-skills.jsonc`, a filename `markdownlint-cli2` 0.14.0 refuses, so the step failed before reading any markdown. Correcting the name was not sufficient, because `--config` carries rules and not globs: the file's own `skills/**/*.md` was discarded and the root options file's `!skills/**` then excluded every file the step existed to check. Both were invisible because the step above it was failing on the bare URL in the row above. Now a directory-level options file run with `skills/` as the working directory, verified at the desk on the pinned version: 28 files linted, a planted bare URL reported, and a second top level heading correctly not reported |
+| 4.9 Code scanning alerts triaged with a recorded reason | Present | First CodeQL analysis, 2026-09-18, returned three alerts on the default branch. `actions/missing-workflow-permissions` was fixed. Two `py/path-injection` alerts in `scripts/reflow-md.py` lines 229 and 253 were dismissed as false positives: the flagged flow is an argparse positional reaching `open()`, so the path is operator input rather than untrusted data, and no containment check exists that would not also break the intended use |
+| 4.10 Alerts outstanding on the release branch | **Nine dismissed with a recorded reason, one fixed by the commit carrying this row** | Ten high security severity alerts in `scripts/mdlint.py`, from the first analysis to run against the release commits. The three `py/path-injection` alerts were dismissed as false positives on 2026-09-18, on the same reasoning as the `reflow-md.py` pair: `sys.argv` paths reach `os.walk` and `open`, so the path is operator input rather than untrusted data. Of the seven `py/polynomial-redos`, six were dismissed as `won't fix` on 2026-09-19 and the seventh is fixed by this commit. The reason string is deliberate and is not interchangeable with the one above: these six are real quadratic patterns rather than false positives. Four of them were independently reproduced on a second host at 15x to 16x scaling when the input quadruples, against a known-quadratic control at 11x and a known-linear control at 2.8x, on inputs no more exotic than a long run of `[` characters. What bounds them is `MAX_LINE`, a 2000 character limit whose guard precedes every affected call site and which reports `MDLINT001` rather than skipping a long line silently. **That bound is per line and not per file.** A worst case line costs roughly 29 ms, and nothing limits how many such lines one contributed file may hold, so the residual is a required check made slow by hostile input rather than one that hangs. Recorded here because the dismissals do not state it and a reader checking them would otherwise have to derive it |
+
+## 5. What the README's badges claim
 
 A badge is an assertion with a click-through. It says a thing exists and lets a
 reader verify it in one action. **A badge may point at evidence and never
@@ -70,8 +70,8 @@ that says more than the badge does.
 
 | Badge | What it asserts | What it does not |
 |---|---|---|
-| `gates` workflow status | The workflow ran on the default branch and its result | Whether it is a required check, which is the row above |
-| Licence | The licence is MIT | Anything about the copyright holder, which `LICENSE` names |
+| 5.1 `gates` workflow status | The workflow ran on the default branch and its result | Whether it is a required check, which is the row above |
+| 5.2 Licence | The licence is MIT | Anything about the copyright holder, which `LICENSE` names |
 
 Alt text on a status badge names the indicator rather than its value, because
 the image is served by a third party and changes while the text in the
@@ -89,17 +89,17 @@ result to a reader who cannot see the image, on every future failure.
   and a bus factor of one, which is the same fact without the implication that
   a project's health is a colour.
 
-## Access control
+## 6. Access control
 
 | Control | State | Evidence |
 |---|---|---|
-| Branch protection on the default branch | **Not verifiable from the tree** | A GitHub setting. Needs a written record, and the row above depends on it |
-| Required review before merge | Not applicable as written | One maintainer. `GOVERNANCE.md` states why a self-merge ban would stop work rather than add review |
-| Signed commits required | **Not configured** | No such requirement in the tree, and it cannot be set from the tree |
-| Two-factor authentication on the account | **Not verifiable from the tree** | Account setting |
-| Least-privilege collaborator access | Not applicable | No collaborators |
+| 6.1 Branch protection on the default branch | **Not verifiable from the tree** | A GitHub setting. Needs a written record, and the row above depends on it |
+| 6.2 Required review before merge | Not applicable as written | One maintainer. `GOVERNANCE.md` states why a self-merge ban would stop work rather than add review |
+| 6.3 Signed commits required | **Not configured** | No such requirement in the tree, and it cannot be set from the tree |
+| 6.4 Two-factor authentication on the account | **Not verifiable from the tree** | Account setting |
+| 6.5 Least-privilege collaborator access | Not applicable | No collaborators |
 
-## Where a dependency is allowed to come from
+## 7. Where a dependency is allowed to come from
 
 There are two zones, and the same package can be correct in one and wrong in
 the other. Keywords below are BCP 14, per `docs/document-layers.md`.
@@ -129,18 +129,18 @@ surface that was already open.
 
 | Zone | Example | Allowed | Why |
 |---|---|---|---|
-| Local core | `scripts/mdlint.py` | Yes, it is this project's code | Standard library only, nothing installed |
-| Local core | `markdownlint-cli2` at the desk | No | Fetches from a registry at run time, and adds a package manifest to a repository that ships none |
-| Local core | WCAG technique IDs, RFC keyword usage | Yes | Published standards, readable at the source |
-| Runner | `markdownlint-cli2` pinned in a workflow step | Yes | Disposable container, no token, exact version |
-| Runner | A third party marketplace action | No | Runs with the workflow's token |
-| Runner | `actions/checkout` | Yes, with the pin recorded above | First party, and unavoidable |
+| 7.1 Local core | `scripts/mdlint.py` | Yes, it is this project's code | Standard library only, nothing installed |
+| 7.2 Local core | `markdownlint-cli2` at the desk | No | Fetches from a registry at run time, and adds a package manifest to a repository that ships none |
+| 7.3 Local core | WCAG technique IDs, RFC keyword usage | Yes | Published standards, readable at the source |
+| 7.4 Runner | `markdownlint-cli2` pinned in a workflow step | Yes | Disposable container, no token, exact version |
+| 7.5 Runner | A third party marketplace action | No | Runs with the workflow's token |
+| 7.6 Runner | `actions/checkout` | Yes, with the pin recorded above | First party, and unavoidable |
 
 **Scope.** These rules govern this repository. Material held at higher
 sensitivity is governed elsewhere by a stricter rule that is not published
 here, and this document does not describe it.
 
-## The gap between this document and a certification
+## 8. The gap between this document and a certification
 
 This document is organised by control area rather than by criterion ID. The
 criterion lists for both targets have not been transcribed from their published
