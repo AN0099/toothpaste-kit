@@ -40,7 +40,7 @@ jobs:
   # rules so that nothing has to be installed at the desk; this job runs the
   # real tool against the same nineteen, so a clean local result has been
   # checked by something other than its own author. Configuration is in
-  # .markdownlint-cli2.jsonc and .markdownlint-cli2-skills.jsonc.
+  # .markdownlint-cli2.jsonc and skills/.markdownlint-cli2.jsonc.
   #
   # Deliberately not a required status check yet. A check is trusted here only
   # after it has been observed working, and this one has never run: no linter
@@ -69,12 +69,22 @@ jobs:
         run: npx --yes "markdownlint-cli2@${MARKDOWNLINT_CLI2_VERSION}"
 
       # MD025 is off under skills/, where one top level heading per section is
-      # the document shape. Same nineteen rules otherwise. Two runs with an
-      # explicit config rather than a directory-level config file, because
-      # per-directory merge order cannot be tested at the desk.
+      # the document shape. Same nineteen rules otherwise.
+      #
+      # This step never linted a single file until 2026-09-18. It passed
+      # --config .markdownlint-cli2-skills.jsonc, and cli2 0.14.0 rejects a
+      # configuration filename that is not one of its supported types, so the
+      # step failed before reading any markdown; the failure was invisible
+      # because the step above it was already failing on a bare URL. Fixing
+      # the name was not enough either: --config carries rules and not globs,
+      # so the file's skills/**/*.md was ignored and the root options file's
+      # !skills/** excluded everything this step exists to check. A
+      # directory-level options file with the directory as the working
+      # directory is the shape that works, and it was verified by running the
+      # pinned version at the desk: 28 files linted, a planted bare URL
+      # reported, and a second top level heading correctly not reported.
       - name: Markdown lint, second party, skills
+        working-directory: skills
         env:
           MARKDOWNLINT_CLI2_VERSION: '0.14.0'
-        run: >-
-          npx --yes "markdownlint-cli2@${MARKDOWNLINT_CLI2_VERSION}"
-          --config .markdownlint-cli2-skills.jsonc
+        run: npx --yes "markdownlint-cli2@${MARKDOWNLINT_CLI2_VERSION}"

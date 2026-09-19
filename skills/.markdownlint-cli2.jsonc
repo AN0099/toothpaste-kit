@@ -1,6 +1,16 @@
 // markdownlint-cli2 configuration for skills/ only.
 // CI only. Nothing here is installed at a contributor's desk.
 //
+// This is a directory-level options file, and the job runs with skills/ as its
+// working directory. It was a root file named .markdownlint-cli2-skills.jsonc
+// passed with --config until 2026-09-18, which could not work for two reasons
+// found by running it: cli2 0.14.0 refuses a config filename that is not a
+// supported type, so the step failed before linting anything, and --config
+// carries rules only, so this file's globs were ignored and the root options
+// file's `!skills/**` then excluded every file the step existed to check. The
+// earlier note here said per-directory merge order could not be tested at the
+// desk. It can: npx runs the pinned version locally.
+//
 // scripts/mdlint.py reimplements these same nineteen rules in the standard
 // library. This file exists so the real tool checks the same rule set, because
 // a clean result from an implementation's own author is a self-audit.
@@ -53,10 +63,12 @@
     "MD041": { "front_matter_title": "^\\s*(title|name)\\s*[:=]" }
   },
 
-  "globs": ["skills/**/*.md"],
+  // Relative to this directory, which is where the job runs.
+  "globs": ["**/*.md"],
 
-  // reflow-md's fixtures are the input and expected output of its own test.
-  // A linter that corrects them destroys the test.
+  // reflow-md's fixtures live outside this directory and are already outside
+  // these globs. The entries are kept so the two configuration files stay
+  // comparable line by line.
   "ignores": [
     "scripts/reflow-md.test.md",
     "scripts/reflow-md.expected.md"

@@ -99,11 +99,21 @@ VAGUE = {
     "learn more", "see more", "details", "info", "this link", "see here",
 }
 
-HEADING = re.compile(r'^(#{1,6})(\s*)(.*?)\s*$')
+# `(.*?)\s*$`, a lazy group followed by a trailing whitespace group, backtracks
+# quadratically on a long heading. `(.*)$` with rstrip in Python is the same
+# result in linear time, and the trailing whitespace it used to swallow is
+# MD009's business, which reports it a few lines earlier.
+HEADING = re.compile(r'^(#{1,6})(\s*)(.*)$')
 FENCE = re.compile(r'^(\s*)(`{3,}|~{3,})\s*(\S+)?')
 IMAGE = re.compile(r'!\[([^\]]*)\]\(([^)]*)\)')
 LINK = re.compile(r'(?<!!)\[([^\]]*)\]\(([^)]+)\)')
-BARE_URL = re.compile(r'(?<![(<\[`])\bhttps?://[^\s<>)\]`"]+')
+# The lookbehinds exclude a link destination, `](https://`, and an autolink,
+# `<https://`. A bare `(` was excluded too until 2026-09-18, which suppressed a
+# parenthesised URL in ordinary prose: a real bare URL that markdownlint reports
+# and this rule stayed silent on, in CODE_OF_CONDUCT.md. Excluding `](` is a
+# rule about markdown; excluding `(` was a rule about punctuation, and it
+# overshot into a true positive class.
+BARE_URL = re.compile(r'(?<![<\[`])(?<!\]\()\bhttps?://[^\s<>)\]`"]+')
 CODE_SPAN = re.compile(r'`[^`]*`')
 # MD056 counts table cells, and in GFM a backslash-escaped pipe is cell content
 # rather than a cell separator. markdownlint 0.41.1 gets this for free: lib/md056.mjs
@@ -133,6 +143,15 @@ MD036_PUNCT = '.,;:!?'
 # bare character excluded every line of bold text, which is what made
 # MD036 unable to fire on its own plant.
 LIST_MARKER = re.compile(r'^\s*([-*+]\s|\d+[.)]\s|>|\|)')
+# Every inline rule below is a regex over one line, and several backtrack
+# quadratically on a line that nearly matches: CodeQL's py/polynomial-redos
+# names seven sites, all of them reached from a file this script was pointed at.
+# A markdown line long enough for that to cost anything is not prose, so the
+# line is reported and its inline rules are skipped. The longest line in this
+# repository is 985 characters, so this is a guard and not a style rule. It
+# reports rather than skipping quietly, because a check that drops part of its
+# input and returns clean is worse than no check at all.
+MAX_LINE = 2000
 
 
 def anchor(text):
@@ -230,9 +249,16 @@ def check(path, text):
         if stripped.startswith('#') and raw[:len(raw) - len(stripped)]:
             bad(i, 'MD023', 'heading does not start at the beginning of the line')
 
+        if len(raw) > MAX_LINE:
+            bad(i, 'MDLINT001', f'line is {len(raw)} characters, over the '
+                f'{MAX_LINE} character analysis limit, so the inline rules '
+                'were not run on it')
+            continue
+
         m = HEADING.match(raw)
         if m:
-            level, gap, title = len(m.group(1)), m.group(2), m.group(3)
+            level, gap = len(m.group(1)), m.group(2)
+            title = m.group(3).rstrip()
             if gap == '':
                 bad(i, 'MD018', 'no space after hash')
             elif len(gap) > 1:
@@ -307,6 +333,11 @@ def check(path, text):
                 bad(ln, 'MD056', f'table row has {w} cells, header has {width}')
 
     for i, raw in enumerate(lines, 1):
+        # The same limit. A line over it was already reported by the loop
+        # above, except inside a fence, where this pass has never been accurate
+        # anyway because it does not track fences.
+        if len(raw) > MAX_LINE:
+            continue
         for _txt, dest in LINK.findall(raw):
             if dest.startswith('#') and anchor(dest[1:]) not in headings:
                 bad(i, 'MD051', f'link fragment does not resolve: {dest}')
@@ -358,7 +389,12 @@ def selftest():
         'MD019': "# T\n\n##  Twospaces\n",
         'MD023': "# T\n\n  ## Indented\n",
         'MD025': "# T\n\n# Second\n",
-        'MD034': "# T\n\nsee https://example.com now\n",
+        # Two shapes. The delimited one fired for weeks while the
+        # parenthesised one did not, and a single plant per rule is what hid
+        # that: it proved the rule could fire, never that it fired on the field
+        # it claims to cover.
+        'MD034': ["# T\n\nsee https://example.com now\n",
+                  "# T\n\nsee (https://example.com) now\n"],
         'MD036': "# T\n\n**Looks like a heading**\n",  # no trailing punctuation
         'MD040': "# T\n\n```\ncode\n```\n",
         'MD041': "Not a heading first\n",
@@ -370,13 +406,18 @@ def selftest():
         'MD059': "# T\n\n[here](x.md)\n",
     }
     ok = True
-    for rule, body in cases.items():
-        hits = {r for _p, _l, r, _m in check('<plant>', body)}
-        if rule in hits:
-            print(f'PLANT ok    {rule} fires on a planted positive')
-        else:
-            print(f'PLANT FAIL  {rule} did not fire (saw: {sorted(hits) or "nothing"})')
-            ok = False
+    for rule, bodies in cases.items():
+        if isinstance(bodies, str):
+            bodies = [bodies]
+        for n, body in enumerate(bodies, 1):
+            label = rule if len(bodies) == 1 else f'{rule} shape {n}'
+            hits = {r for _p, _l, r, _m in check('<plant>', body)}
+            if rule in hits:
+                print(f'PLANT ok    {label} fires on a planted positive')
+            else:
+                print(f'PLANT FAIL  {label} did not fire '
+                      f'(saw: {sorted(hits) or "nothing"})')
+                ok = False
     # The frontmatter and path behaviour needs its own checks, because each one
     # is a rule NOT firing, and a rule that does not fire is indistinguishable
     # from a rule that is broken unless the same input is also shown to fire

@@ -115,6 +115,9 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
 ## Where the first release stands
 
 **Not cut.** The repository has no tags as of 2026-09-18. Step 1 passes, and
-steps 2 through 8 are the maintainer's to run. `0.1.0` is the number to use:
-pre-1.0 because the schema still moves, and `0.1.0` rather than `0.0.1` because
-the kit is a working set of eleven skills and a protocol, not a sketch.
+steps 2, 3 and 4 are done on the release branch: the `0.1.0` section is written
+in `CHANGELOG.md`, `CITATION.cff` carries `version` and `date-released`, and
+`SECURITY.md` names the supported versions. Steps 5 through 8 remain, and every
+one of them is the maintainer's. `0.1.0` is the number to use: pre-1.0 because
+the schema still moves, and `0.1.0` rather than `0.0.1` because the kit is a
+working set of eleven skills and a protocol, not a sketch.
