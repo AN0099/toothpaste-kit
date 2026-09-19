@@ -24,7 +24,7 @@ it. Skipping this step is the exact failure that motivated the rule.
 **The shape of the correct command**, run from the tree root. Substitute the
 directories that are actually publishable in your tree:
 
-```
+```sh
 repomix --include "*.md,<dir-a>/**,<dir-b>/**" --output repomix-output.xml
 ```
 
@@ -33,7 +33,7 @@ working directory before repomix sees it.
 
 **Verify every run, do not assume:**
 
-```
+```sh
 grep -c '<file path=' repomix-output.xml
 ```
 

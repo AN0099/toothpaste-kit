@@ -78,7 +78,7 @@ Move any thread that closed this session from `threads-flagged.md` to
 
 Run these. Do not eyeball them.
 
-```
+```sh
 grep -rlP '\x{2014}' --include='*.md' . | grep -v -e em-dash -e banned-words
 ```
 
@@ -88,7 +88,7 @@ before close. The two excluded filenames quote the character deliberately.
 **That command covers one of the two characters the convention bans.** Run the
 second one too, and read its result differently:
 
-```
+```sh
 find . -name '*.md' -not -name '*em-dash*' -not -name '*banned-words*' \
   -exec grep -lP '\x{2013}' {} +
 ```
@@ -101,9 +101,8 @@ tree and flagged `Mar 15 - Aug 30` and `Apr-Jun 2026`, which are ranges, so it
 would have taught its reader to dismiss it.
 
 So report the count and look at the hits. Do not gate on them, and do not report
-zero en dashes when the check was never run, which is what this skill did until
-2026-09-04. A check that silently covers half its rule is the failure this phase
-warns about two paragraphs above, and it was in this file.
+zero en dashes when the check was never run. A check that silently covers half
+its rule is the failure this phase warns about two paragraphs above.
 
 **Verify the sweep before trusting a clean result.** A search that returns
 nothing is indistinguishable from a search that is silently broken, which is the
@@ -117,14 +116,14 @@ unfiled tree, and the archive. Those are exactly the directories where the sweep
 is still recorded as incomplete in `index.md`. When exhaustive coverage is the
 point, drive the walk yourself rather than trusting the default:
 
-```
+```sh
 find . -name '*.md' -not -name '*em-dash*' -not -name '*banned-words*' \
   -exec grep -lP '\x{2014}' {} +
 ```
 
 Verify the memory store is still contained inside the restricted tier:
 
-```
+```sh
 grep MEMORY_FILE_PATH .mcp.json
 ```
 

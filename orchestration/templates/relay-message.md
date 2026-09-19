@@ -2,7 +2,7 @@
 
 Copy this block. Fill every field. Paste the whole block into the receiving agent's surface.
 
-```
+```text
 ---
 from: <agent_id> (<surface>)
 to: <agent_id> (<surface>)

@@ -1,0 +1,90 @@
+name: gates
+
+# The mechanical checks CONTRIBUTING.md states as rules.
+#
+# Like commit-attribution, this binds only when set as a required status
+# check in the ruleset on the default branch. Unset, it reports and blocks
+# nothing.
+#
+# The gates live in scripts/gates.sh rather than inline here, so that a
+# contributor's local run and this job are the same text. A gate whose CI
+# copy and local copy are separate can diverge, and the divergence only
+# shows up as a clean local run rejected by CI.
+#
+# Run the same thing yourself:  ./scripts/gates.sh --selftest
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      # Pinned by tag, not by digest. Digest pinning is the stricter
+      # practice and is tracked in docs/security-posture.md rather than
+      # guessed at here.
+      - uses: actions/checkout@v4
+
+      # --selftest proves each gate can fail against a planted positive
+      # before the clean result is trusted. A gate that has never returned a
+      # hit has not been shown capable of returning one.
+      - name: Mechanical gates
+        run: ./scripts/gates.sh --selftest
+
+  # The independent party. scripts/mdlint.py reimplements nineteen markdownlint
+  # rules so that nothing has to be installed at the desk; this job runs the
+  # real tool against the same nineteen, so a clean local result has been
+  # checked by something other than its own author. Configuration is in
+  # .markdownlint-cli2.jsonc and skills/.markdownlint-cli2.jsonc.
+  #
+  # Deliberately not a required status check yet. A check is trusted here only
+  # after it has been observed working, and this one has never run: no linter
+  # is installed at the desk, so its first real execution is on a runner.
+  # Promote it in the ruleset once it has been green once, and treat any
+  # disagreement with scripts/mdlint.py as a defect in scripts/mdlint.py.
+  markdownlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # An exact version, and no third party action: an action runs with the
+      # workflow's token, a pinned package in a throwaway runner does not.
+      #
+      # THE PIN IS UNVERIFIED, and what needs checking is now specific.
+      # scripts/mdlint.py mirrors markdownlint 0.41.1, whose rule set and
+      # parameter defaults were read from the library itself. This pin names
+      # markdownlint-cli2, a different package with its own version line, and
+      # which cli2 release bundles markdownlint 0.41.1 has not been checked.
+      # Checking a registry is web work and belongs to the maintainer.
+      # A wrong pin fails this job loudly, which is the acceptable failure.
+      # Confirm it before promoting the job to a required check.
+      - name: Markdown lint, second party, outside skills
+        env:
+          MARKDOWNLINT_CLI2_VERSION: '0.14.0'
+        run: npx --yes "markdownlint-cli2@${MARKDOWNLINT_CLI2_VERSION}"
+
+      # MD025 is off under skills/, where one top level heading per section is
+      # the document shape. Same nineteen rules otherwise.
+      #
+      # This step never linted a single file until 2026-09-18. It passed
+      # --config .markdownlint-cli2-skills.jsonc, and cli2 0.14.0 rejects a
+      # configuration filename that is not one of its supported types, so the
+      # step failed before reading any markdown; the failure was invisible
+      # because the step above it was already failing on a bare URL. Fixing
+      # the name was not enough either: --config carries rules and not globs,
+      # so the file's skills/**/*.md was ignored and the root options file's
+      # !skills/** excluded everything this step exists to check. A
+      # directory-level options file with the directory as the working
+      # directory is the shape that works, and it was verified by running the
+      # pinned version at the desk: 28 files linted, a planted bare URL
+      # reported, and a second top level heading correctly not reported.
+      - name: Markdown lint, second party, skills
+        working-directory: skills
+        env:
+          MARKDOWNLINT_CLI2_VERSION: '0.14.0'
+        run: npx --yes "markdownlint-cli2@${MARKDOWNLINT_CLI2_VERSION}"

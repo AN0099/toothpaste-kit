@@ -22,12 +22,18 @@ keywords:
   - research-software
   - accessibility
 
-# version and date-released are deliberately absent. This project has no version
-# numbering scheme yet (see docs/project-state.md) and has cut no release. Add both,
-# plus an identifiers block carrying the Zenodo DOI, at the first tagged release:
+version: 0.1.0
+date-released: '2026-09-18'
+
+# These two were commented out until a release existed, because a file claiming
+# a released version that does not exist is worse than one claiming nothing.
+# They are filled in as step 3 of docs/releasing.md. THIS COMMIT MUST BE THE
+# COMMIT THAT GETS TAGGED v0.1.0. If it is committed and not tagged, this file
+# is the lie it was written to avoid.
 #
-# version: 0.1.0
-# date-released: YYYY-MM-DD
+# The identifiers block comes after the release exists, because Zenodo mints the
+# DOI from the GitHub release rather than the other way round:
+#
 # identifiers:
 #   - type: doi
 #     value: 10.5281/zenodo.XXXXXXX

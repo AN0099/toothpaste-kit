@@ -16,7 +16,7 @@ This is deliberately vendor-agnostic and doesn't reference this project's own co
 
 ## The packet (copy everything in the fenced block)
 
-```
+```text
 You are extracting everything of value from this conversation's own context into a dense, machine-readable log for external processing. This is a mechanical extraction task, not a summary, critique, or improvement of the conversation. Follow this exactly.
 
 GOAL

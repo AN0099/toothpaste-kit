@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v3
+
+Index brought up to the twenty-seven-command vocabulary, with the brevity code beside every entry.
+Closes `docs/interface-contract.md` 5-1, which recorded the codes as missing from the
+discoverability index.
+
+**The index had already fallen behind before the retiering.** It listed seventeen commands while
+its own description said nineteen, because ATOMIC and ELABORATE were added to
+`working-preferences` and not here. A count written in prose beside a list is a claim nothing
+checks. Count the list.
+
+ATOMIC joins FREEZE, FLAG and RETRACT in the MAN resolution rule, since `working-preferences` gives
+it a Session-State Semantics entry and its one-line index entry understates that.
+
 ## v2
 
 Removed a Routing section that described a mechanism this repository never contained. It stated

@@ -1,6 +1,6 @@
 # Control Layers
 
-**Working draft, started 2026-09-06.** How automation, gates and the human divide responsibility in
+**Status: working draft.** How automation, gates and the human divide responsibility in
 this system, borrowed from process-safety practice rather than from software convention.
 
 The claim: a control system is not one mechanism that works. It is several independent mechanisms
@@ -236,6 +236,37 @@ For any proposed check, in order:
 7. When all of it fails, what limits the damage? (Layer 7)
 
 Most proposals die at step 1 or step 3, which is the point.
+
+## What a document here may say about the system it describes
+
+This document describes the control design of a private working tree, and it is
+published on purpose. The boundary is a **kind** of content rather than a level of
+detail.
+
+**Architecture and reasoning are publishable. Identifiers are not.** The layers,
+the tier separation, the conduit rule, the Purdue mapping and the reason each was
+chosen are the point of publishing at all: a control model nobody can read cannot
+be reviewed, argued with, or reused. What does not appear is the material that
+makes a description actionable against one specific machine or person, namely IP
+addresses, hostnames, usernames, real addresses, credentials, and the identifying
+details of a named individual.
+
+The two are easy to confuse and they fail differently. Describing a control tells
+a reader how this system is meant to fail safely, which is reviewable and is how
+the model improves. Naming a host tells them where to aim. Only the second is a
+disclosure.
+
+Two consequences for anyone writing in this repository:
+
+- **Do not defer a specific claim to a document the reader cannot open.** Stating
+  the two-layer rule is fine, because `docs/document-layers.md` is here and the
+  rule is the content. Writing that the reasoning behind a particular decision is
+  held outside this repository is not: it advertises that something exists and
+  hands the reader nothing they can act on. Generalize the reasoning until it can
+  be included, or drop the reference entirely.
+- **A gate that halts on architecture is enforcing a rule nobody wrote down.**
+  The boundary above is that rule. A halt should be able to name the identifier
+  it found, not the depth it disliked.
 
 ## Known gaps in this system
 

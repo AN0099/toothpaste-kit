@@ -32,7 +32,7 @@ Both layers are kept. The failure this prevents is a README that reads like a la
 
 **`index.md` is the entry point and it goes stale.** It names which documents must stay current, which is what `session-close` phase 2 checks. Trust it over memory of a previous session, and correct it when it is wrong.
 
-**Threads move in one direction.** An entry is added to the open log when something is raised and not settled. It moves to the resolved log with its resolution written out. A status change alone loses the reason, which is the part worth keeping.
+**Threads move in one direction.** An entry is added to the open log when something is raised and not settled. It moves to the resolved log with its resolution written out. A status change alone loses the reason, and the reason is what a later reader needs.
 
 **Procedures record reasoning the command does not carry.** A procedure file exists when running the operation correctly depends on knowing why the flags are what they are. If the command is self-explanatory it does not need one.
 

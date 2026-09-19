@@ -33,7 +33,7 @@ specific one guessed now would be the third version of this same mistake.
 
 Phase 3's dash sweep covered the em dash only, while the convention it enforces
 bans an em dash and any punctuation substituting for the same grammatical
-function. Measured on the maintainer's tree 2026-09-04: 100 files carried an em
+function. Measured 2026-09-04: 100 files carried an em
 dash and the check found them, 73 carried an en dash and the check reported clean
 on every one. The skill that warns about a check looking like coverage contained
 one.

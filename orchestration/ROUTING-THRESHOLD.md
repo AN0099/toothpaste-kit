@@ -60,7 +60,7 @@ Output that reaches lead or human_gate inherits the weakest unverified label any
 
 ## Worked examples
 
-**Formalizing four existing commands into skill files**
+### Formalizing four existing commands into skill files
 Gate 0: public project documentation, no Restricted/Confidential content, pass. Gate 1: no live-data, distillation, structured-transform, or tool-call-specific need beyond the file-write claude-2 already owns, falls through. Gate 2: local-1a/1b inactive, so draft generation routes to qwen-2; the file-write itself stays with claude-2 per Gate 1's standing tool-call exclusion, not delegated to qwen-2 regardless of Gate 2's outcome. Gate 3: qwen-2's draft starts Unknown, becomes Derived-grounded once claude-2 confirms the four files match the already-informal behavior the task describes.
 Route: qwen-2 drafts → claude-2 verifies and writes → Derived-grounded.
 

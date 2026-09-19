@@ -1,6 +1,6 @@
 # Accessibility
 
-**Working draft, started 2026-09-06.** Standalone: it can be read without any other file in this
+**Status: working draft.** Standalone: it can be read without any other file in this
 repository. Cross-referenced at the end for readers who want the parts it touches.
 
 Scope is the accessibility of **the interface the work is done through**. The accessibility of what a
@@ -172,5 +172,6 @@ repeating it becomes a document nobody finishes.
 - `interface-contract.md`: current status of the brevity code and the input syntax.
 - `skills/working-preferences/SKILL.md`: normative location of the brevity code, the input syntax and
   the reply-cost rules.
-- A companion document on the accessibility of produced artifacts, covering WCAG, PDF/UA and the
-  document pipeline, is held outside this repository with the ingestion specification it belongs to.
+- The accessibility of produced artifacts, covering WCAG, PDF/UA and the document pipeline, is
+  not covered in this repository. It belongs with the ingestion specification and is named here as
+  a gap rather than promised as forthcoming.

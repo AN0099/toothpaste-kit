@@ -1,0 +1,22 @@
+# Dependency updates.
+#
+# Only GitHub Actions are listed, and that is not an oversight. This
+# repository ships Markdown, JSON, two shell scripts and one Python script
+# with no third-party imports. There is no package manifest, so there is no
+# npm, pip or module ecosystem for Dependabot to watch. The actions used by
+# the two workflows are the project's entire declared dependency surface.
+#
+# If a manifest ever lands, add its ecosystem here in the same commit.
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      # The commit-attribution workflow rejects AI attribution trailers.
+      # Dependabot adds none, and this keeps its subjects consistent with
+      # the rest of the history.
+      prefix: "deps"

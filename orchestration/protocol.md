@@ -4,7 +4,7 @@
 
 Every message that crosses a surface boundary is a single block with two parts: a short human-readable header, and a JSON payload conforming to `schemas/request.json` or `schemas/response.json`.
 
-```
+```text
 ---
 from: <agent_id> (<surface>)
 to: <agent_id> (<surface>)

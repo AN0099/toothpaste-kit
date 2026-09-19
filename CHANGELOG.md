@@ -3,6 +3,84 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
+## 0.1.0 (2026-09-18)
+
+First tagged release. Pre-1.0: the orchestration schema and skill interfaces
+still move, and a MINOR bump may break something. `README.md` says pre-alpha and
+that remains true.
+
+The kit at this release is eleven skills, the orchestration protocol with its
+two JSON schemas and a four-vendor registry, seven inert hook rule examples, and
+four scripts. Most of it is not new at 0.1.0; the version exists because having
+no release at all blocks the OpenSSF badge, a Zenodo DOI, and having a version
+to report a vulnerability against.
+
+### Added
+
+- `GOVERNANCE.md`. One maintainer, stated as a governance model rather than left
+  implicit, with bus factor one named as a known risk. Merges, tags and pushes
+  are not delegated, and the document says why that boundary is the main control
+  keeping review meaningful in a project where agents do much of the editing.
+- `docs/releasing.md`. Repo-wide semantic versioning, cut as an annotated tag.
+  Chosen over per-skill version strings because skills here reference each other
+  by name and load as a set, so a reader needs to know which set they have. The
+  absence of any release was blocking the OpenSSF badge, a Zenodo DOI, and
+  having a version to report a vulnerability against.
+- `docs/security-posture.md`. One row per control, with an evidence column that
+  names a file or says the thing is absent. Organised by control area rather than
+  by criterion ID until the criterion lists are transcribed from their published
+  source, because inventing criterion IDs would produce a document that looks
+  authoritative and cites nothing.
+- `scripts/gates.sh` and `.github/workflows/gates.yml`. The seven mechanical
+  gates `CONTRIBUTING.md` states as rules, now enforced. The gates live in the
+  script and the workflow calls it, so a contributor's local run and CI are the
+  same text rather than two copies that can drift.
+- `scripts/gates.sh --selftest`, which plants a positive for each gate and
+  confirms the gate fires before the real pass runs. A gate that has never
+  returned a hit has not been shown capable of returning one.
+- `.github/dependabot.yml`, github-actions only. The repository ships no package
+  manifest, so the actions used by the two workflows are its entire declared
+  dependency surface.
+- `permissions: contents: read` on the new workflow.
+- `scripts/mdlint.py`, a seventh gate. Eighteen markdown structure rules using
+  markdownlint's own rule IDs, standard library only. markdownlint itself was
+  rejected on the same grounds the CI design note rejected third party actions:
+  `npx` fetches at run time, which is a supply chain surface attached to the
+  thing meant to increase trust, and a package manifest is the other half of
+  that cost in a repository that deliberately ships none. Four of the rules are
+  accessibility rules mapped to WCAG techniques in `docs/document-accessibility.md`.
+- `docs/document-accessibility.md`, the output-side companion that
+  `docs/accessibility.md` section 8 listed as open. Technique IDs read from
+  local W3C captures or from a supplied URL, never from recall, and the document
+  says plainly that the project does not claim conformance.
+- A Succession section in `GOVERNANCE.md`, naming what a successor needs and the
+  state of each item. Nobody is listed as a maintainer without written consent.
+
+### Changed
+
+- `README.md` restructured around an index of descriptive anchor links, with the
+  narrative moved into `philosophy.md`. One `h1`, no skipped heading levels.
+- `philosophy.md` deduplicated. `## The name` was fully contained in the
+  Toothpaste Repairman section and pointed at a README passage that had moved
+  into the same file, so it was removed rather than rewritten. The author's own
+  sections are unchanged, verified byte for byte against the committed original.
+- Three mechanical rules in `CONTRIBUTING.md`, stated before they could block
+  anyone: every `.json` parses, a registry entry is self-consistent, and every
+  `SKILL.md` carries `name` and `description`. A blocking check that no document
+  promises would reject a contributor under a rule they had no way to read.
+
+### Fixed
+
+- `docs/project-state.md` was twelve days stale. It called five committed
+  documents uncommitted, and described the code of conduct's reporting contact as
+  a placeholder when it is a real address.
+- A typo in the `README.md` overview.
+
+### Known
+
+- `README.md` carries one sentence that ends mid-clause, at "with the end-goal".
+  It is the maintainer's own draft and is left for them rather than completed.
+
 ## 2026-09-06
 
 ### Added
