@@ -3,7 +3,7 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
-## 0.1.0 (2026-09-18)
+## 0.1.0 (2026-09-19)
 
 First tagged release. Pre-1.0: the orchestration schema and skill interfaces
 still move, and a MINOR bump may break something. `README.md` says pre-alpha and
@@ -78,8 +78,16 @@ to report a vulnerability against.
 
 ### Known
 
-- `README.md` carries one sentence that ends mid-clause, at "with the end-goal".
-  It is the maintainer's own draft and is left for them rather than completed.
+- **`scripts/mdlint.py` has a quadratic-time residual that is bounded per line
+  and not per file.** Six `py/polynomial-redos` alerts are dismissed as
+  `won't fix` rather than as false positives, because the patterns are real:
+  four of them were independently reproduced on a second host at 15x to 16x
+  scaling when the input quadruples, against a known-quadratic control at 11x.
+  `MAX_LINE` caps analysis at 2000 characters and its guard precedes every
+  affected call site, so a worst-case line costs roughly 29 ms. Nothing caps how
+  many such lines one file may hold, so a hostile input makes the check slow
+  rather than making it hang. `docs/security-posture.md` row 4.10 carries the
+  full reasoning.
 
 ## 2026-09-06
 

@@ -89,6 +89,19 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
    Without `allowedSignersFile`, `git tag -v` reports that it cannot check the
    signature, which is not the same as a bad signature.
 
+   **Expect exactly one commit per release that does not verify locally, and
+   expect it to be the merge.** Merging through the web interface produces a
+   merge commit carrying GitHub's signature rather than the maintainer's, which
+   is what satisfies `required_signatures` without a signing key configured on
+   the merge step. `git log --format=%G?` reports `E` on it, meaning an unknown
+   signer, while the API reports `verified=true`. Both are correct and they are
+   about different signers: the maintainer's authorship survives in the signed
+   commits inside the merge, and the merge commit attests only that an
+   authenticated account with permission performed it. The trust anchor for that
+   one commit is the forge. This is written down so the result is expected
+   rather than rediscovered, the same reason a check states its coverage before
+   its clean result is trusted.
+
 6. **Create the GitHub release** from that tag, pasting the `CHANGELOG.md`
    section as the body.
 

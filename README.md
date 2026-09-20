@@ -8,7 +8,7 @@ halt.
 **Status: work in progress, pre-alpha.** The skills are in daily use and the
 interfaces still change.
 
-[![gates workflow status](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml/badge.svg?branch=main)](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml) [![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+[![gates workflow status](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml/badge.svg?branch=main)](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml) [![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE) [![concept DOI, resolves to the newest version](https://zenodo.org/badge/DOI/10.5281/zenodo.22850481.svg)](https://doi.org/10.5281/zenodo.22850481) [![latest tagged release](https://img.shields.io/github/v/release/AN0099/toothpaste-kit?label=release)](https://github.com/AN0099/toothpaste-kit/releases) [![Software Heritage archive status](https://archive.softwareheritage.org/badge/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/)](https://archive.softwareheritage.org/browse/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/) [![OpenSSF Best Practices level](https://www.bestpractices.dev/projects/14726/badge)](https://www.bestpractices.dev/projects/14726)
 
 **Accessibility is a requirement here, not an afterthought.** The documents this
 repository ships are authored against
