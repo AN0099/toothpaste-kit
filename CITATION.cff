@@ -23,7 +23,7 @@ keywords:
   - accessibility
 
 version: 0.1.0
-date-released: '2026-09-18'
+date-released: '2026-09-19'
 
 # These two were commented out until a release existed, because a file claiming
 # a released version that does not exist is worse than one claiming nothing.
@@ -32,9 +32,17 @@ date-released: '2026-09-18'
 # is the lie it was written to avoid.
 #
 # The identifiers block comes after the release exists, because Zenodo mints the
-# DOI from the GitHub release rather than the other way round:
+# DOI from the GitHub release rather than the other way round. Filled in
+# 2026-09-19 once the release was published.
 #
-# identifiers:
-#   - type: doi
-#     value: 10.5281/zenodo.XXXXXXX
-#     description: Concept DOI for all versions
+# The concept DOI is listed first and is the one to cite: it covers every
+# version and always resolves to the newest. The version DOI is kept beside it
+# so a reader citing this exact release has the identifier for it.
+
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22850481
+    description: Concept DOI, all versions, resolves to the newest
+  - type: doi
+    value: 10.5281/zenodo.22850482
+    description: Version DOI for v0.1.0
