@@ -121,15 +121,25 @@ Two skill families are specced and not yet built:
   a claim's source is current, moved, changed, or gone. It is deterministic, costs no tokens, and is
   not ready to ship here. The full-repo audit that found six inaccuracies below is the kind of pass
   it is meant to make unnecessary.
-- No release yet, though the scheme for one now exists. `docs/releasing.md` holds it, the
-  repo-level `CHANGELOG.md` carries a `0.1.0` section, and `CITATION.cff` carries `version` and
-  `date-released`. What is still absent is the tag, and with it the Zenodo DOI and the OpenSSF
-  Best Practices Badge, both of which need a release to point at; the `identifiers` block in
-  `CITATION.cff` stays commented until Zenodo mints the DOI. **This is still the critical path for
-  the security posture work below**, because a repository with no release has no release notes, no
-  signed artifact and no version to report a vulnerability against. The one remaining
-  prerequisite is branch protection on the default branch, which is a host setting rather than a
-  file and so belongs to the maintainer.
+- **Closed 2026-09-19: 0.1.0 is released.** Tag `v0.1.0`, six badges on the README, and the
+  `identifiers` block in `CITATION.cff` filled with the Zenodo concept DOI rather than left
+  commented. This bullet previously named the release as the critical path for the security
+  posture work; that path is now walked, so what follows is what the release left open rather
+  than what it blocks.
+  - **The OpenSSF Best Practices Badge reads 97 percent.** Project 14726. Exactly
+    two criteria are short, `know_secure_design` and `know_common_errors`, both `MUST` and both
+    marked Unmet by choice pending an assessment rather than left unanswered. The figure was
+    derived by parsing all 67 passing criteria out of `criteria.yml` and checking each answer
+    against its own attributes, which is why it is two rather than an estimate. The badge image
+    is live, so the questionnaire reaching passing updates the README with no further commit.
+  - **Branch protection is in place and is stronger than the bullet assumed.** Ruleset
+    `23662331` carries six rules with five required contexts bound. A direct push to the default
+    branch cannot succeed at all, established by attempting one: the `code_scanning` rule demands
+    CodeQL results for a commit the remote has not accepted. No `pull_request` rule declares
+    this, so the constraint is emergent rather than configured, and `docs/security-posture.md`
+    rows 4.6 and 6.1 now say so.
+  - **Still open and the maintainer's:** the education suite that would let the two `MUST`
+    criteria be answered Met.
 - No versioning scheme *across* the skill set. Individual skills still carry their own
   `CHANGELOG.md`, and the repo-level version does not imply a version for any single skill.
 - Skill interfaces still change without deprecation notice.
