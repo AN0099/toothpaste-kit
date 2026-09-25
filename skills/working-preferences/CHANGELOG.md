@@ -60,3 +60,11 @@ The command vocabulary was revised on 2026-09-08 and this file did not pick it u
 - **Removed the paragraph grouping two-key codes by initial.** It described the old table and is false of the new one.
 - **Not ported: left-hand-only aliases.** The source vocabulary carries one per command. They are fitted to one person, and `docs/interface-contract.md` 5-4 argues that any one-handed variant must be mirrorable. Held back by decision until the one-handed codes are refined.
 - **NEXT block rule:** the letter-collision example now names DEEPEN.
+
+## v5 (context cadence)
+
+- **Added Context Cadence**, a banded table for when the agent raises the context window's size and when it offers a compaction. Patches two observed failures, so it is load-bearing under Failure-Mode Preservation: a session ran far past the degradation point and the operator had to ask for the reminder the agent owed unprompted; and the opposite risk the operator named when adding it, compacting so often that working context is cut off before it stops being needed. The 40k spacing rule and the clean-boundary definition exist for the second; the unprompted status line exists for the first.
+- **The NEXT block is replaced by Questions and Answers.** Decisions are asked as three labeled questions, each closing with the codes it accepts; alternatives are digits inside that list. Answers follow a grammar of `;` segments of `<code> qN`, read back before any work. The single numbered menu had one question per message, and a whole-message code could not answer three at once.
+- **A code is now recognized paired with a question label** as well as when it is the entire message. The whole-message rule alone made `f q1; d q2` unparseable.
+- **Format: the three questions are put to the operator.** The previous wording, first-person follow-ups, described the opposite of the practice.
+- **Questions keep their numbers until answered, digit definitions sit under their own question, one code type per block where possible, and a misfit answer is read against the previous block.** From a near miss in which renumbered carried questions led a suggested reply to answer the previous block's layout.

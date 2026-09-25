@@ -171,7 +171,7 @@ Mapped here, and every one of these already exists:
 |---|---|
 | Observe | `just check`, `just status`, the gates, the alarms, the dashboard |
 | **Orient** | **`index.md`, the handoff, the session records, this document** |
-| Decide | The NEXT block, answered in one keystroke |
+| Decide | Three labeled questions, each answered in one keystroke |
 | Act | `just` recipes, the automation, the agent |
 
 **The diagnosis this produces: the bottleneck is Orient, not Observe.** There is abundant
