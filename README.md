@@ -154,6 +154,7 @@ The lowest-friction first contribution is a surface descriptor in `orchestration
 
 | Document | What it answers |
 |---|---|
+| [Quickstart](docs/quickstart.md) | The shortest path from nothing to a working loop |
 | [Governance](GOVERNANCE.md) | Who decides, how a change lands, and what is never delegated |
 | [Contribution guide](CONTRIBUTING.md) | The rules every change passes, and the script that enforces them |
 | [Security policy](SECURITY.md) | What counts as a vulnerability here, and how to report one privately |
