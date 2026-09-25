@@ -3,7 +3,7 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-09-18.
+Last updated 2026-09-23.
 
 ## Live
 
@@ -111,12 +111,12 @@ Two skill families are specced and not yet built:
 
 ## Known gaps
 
-- No test suite in this repo. An eval harness covering `document-standards` exists and is not
+- No test suite in this repo (TK-069). An eval harness covering `document-standards` exists and is not
   ready to ship here. Skills are otherwise validated by use and
   review. The CI half of this gap is closed: `gates.yml` is installed and runs seven mechanical
   gates plus a second-party markdown lint, so the checks `CONTRIBUTING.md` documents are now
   enforced rather than merely documented.
-- No drift detection for this repo's own documents. A checker exists that records a source path
+- No drift detection for this repo's own documents (TK-070). A checker exists that records a source path
   and a content hash next to a claim and rehashes on demand, reporting whether
   a claim's source is current, moved, changed, or gone. It is deterministic, costs no tokens, and is
   not ready to ship here. The full-repo audit that found six inaccuracies below is the kind of pass
@@ -139,10 +139,10 @@ Two skill families are specced and not yet built:
     this, so the constraint is emergent rather than configured, and `docs/security-posture.md`
     rows 4.6 and 6.1 now say so.
   - **Still open and the maintainer's:** the education suite that would let the two `MUST`
-    criteria be answered Met.
-- No versioning scheme *across* the skill set. Individual skills still carry their own
+    criteria be answered Met (TK-071).
+- No versioning scheme *across* the skill set (TK-072). Individual skills still carry their own
   `CHANGELOG.md`, and the repo-level version does not imply a version for any single skill.
-- Skill interfaces still change without deprecation notice.
+- Skill interfaces still change without deprecation notice (TK-073).
 
 ## Security posture, and what is actually in place
 
@@ -169,10 +169,34 @@ rather than recalled.
 row; `docs/releasing.md` holds the versioning scheme. The shorter table here is kept because it is
 the record of what was true when the work started.
 
-The first three absences are the ones a reader will notice, and the ordering above is not a plan.
+Since that record, governance, versioning and branch protection have closed; see
+`docs/security-posture.md` for each row's current state. The ordering above is not a plan.
 The plan, once the target tier is fixed, belongs in its own document with one row per criterion and
 a pointer to the evidence, because a posture claim without per-criterion evidence is the same
 unverifiable clean result this project's own conventions reject.
+
+## In v0.1.1
+
+- **`orchestration/ROLES.md`.** Defines operator, lead, aide and minions as an
+  axis of authority over a decision, explicitly separate from the three axes
+  the kit already had: clearance, working surface, and reach. It also states
+  that persona is not role, and leaves persona unbuilt.
+- **`skills/orient/`.** It does the judgement half of a reorientation and
+  delegates the mechanical half to whatever state tool the adopting tree has,
+  rather than shipping one.
+- **`skills/jot/` and `skills/touch/`.** Two small skills an agent may call
+  itself at a clean boundary: `jot` appends a short record of decisions,
+  corrections and findings, and `touch` makes one fact-level update to a
+  standing file. Their shared rules are in `docs/partial-captures.md`,
+  including the one that matters most: neither satisfies `session-log` or
+  `session-close`, and each marks its entry so it cannot be mistaken for
+  one.
+- **`working-preferences` v5.** Adds a Context Cadence section, and replaces
+  the NEXT block with Questions and Answers: three labeled questions, each
+  closing with the codes it accepts, answered as `f q1; 2 q2`. Mirrored in
+  `docs/interface-contract.md`, `docs/control-layers.md` and `skills/commands/`.
+- **`README.md` and `docs/quickstart.md`**, the quickstart batch.
+
 
 ## Open questions
 
@@ -185,6 +209,8 @@ unverifiable clean result this project's own conventions reject.
   it would require a written assignment from every individual holder, which is a formality today
   and a collection problem once outside contributors land.
 
+- Whether `skills/orient/` should ship a reference state tool or keep delegating. Delegating
+  keeps it portable and leaves an adopter with a skill whose first phase they must supply.
 - Whether `commands` should split, since the twenty-seven-command vocabulary has grown informal
   extensions that were never audited against the original set.
 - Whether skills should declare version compatibility with each other, given how often they
