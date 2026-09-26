@@ -5,7 +5,7 @@ description: Gateway and index for the project command vocabulary. Lists all twe
 # Scope
 Discoverability index for the twenty-seven commands in the project command vocabulary, with the brevity code for each. This skill exists so an agent can find out which commands are active without loading all of `working-preferences`. HELP and MAN resolve here. Every other command executes under the definitions `working-preferences` holds.
 # Command Index
-Code in parentheses. A code is a code only when it is the entire message.
+Code in parentheses. A code is a code only when it is the entire message, or paired with a question label (`f q1`); see `working-preferences` Questions and Answers.
 - ATOMIC (`jd`): toggle. Nothing is applied until every part is done and checked; a failure reverts the whole set.
 - AUDIT [scope] (`dl`): targeted diagnostic pass. Report errors, gaps, and unverified claims. Do not fix; await instruction.
 - COMPLETE (`fl`): finalize now with available context, no further checkpointing.

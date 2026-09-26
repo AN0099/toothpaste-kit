@@ -140,6 +140,11 @@ phase: the command still succeeds, and its success has stopped meaning anything.
 If the store was ever moved out of `.mcp.json`, query the live server instead and
 correct this line, rather than reading the file that is easy to reach.
 
+**Prefer a tool that judges each store by where it is and whether it holds data.**
+The grep has passed while the declared file had never been written and the memory
+in use was the harness's own file store, which no config declares. If your tree
+has such a tool, run it in place of the grep.
+
 Then read the store itself, not just its size. Aggregation is what a per-write
 check cannot see: individually ordinary observations can reconstruct reasoning
 that no single one states.

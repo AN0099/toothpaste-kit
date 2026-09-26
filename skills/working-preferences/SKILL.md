@@ -137,7 +137,7 @@ The rules in this file are defaults applied within a task, not a claim of author
 
 Lowercase home-row equivalents for every command above. Added because the ALLCAPS forms cost a held Shift on the highest-frequency text in the vocabulary, and input strain is a real cost that the original design never priced.
 
-**A code is recognized only when it is the entire message.** Nothing before it, nothing after it. This is the same rule the harness applies to slash commands, which are parsed from the start of the input only. A bare `j` inside a sentence is the letter j.
+**A code is recognized in two places only:** as the entire message, or paired with a question label in an answer segment (`f q1`, see Questions and Answers below). A bare `j` inside a sentence is the letter j.
 
 | Tier | Code | Command | Tier | Code | Command |
 |---|---|---|---|---|---|
@@ -164,7 +164,7 @@ Twenty-seven commands, twenty-seven codes, in three tiers. **Tier is assigned by
 
 `j`, `k`, `kd`, `lf`, `sdj` and `sdk` take an argument on the same line exactly as their ALLCAPS forms do.
 
-A single key and a longer code sharing a first letter is not ambiguous, because a code is only a code when it is the entire message. `f` is CONFIRM, `fk` is PROCEED.
+A single key and a longer code sharing a first letter is not ambiguous, because a code is only a code in one of those two places. `f` is CONFIRM, `fk` is PROCEED.
 
 The ALLCAPS forms remain valid and are not deprecated. This is an addition. Both forms mean the same thing and neither takes precedence.
 
@@ -181,39 +181,42 @@ How this operator's messages are structured. These are observed patterns, not re
 - **Urgency arrives as a stated consequence, not a label.** A remark about a real-world cost is a priority signal and should reorder the work. It is not background colour.
 - **Permission is granted scoped and time-boxed**, commonly "for this session". A grant to read or handle something is not a grant to delete it; destructive steps still halt for their own confirmation.
 - **Corrections lead with the correction, then the intent.** The first clause says what to undo, the second says what was actually meant. Read both before acting on either.
-- **Typos and dropped words are frequent, semantically irrelevant, and injury-related.** Infer from context and proceed. Never ask for clarification on an obvious slip, never mirror one back, and never remark on them. A clarifying question about a typo costs the operator more typing, which is the thing being minimised, so the usual efficiency argument understates the cost. Ask only when two readings produce materially different work.
+- **Typos and dropped words are frequent and semantically irrelevant.** Infer from context and proceed. Never ask for clarification on an obvious slip, never mirror one back, and never remark on them. A clarifying question about a typo costs the operator more typing, which is the thing being minimised, so the usual efficiency argument understates the cost. Ask only when two readings produce materially different work.
 
 ## Reply Cost
 
 Every question put to this operator is paid for in keystrokes by a hand that is already the constraint. Design the ask, not just the answer.
 
-- **Make decisions answerable in one keystroke.** When confirmation is needed, present the options so the reply is a single character. See the NEXT block below, which is the standard form.
+- **Make decisions answerable in one keystroke.** When confirmation is needed, present the options so each answer is a single character. See Questions and Answers below, which is the standard form.
 
-## The NEXT Block
+## Questions and Answers
 
-End any response that needs a decision with a numbered option list. This is the default way to ask this operator anything, not a special case.
+End any response that needs a decision with three questions put to the operator, labeled `Q1`, `Q2`, `Q3`, one per line. Each question closes with the codes it accepts, in parentheses.
 
 ```text
-## Next
-- `1` <recommended action, verb first>
-- `2` <alternative>
-- `3` <alternative>
-- `0` stop here
+Q1. Which register does the archive read? (1 / 2 / d)
+    1 = merge the current register in first
+    2 = use the register as it stands
+Q2. Commit the staged set as one commit? (f / d)
+Q3. Record the finding in the flag log? (f / j / d)
 ```
 
-Rules, each of which exists for a reason:
-
-- **Digits only, never letters.** Letters are reserved for the brevity code and always mean it. A `j` offered as a menu key collides with DEEPEN. This was violated repeatedly before being noticed, which is the argument for stating it.
-- **`0` always means stop, park it, no action.** A fixed slot becomes muscle memory and costs no reading.
-- **Recommended option is `1`.** The operator should be able to reply `1` without reading the rest.
-- **One line each, verb first, no prose.** If an option needs a sentence of explanation it is two options, or it is not ready to be offered.
-- **Four options maximum.** More than four is a sign the work has not been thought through far enough to ask about.
-- **Name the irreversible one.** If an option publishes, deletes, or pushes, say so in its line. The operator must never have to ask what a number does.
-- **Offer a NEXT block only when the answer changes what happens next.** A block appended to a finished report is noise, and noise here costs alarm budget in exactly the way `control-layers.md` describes.
-- **Carry unanswered options forward** rather than restating the whole question. An option not chosen is still open, and re-litigating it costs keystrokes.
-- **Batch questions.** One message carrying four cheap questions costs less than four messages carrying one each.
+- **`f` always means do what the question names.** Write the question so that is true, and a yes needs no reading beyond it.
+- **Alternatives are digits inside the code list**, `1` the recommendation, each defined directly under its own question, indented. Never write alternatives inside the question.
+- **One code type per block where possible.** A digit question goes alone or first, so a mixed block is rare and looks different.
+- **Letters are only ever brevity codes.** A `j` offered as a menu key collides with DEEPEN. This was violated repeatedly before being noticed, which is the argument for stating it.
+- **`d` means stop, park it, no action.** A fixed meaning becomes muscle memory and costs no reading.
+- **Four alternatives maximum.** More than four is a sign the work has not been thought through far enough to ask about.
+- **Name the irreversible one.** If an answer publishes, deletes, or pushes, say so in the question or its digit line. The operator must never have to ask what a code does.
+- **Ask only when the answer changes what happens next.** Questions appended to a finished report are noise, and noise here costs alarm budget in exactly the way `control-layers.md` describes.
+- **A question keeps its number until it is answered.** Carry it forward on the same line; never drop or renumber it. A new question takes a free slot or waits. The block is read by position before it is read by content, so moving a question changes what an answer means while every word stays true.
 - **Default rather than ask where a default is defensible.** State the assumption and proceed; a correction costs one short message, whereas a blocking question costs one message before any work happens at all. Reserve blocking questions for cases where proceeding would be unsafe or would waste the work.
-- **Never require a re-type.** If a reply is ambiguous, act on the most probable reading and say which one you took, so the correction is optional rather than mandatory.
+
+**The answer grammar.** An answer is `;`-separated segments, each `<code> qN`: `f q1; 2 q2; d q3`. Prose in a segment, or after `pr:`, is an instruction and outranks a conflicting code. `(c: ...)` attaches a comment to the segment before it.
+
+- **Read back first.** The reply opens with one line restating each answer's meaning, not only its letter, before any work: `Readback: Q1 f (commit); Q2 2 (new register); Q3 d (do not)`. A misread is then caught before it becomes an action.
+- **Never require a re-type.** When an answer departs from the grammar, take the most probable reading, say which in the readback, and name the standard form. Never refuse or re-ask over syntax.
+- **Read a misfit against the previous block too.** An answer that does not fit the current block often fits the last one exactly; name that reading in the readback.
 
 # Session-State Semantics
 
@@ -222,13 +225,29 @@ Rules, each of which exists for a reason:
 - **RETRACT:** content is excised from the record and treated as never stated. If load-bearing, surface that dependency before executing the retraction.
 - **ATOMIC:** while on, the unit of work is indivisible. Nothing is applied until every part is complete and checked; a failure in any part reverts the whole set rather than leaving the tree half-changed. Report what is staged and unapplied at each turn, so the pending set is never invisible. Turning it off applies or discards the pending set, and which one must be asked rather than assumed. It exists to reinsert a deliberate checkpoint into a loop otherwise optimised to remove them, and it is off by default because that cost is only worth paying when a partial application would be worse than no application.
 
+# Context Cadence
+
+The context window fails in two directions. Past roughly 150k tokens output degrades, the region this operator calls the dumb zone. Compacting too often fails the other way: each compaction replaces working context with a summary, and a summary drops the reasoning that was still in use. The cadence exists to stay between the two, and **raising it is the agent's job, unprompted**. The operator should never have to ask where the window stands.
+
+| Estimated context | What the agent does |
+|---|---|
+| Under 60k | Nothing. |
+| 60k to 100k | One status line at the end of a reply, about every 20k of growth: `CTX ~75k est; next clean boundary: <what>`. Plan the boundary rather than propose the compact. |
+| 100k to 130k | Offer the compact as a Q-block option at the next clean boundary, with a `session-log` capture first. |
+| Over 130k | Say so in every reply until compacted. Finish only the current step, then stop and ask. |
+
+- **A clean boundary** is after a commit, a dispatch, or a closed decision, with the capture's "where the work stands" already on disk. Never compact mid-step or with reasoning that exists only in the window.
+- **Do not propose a compact within about 40k of the last one** unless the work is changing topic entirely. A small window gains little from compaction and loses its working set.
+- **The figure is an estimate and says so.** A status line or harness reading the operator can see outranks the agent's estimate; ask for it when the two might differ.
+- **After a compaction, orient before acting.** The summary is a set of claims, not the state.
+
 # Failure-Mode Preservation
 
 Rules that exist as patches to an observed failure mode are load-bearing. Don't paraphrase, consolidate, or remove them for elegance when this file is edited later. If a rule's origin isn't obvious from its wording, note the failure it prevents in CHANGELOG.md rather than silently dropping it in a future rewrite.
 
 # Format
 
-- After each response, append three first-person follow-up questions labeled Q1, Q2, Q3, each on its own line.
+- After each response, append three questions put to the operator, labeled Q1, Q2, Q3, each on its own line with its code list. See Questions and Answers.
 - Exception: a turn that ends by calling a UI-driven tool requiring the turn to end there does not append Q1-3, since the tool's mechanics require the turn to end at that point.
 - Exception: an explicit sequenced "await confirm" instruction between named steps may substitute a single "confirm to proceed to [X]?" for Q1-3 at each intermediate step. Q1-3 resumes at the first response after the sequence ends, whether it completes or breaks off early.
 - Exception: an explicit token-conservation instruction overrides the requirement for that turn only.

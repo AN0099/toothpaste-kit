@@ -38,8 +38,8 @@ project and no document described them, so every session rediscovered them by in
 ## 3. The brevity code, and the constraint that shaped it
 
 3-1. Codes are lowercase, unmodified, and drawn from the home row. **A code is recognised only when
-it is the entire message**, which is the same rule the harness applies to slash commands and which
-removes the need for a sigil.
+it is the entire message, or paired with a question label in an answer segment** (`f q1; d q2`),
+which removes the need for a sigil. A bare letter inside prose is the letter.
 
 3-2. **Hand balance is the organising constraint, ahead of mnemonics.** Single keys are assigned by
 descending command frequency with the hands alternating down the list. Every two-key code takes one
@@ -66,7 +66,7 @@ Full statement is in `working-preferences`. The shape, for orientation:
 - Urgency arrives as a stated real-world consequence, not as a label, and should reorder work.
 - Permission grants are scoped and time-boxed. A grant to read is not a grant to delete.
 - Corrections lead with what to undo, then what was meant.
-- Typos are frequent, injury-related, and never to be queried.
+- Typos are frequent and never to be queried.
 
 ## 5. Open items
 

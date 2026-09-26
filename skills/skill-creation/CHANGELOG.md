@@ -41,3 +41,15 @@ that both sides are what you think they are.
 
 Sibling cross-references, meaning the existing skills naming `skill-creation` and `skill-discovery`
 in their own Scope Pointer sections, were left for a separate change rather than applied here.
+
+## v2 (single-verb exception for boundary procedures)
+
+The naming convention asked for a noun phrase of two or three words. `orient`, `jot` and `touch`,
+added in 0.2.0, are each a single verb, and a review before that release found the conflict. The
+convention now carries an exception rather than the three skills being renamed.
+
+**Why an exception rather than a rename.** The noun-phrase rule names a domain, which suits a skill
+that governs behaviour continuously. These three are procedures an agent runs on its own at one
+moment, and for them the name is the instruction. A rename after release would also count as a
+breaking change under `docs/releasing.md`, so the choice had to be made before 0.2.0 was tagged.
+The exception is narrow: a skill that governs a domain still takes a noun phrase.
