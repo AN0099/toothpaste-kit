@@ -25,7 +25,7 @@ open-threads log as a finding, and `session-close` fixes it.
 
 Then append to the day's capture file:
 
-```
+```text
 ## HH:MM [touch] <file>: <the fact, in a few words>
 ```
 

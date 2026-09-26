@@ -21,7 +21,7 @@ a vulnerability report, which needs a version to be reported against.
 lives, and they are the detail behind a release rather than a competing version
 number. A skill does not carry its own version string. The reason is that skills
 here reference each other by name and are loaded as a set, so a reader needs to
-know which set they have, not which eleven independent numbers.
+know which set they have, not a list of independent numbers.
 
 **Pre-1.0 means the interfaces still move.** While MAJOR is 0, a MINOR bump may
 break something, which is what 0.x is for. `README.md` says pre-alpha and that
@@ -49,30 +49,33 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
    Draw on the per-skill `CHANGELOG.md` files for detail rather than repeating
    them wholesale.
 
-3. **Fill in `CITATION.cff` in the same commit as the tag.** It currently ships
-   with `version` and `date-released` commented out, deliberately, because a
-   file claiming a released version that does not exist is worse than one
-   claiming nothing. Uncomment and set both:
+3. **Set `version` and `date-released` in `CITATION.cff` in the tree that gets
+   tagged.** They go in on the release branch before the merge, so the merge
+   commit the tag points at carries them. For example:
 
    ```yaml
-   version: 0.1.0
-   date-released: 2026-09-18
+   version: 0.2.0
+   date-released: 2026-09-26
    ```
 
-   The `identifiers` block with the Zenodo DOI is added after the first release
-   exists, since Zenodo mints the DOI from the release.
+   The date also heads the release's `CHANGELOG.md` section. If the tag is cut
+   on a different day, change both before the release commit.
 
-4. **Update `SECURITY.md`'s "Supported versions"**, which currently says `main`
-   only because there was no release to patch. After the first tag it should say
-   which versions get fixes. For a one-maintainer project the honest answer is
-   the latest release and `main`.
+   Remove the previous release's version DOI from `identifiers`: beside the new
+   `version` it would name the wrong release. The concept DOI stays. The new
+   version DOI is added after the release, because Zenodo mints it from the
+   release (step 7).
+
+4. **Check `SECURITY.md`'s "Supported versions".** Since 0.1.0 it says the
+   latest release and `main`, which is the honest answer for a one-maintainer
+   project. Change it only if that stops being true.
 
 5. **Tag, annotated and signed.** A signing SSH key is registered on the
    account, so the tag is signed rather than merely annotated:
 
    ```sh
-   git tag -s v0.1.0 -m "toothpaste-kit 0.1.0"
-   git push origin v0.1.0
+   git tag -s v0.2.0 -m "toothpaste-kit 0.2.0"
+   git push origin v0.2.0
    ```
 
    GitHub marks the tag Verified when the key is registered as a **signing**
@@ -83,7 +86,7 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
    git config gpg.format ssh
    git config user.signingkey ~/.ssh/<key>.pub
    git config gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
-   git tag -v v0.1.0
+   git tag -v v0.2.0
    ```
 
    Without `allowedSignersFile`, `git tag -v` reports that it cannot check the
@@ -103,16 +106,20 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
    its clean result is trusted.
 
 6. **Create the GitHub release** from that tag, pasting the `CHANGELOG.md`
-   section as the body.
+   section as the body. Publish it rather than saving a draft: the Zenodo
+   webhook fires on a published release.
 
-7. **Add the `identifiers` block to `CITATION.cff`** once Zenodo has minted the
-   DOI. The Zenodo integration is enabled, and it mints from the GitHub release
-   webhook in step 6, so the DOI does not exist until that step completes. It
-   issues a concept DOI covering every version, which always resolves to the
-   newest, and a per-version DOI. Cite the concept DOI.
+7. **Add the version DOI to `CITATION.cff`** once Zenodo has minted it. The
+   Zenodo integration is enabled, and it mints from the GitHub release webhook
+   in step 6, so the DOI does not exist until that step completes. It issues a
+   concept DOI covering every version, which always resolves to the newest, and
+   a per-version DOI. Cite the concept DOI. This is a change to `main` after
+   the tag, so it goes through its own pull request, which also marks the
+   release as cut under "Where releases stand" below.
 
-8. **Add the release badges to `README.md` in the same edit.** Four, appended
-   to the existing badge line after the `gates` and licence badges:
+8. **Release badges in `README.md`.** Added at 0.1.0; a later release leaves
+   them as they are. Four, on the badge line after the `gates` and licence
+   badges:
 
    - the Zenodo concept DOI badge, linking to the concept DOI
    - the Software Heritage archive badge, linking to the archived origin
@@ -125,12 +132,14 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
    whose subject has no row in `docs/security-posture.md` does not belong in
    the README.
 
-## Where the first release stands
+## Where releases stand
 
-**Not cut.** The repository has no tags as of 2026-09-18. Step 1 passes, and
-steps 2, 3 and 4 are done on the release branch: the `0.1.0` section is written
-in `CHANGELOG.md`, `CITATION.cff` carries `version` and `date-released`, and
-`SECURITY.md` names the supported versions. Steps 5 through 8 remain, and every
-one of them is the maintainer's. `0.1.0` is the number to use: pre-1.0 because
-the schema still moves, and `0.1.0` rather than `0.0.1` because the kit is a
-working set of eleven skills and a protocol, not a sketch.
+- **0.1.0, cut 2026-09-19.** The first release: a signed tag, a GitHub
+  release, a Zenodo concept DOI and a version DOI. The concept DOI is in
+  `CITATION.cff`; the 0.1.0 version DOI is `10.5281/zenodo.22850482`.
+  `0.1.0` rather than `0.0.1` because the kit was already a working set of
+  eleven skills and a protocol, not a sketch.
+- **0.2.0, prepared in this tree.** MINOR, because it adds three skills and
+  changes the question format in `working-preferences`, a change a MINOR bump
+  may make while MAJOR is 0. Steps 2 and 3 are done. The step 7 pull request
+  adds its version DOI and marks it cut here.

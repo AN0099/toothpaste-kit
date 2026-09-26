@@ -3,6 +3,59 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
+## 0.2.0 (2026-09-26)
+
+A MINOR release under `docs/releasing.md`: three new skills, and a changed
+question format in `working-preferences`. Pre-1.0, so the format change is
+allowed in a MINOR bump. Documentation and skill files only; no script changes.
+
+### Added
+
+- `orchestration/ROLES.md`. Operator, lead, aide and minions, defined as an
+  axis of authority over a decision, separate from clearance, working surface
+  and reach. Persona is stated to be a different thing, and is left unbuilt.
+- `skills/orient/`. The judgement half of a reorientation. The mechanical half
+  is delegated to whatever state tool the adopting tree has.
+- `skills/jot/` and `skills/touch/`. Partial captures an agent may call at a
+  clean boundary: `jot` records decisions, corrections and findings, and
+  `touch` makes one fact-level update to a standing file.
+- `docs/partial-captures.md`. The rules `jot` and `touch` share, including
+  that neither satisfies `session-log` or `session-close`, and that each marks
+  its entry so it cannot be mistaken for one.
+- `docs/quickstart.md`, linked from `README.md`.
+
+### Changed
+
+- `working-preferences` v5. Adds Context Cadence, which sets when the agent
+  reports context size and when it offers a compaction. **Replaces the NEXT
+  block with Questions and Answers**: three labeled questions, each closing
+  with the codes it accepts, answered as `f q1; 2 q2`. An adopter who relies
+  on the NEXT block needs to update. Mirrored in `docs/interface-contract.md`,
+  `docs/control-layers.md` and `skills/commands/`. Reasons are in the skill's
+  own `CHANGELOG.md`.
+- `session-close` now prefers a tool that judges each memory store by where it
+  is and whether it holds data, over the path grep, which has passed while
+  the declared store had never been written.
+- `docs/project-state.md` has a section for this release, and task ids on each
+  known gap.
+- `docs/releasing.md` step 3 describes setting the citation fields in the tree
+  that gets tagged, and steps 4, 7 and 8 no longer describe the first release
+  as still to come. Step 5's examples name this release.
+- `skill-creation` v2. The naming convention allows a single verb for a
+  procedure an agent runs on its own at a clean boundary, which covers
+  `orient`, `jot` and `touch`. A skill that governs a domain still takes a
+  noun phrase.
+
+### Fixed
+
+- `README.md` and `docs/project-state.md` said eleven skills and listed only
+  those. Both now list all fourteen in three classes, and the README tells an
+  adopter to copy the whole `skills/` folder rather than a count.
+- `orient`, `jot` and `touch` arrived without the `CHANGELOG.md` every other
+  skill carries. Each now has a v1 entry giving the reasons for its shape.
+- Three markdown findings from the gates: two code fences without a language,
+  and one double blank line.
+
 ## 0.1.0 (2026-09-19)
 
 First tagged release. Pre-1.0: the orchestration schema and skill interfaces

@@ -11,6 +11,7 @@ Any time a new skill is being added to this system, an existing skill is being s
 
 - Lowercase, hyphen-separated, noun phrase naming the skill's domain, not a verb phrase describing an action: `document-standards`, `working-preferences`, `skill-discovery`. Not `write-documents` or `discover-skills`.
 - Two words, occasionally three, matching the existing family (`working-preferences`, `document-standards`, `technical-documents`, `surface-regimes`, `skill-creation`, `skill-discovery`). A name needing more than three words signals the skill's scope is too wide. Narrow it or split it before naming it.
+- One exception to both rules above: a procedure an agent runs on its own at a clean boundary may be named by a single verb, because the name is the instruction the agent follows at that moment. `orient`, `jot` and `touch` are the existing cases. A skill that governs a domain still takes a noun phrase.
 - No version number, date, or status word in the name itself. No `document-standards-v2`, no `skill-creation-draft`. Versioning lives in the skill's own `CHANGELOG.md`. The name describes the domain, which shouldn't change with revisions.
 - Check for collision and near-collision before finalizing, not only exact duplicates. `skill-creation` and `skill-create` triggering on similar phrasing is as much a problem as an exact match.
 

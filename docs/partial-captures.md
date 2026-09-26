@@ -30,7 +30,7 @@ dated trace in one place.
 
 ## Heading shape
 
-```
+```text
 ## HH:MM [jot] <what the stretch was>
 ## HH:MM [touch] <file>: <the fact, in a few words>
 ```

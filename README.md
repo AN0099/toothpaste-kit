@@ -49,7 +49,7 @@ vendor-agnostic framework is on the roadmap.
 
 ### `skills/`
 
-Eleven skills, in two classes.
+Fourteen skills, in three classes.
 
 Seven govern agent behavior continuously. An agent loads them on its own when the frontmatter `description` matches what it is doing.
 
@@ -71,6 +71,14 @@ Four are procedures a person invokes. All four set `disable-model-invocation`, s
 | `session-close` | At the end of a working session. Captures reasoning that exists nowhere on disk, then updates the standing documents |
 | `daily-dashboard` | At the start of a working session. Reads those documents back, verifies carry-over against the working trees, and ends on questions |
 | `session-log` | Mid-session, before context is compacted. Captures the reasoning from the recent stretch to one append-only file, and nothing else |
+
+Three are procedures an agent may run on its own at a clean boundary. None sets `disable-model-invocation`, because each one reads or records and none decides anything. None of them satisfies `session-log` or `session-close`.
+
+| Skill | Runs |
+|---|---|
+| `orient` | After a compaction or a handoff, or before acting on a summary. Runs the tree's own state tool, then asks what moved and where the record disagrees with the tree |
+| `jot` | After a stretch of work. Appends one short, marked entry of decisions, corrections and findings to the day's capture file |
+| `touch` | Right after the work it records. Makes one fact-level update to a standing file, and leaves a marked line in the day's capture file |
 
 ### `docs/`
 
@@ -111,7 +119,7 @@ Copy the directories under `skills/` into your Claude skills directory:
 cp -r skills/* ~/.claude/skills/
 ```
 
-Each skill is one `SKILL.md` and a `CHANGELOG.md`, plus an optional `references/`. They cross-reference each other by name, so copy all eleven or expect broken pointers.
+Each skill is one `SKILL.md` and a `CHANGELOG.md`, plus an optional `references/`. They cross-reference each other by name, so copy the whole `skills/` folder or expect broken pointers.
 
 To symlink instead of copy, so that a `git pull` updates them in place:
 

@@ -3,11 +3,11 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-09-23.
+Last updated 2026-09-26.
 
 ## Live
 
-Eleven skills in two classes.
+Fourteen skills in three classes.
 
 Seven govern agent behavior and are in daily use: `working-preferences`, `document-standards`,
 `technical-documents`, `surface-regimes`, `skill-creation`, `skill-discovery`, `commands`.
@@ -16,6 +16,10 @@ Four are human-invoked procedures: `redaction-gate`, `session-close`,
 `daily-dashboard` and `session-log`. All four set `disable-model-invocation`, which is the point in
 each case. A gate a model can invoke to satisfy itself is not a gate, and an agent should not decide
 on its own that a session is over or that a working day has started.
+
+Three are procedures an agent may run on its own at a clean boundary: `orient`, `jot` and `touch`.
+None sets `disable-model-invocation`, because each reads or records and none decides anything, and
+none satisfies `session-log` or `session-close`.
 
 `hooks/` carries seven `hookify` rule examples, inert where they sit. `scripts/` carries
 `link-skills.sh` and `reflow-md.py`, the latter with a fixture and `--selftest`. `link-skills.sh`
@@ -175,7 +179,7 @@ The plan, once the target tier is fixed, belongs in its own document with one ro
 a pointer to the evidence, because a posture claim without per-criterion evidence is the same
 unverifiable clean result this project's own conventions reject.
 
-## In v0.1.1
+## In v0.2.0
 
 - **`orchestration/ROLES.md`.** Defines operator, lead, aide and minions as an
   axis of authority over a decision, explicitly separate from the three axes
@@ -196,7 +200,6 @@ unverifiable clean result this project's own conventions reject.
   closing with the codes it accepts, answered as `f q1; 2 q2`. Mirrored in
   `docs/interface-contract.md`, `docs/control-layers.md` and `skills/commands/`.
 - **`README.md` and `docs/quickstart.md`**, the quickstart batch.
-
 
 ## Open questions
 
