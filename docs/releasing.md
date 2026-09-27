@@ -139,7 +139,7 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
   `CITATION.cff`; the 0.1.0 version DOI is `10.5281/zenodo.22850482`.
   `0.1.0` rather than `0.0.1` because the kit was already a working set of
   eleven skills and a protocol, not a sketch.
-- **0.2.0, prepared in this tree.** MINOR, because it adds three skills and
-  changes the question format in `working-preferences`, a change a MINOR bump
-  may make while MAJOR is 0. Steps 2 and 3 are done. The step 7 pull request
-  adds its version DOI and marks it cut here.
+- **0.2.0, cut 2026-09-26.** MINOR, because it adds three skills and changes
+  the question format in `working-preferences`, a change a MINOR bump may make
+  while MAJOR is 0. The 0.2.0 version DOI is `10.5281/zenodo.22978591`, listed
+  in `CITATION.cff` beside the concept DOI.
