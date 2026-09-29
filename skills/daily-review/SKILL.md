@@ -23,12 +23,12 @@ gives: a model re-deriving lanes from raw JSON is doing a script's job, and doin
 | Lane | Holds | Leaves by |
 |---|---|---|
 | Inbox | captured, not yet clarified | this review |
-| Someday/Maybe | considered and parked | the monthly review |
+| Someday/Maybe | considered and parked | a monthly review, if the tree runs one |
 | Next | ready to start, in order | a seat pulling its top task |
 | Waiting | blocked on a named person, task or event | the blocker clearing |
 | Doing | pulled; at most one per seat | finishing, to Verify |
 | Verify | deliverable exists and a second party checked it | the person's word, to Done |
-| Done, Archive | accepted; out of the board | the monthly review archives |
+| Done, Archive | accepted; out of the board | a monthly review, if the tree runs one, archives |
 
 **Priority is an Eisenhower quadrant**: Do, Decide, Delegate, Delete. **Urgent is read, not felt**:
 a task is urgent only when it carries a due date and a stated consequence of missing it. Important
@@ -48,11 +48,11 @@ not write anything yet.**
 
 1. **Inbox to empty.** Each item gets a destination: Next (with a quadrant and a next action),
    Waiting (with its blocker), Someday/Maybe, a child of an existing task, or trash. Work that takes
-   under two minutes is proposed as done now and noted in the capture log, not queued.
+   under two minutes is proposed as done now and noted in the capture file, not queued.
 2. **Doing, carried.** Each task still in Doing from a previous day: carry it (it stays, and its
    carry count rises by one), move it back to Next, or move it to Waiting with a blocker. A task
    bumped by an interruption returns to the top of Next and its count does not rise. **A count of
-   three or more is said aloud**: a task carried all week is a question for the weekly review, and
+   three or more is said aloud**: a task carried all week is a question for a weekly review, and
    the daily review names it so the question is not first asked there.
 3. **Verify, offered for close.** Each task in Verify, with the second-party check its note records.
    Offer the close; never close it. A task whose note records no second party does not belong in
@@ -90,8 +90,8 @@ unanswered row stays where it was and is listed as unanswered.
 
 - `daily-dashboard`: the state view. It checks the standing files and working trees against their
   claims; this reads the board and moves tasks. Run it first when both are wanted.
-- `weekly-review`: Waiting's blockers, carry-over by count, the Done lane, and one Decide task
+- `weekly-review` (not in this kit): Waiting's blockers, carry-over by count, the Done lane, and one Decide task
   scheduled so the important is not starved by the urgent.
-- `monthly-review`: Someday adopted or rejected, and archive candidates chosen by the person.
+- `monthly-review` (not in this kit): Someday adopted or rejected, and archive candidates chosen by the person.
 - `session-close`: updates the standing files at the end of a session. A move made here is already
   in the queue and does not wait for it.

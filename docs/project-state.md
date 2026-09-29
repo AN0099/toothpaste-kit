@@ -3,17 +3,17 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-09-26.
+Last updated 2026-09-29.
 
 ## Live
 
-Fourteen skills in three classes.
+Fifteen skills in three classes.
 
 Seven govern agent behavior and are in daily use: `working-preferences`, `document-standards`,
 `technical-documents`, `surface-regimes`, `skill-creation`, `skill-discovery`, `commands`.
 
-Four are human-invoked procedures: `redaction-gate`, `session-close`,
-`daily-dashboard` and `session-log`. All four set `disable-model-invocation`, which is the point in
+Five are human-invoked procedures: `redaction-gate`, `session-close`,
+`daily-dashboard`, `daily-review` and `session-log`. All five set `disable-model-invocation`, which is the point in
 each case. A gate a model can invoke to satisfy itself is not a gate, and an agent should not decide
 on its own that a session is over or that a working day has started.
 
@@ -178,6 +178,17 @@ Since that record, governance, versioning and branch protection have closed; see
 The plan, once the target tier is fixed, belongs in its own document with one row per criterion and
 a pointer to the evidence, because a posture claim without per-criterion evidence is the same
 unverifiable clean result this project's own conventions reject.
+
+## In v0.3.0
+
+- **`skills/daily-review/`.** The once-a-day pass over a task board's lanes,
+  split out of `daily-dashboard`. It proposes moves and asks; it moves
+  nothing the person did not answer.
+- **A Cadence section in `docs/releasing.md`.** A release review every two
+  weeks on a Tuesday, which publishes a release only when the review admits
+  one.
+- **`CITATION.cff` lists only the concept DOI.** Each version DOI is recorded
+  in `docs/releasing.md` by the release after it.
 
 ## In v0.2.0
 

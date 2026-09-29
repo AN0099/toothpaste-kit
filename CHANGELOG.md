@@ -3,6 +3,34 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
+## 0.3.0 (2026-09-29)
+
+A MINOR release under `docs/releasing.md`: one new skill, and a release cadence.
+Documentation and skill files only; no script changes.
+
+### Added
+
+- `skills/daily-review/`. A once-a-day pass over a task board's lanes: the
+  Inbox clarified to empty, carried work counted, finished work offered for
+  close, priority read as an Eisenhower quadrant, and the day's order proposed.
+  It proposes and asks; it moves nothing the person did not answer. It assumes
+  a lane-board tool and says what that tool must print.
+- `docs/releasing.md` has a Cadence section: a release review every two weeks
+  on a Tuesday, with a Friday cutoff and a Monday final review, and a release
+  only when the review admits one.
+
+### Changed
+
+- `CITATION.cff` lists only the concept DOI, which is the one to cite. Each
+  version DOI is recorded under "Where releases stand" in `docs/releasing.md`
+  by the release after it, so a release no longer needs a follow-up pull
+  request to record its DOI. Steps 3 and 7 of `docs/releasing.md` say so.
+- `README.md` and `docs/project-state.md` list fifteen skills, with
+  `daily-review` among those a person invokes.
+- `docs/quickstart.md`: the example `CLAUDE.md` names the provenance layer and
+  the file that lists the standing files, which the loop skills look for
+  before writing.
+
 ## 0.2.0 (2026-09-26)
 
 A MINOR release under `docs/releasing.md`: three new skills, and a changed

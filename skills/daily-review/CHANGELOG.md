@@ -6,7 +6,7 @@ The once-a-day lane pass, split out of `daily-dashboard`. The dashboard had beco
 at different rates: a state view wanted several times a day as a thorough reorientation, and a
 review of the task board wanted once. Run together, the board review was repeated every time the
 state was wanted, or skipped with it. Now the dashboard keeps the state view, and this skill takes
-the board, matching `weekly-review` and `monthly-review` in name and shape.
+the board, in the shape of a weekly and a monthly review, which the kit does not ship.
 
 Three things are deliberate.
 
