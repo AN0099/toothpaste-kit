@@ -37,10 +37,13 @@ it stays out.**
 
 ## 2. The file the agent reads every session
 
-`CLAUDE.md` at the workspace root. Start with five conventions and add
-only when something bites you:
+`CLAUDE.md` at the workspace root. Start with where things go and five
+conventions, and add only when something bites you. The skills read the
+first two lines to find where to write, and stop and ask without them:
 
 ```markdown
+- The provenance layer is `.agents/context/`.
+- The standing files are listed in `index.md`.
 - No completion claim is fact until verified by someone other than the
   claimer. Self-audit is not verification.
 - State a check's coverage, or it is not a check.
