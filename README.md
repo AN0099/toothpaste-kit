@@ -49,7 +49,7 @@ vendor-agnostic framework is on the roadmap.
 
 ### `skills/`
 
-Fifteen skills, in three classes.
+Sixteen skills, in three classes.
 
 Seven govern agent behavior continuously. An agent loads them on its own when the frontmatter `description` matches what it is doing.
 
@@ -63,7 +63,7 @@ Seven govern agent behavior continuously. An agent loads them on its own when th
 | `skill-discovery` | Whether a recurring need is worth a skill, and finding one that already exists |
 | `commands` | Index for the twenty-seven-command vocabulary, with brevity codes |
 
-Five are procedures a person invokes. All five set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started.
+Six are procedures a person invokes. All six set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started.
 
 | Skill | Runs |
 |---|---|
@@ -71,6 +71,7 @@ Five are procedures a person invokes. All five set `disable-model-invocation`, s
 | `session-close` | At the end of a working session. Captures reasoning that exists nowhere on disk, then updates the standing documents |
 | `daily-dashboard` | At the start of a working session. Reads those documents back, verifies carry-over against the working trees, and ends on questions |
 | `daily-review` | Once a day, before the first task is pulled. Proposes moves across the task board's lanes and ends on questions; assumes a lane-board tool |
+| `weekly-review` | Once a week, after a daily review. Chases Waiting's blockers, names carried work by its count, reads the Done lane back, and schedules one important task; ends on questions |
 | `session-log` | Mid-session, before context is compacted. Captures the reasoning from the recent stretch to one append-only file, and nothing else |
 
 Three are procedures an agent may run on its own at a clean boundary. None sets `disable-model-invocation`, because each one reads or records and none decides anything. None of them satisfies `session-log` or `session-close`.

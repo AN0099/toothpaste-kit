@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v1.1
+
+The Scope Pointer names `weekly-review` as part of the kit, now that it ships. No change to the
+procedure.
+
 ## v1 (initial)
 
 The once-a-day lane pass, split out of `daily-dashboard`. The dashboard had become two things run
