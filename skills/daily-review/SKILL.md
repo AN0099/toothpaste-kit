@@ -90,7 +90,7 @@ unanswered row stays where it was and is listed as unanswered.
 
 - `daily-dashboard`: the state view. It checks the standing files and working trees against their
   claims; this reads the board and moves tasks. Run it first when both are wanted.
-- `weekly-review` (not in this kit): Waiting's blockers, carry-over by count, the Done lane, and one Decide task
+- `weekly-review`: Waiting's blockers, carry-over by count, the Done lane, and one Decide task
   scheduled so the important is not starved by the urgent.
 - `monthly-review` (not in this kit): Someday adopted or rejected, and archive candidates chosen by the person.
 - `session-close`: updates the standing files at the end of a session. A move made here is already

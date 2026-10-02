@@ -3,6 +3,23 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
+## Unreleased
+
+### Added
+
+- `skills/weekly-review/`. A once-a-week pass over a task board's slower lanes:
+  each Waiting blocker chased, carried work named by its count, the Done lane
+  read back against each task's own verification, and one important task given
+  a day, never a due date. It proposes and asks; it moves nothing the person
+  did not answer.
+
+### Changed
+
+- `README.md` and `docs/project-state.md` list sixteen skills, with
+  `weekly-review` among those a person invokes.
+- `skills/daily-review/` v1.1: its Scope Pointer names `weekly-review` as
+  shipped.
+
 ## 0.3.0 (2026-09-29)
 
 A MINOR release under `docs/releasing.md`: one new skill, and a release cadence.

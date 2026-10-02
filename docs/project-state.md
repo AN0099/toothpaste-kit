@@ -3,17 +3,17 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-09-29.
+Last updated 2026-09-30.
 
 ## Live
 
-Fifteen skills in three classes.
+Sixteen skills in three classes.
 
 Seven govern agent behavior and are in daily use: `working-preferences`, `document-standards`,
 `technical-documents`, `surface-regimes`, `skill-creation`, `skill-discovery`, `commands`.
 
-Five are human-invoked procedures: `redaction-gate`, `session-close`,
-`daily-dashboard`, `daily-review` and `session-log`. All five set `disable-model-invocation`, which is the point in
+Six are human-invoked procedures: `redaction-gate`, `session-close`,
+`daily-dashboard`, `daily-review`, `weekly-review` and `session-log`. All six set `disable-model-invocation`, which is the point in
 each case. A gate a model can invoke to satisfy itself is not a gate, and an agent should not decide
 on its own that a session is over or that a working day has started.
 
