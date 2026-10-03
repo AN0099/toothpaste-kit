@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.1
+## v2
 
 The Scope Pointer names `weekly-review` as part of the kit, now that it ships. No change to the
 procedure.
