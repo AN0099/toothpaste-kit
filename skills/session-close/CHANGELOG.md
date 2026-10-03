@@ -1,5 +1,36 @@
 # CHANGELOG
 
+## v5
+
+**BREAKING.** Migration: name your provenance layer in your `CLAUDE.md`. Where it names none,
+phase 1 now stops and asks instead of writing to `agents/claude/context/`.
+
+Three fixes, all found by a newcomer running the loop from the quickstart and reported in issue #11.
+
+**Phase 1 named a directory from the tree it was written in.** Provenance went to
+`agents/claude/context/`, while `session-log` already read the location from `CLAUDE.md`. The run
+in the issue wrote to the right place anyway, because the agent followed `CLAUDE.md` over the
+skill, which is the outcome this revision makes the instruction. It also says to stop and ask when
+`CLAUDE.md` names nothing, the same rule `session-log` states. This removes a behavior, which
+`docs/releasing.md` counts as breaking whatever the opening note said about substituting
+filenames. It skips the deprecation window as a safety fix: the old default could write session
+reasoning into a repository that later gains a public remote, the mixing the two-layer rule
+forbids.
+
+**Phase 3's dash sweeps used `grep -P`, which only GNU grep has.** Each command now builds the
+character with `printf` and walks with `find`. That also folds the old "known coverage gap"
+command into the main ones: the ignore-file wrapper problem it described is the reason every
+sweep now drives its own walk, rather than a footnote under one of them. Tested under `sh` against
+a planted file in a hidden directory, an exempt filename and an en dash, in the default and the C
+locale. Not tested on BSD or macOS userland.
+
+**The memory store check read as a requirement of every tree.** It named `.mcp.json`, a tier
+directory and a procedure document that exist only in the tree this skill came from, so a new tree
+could neither run it nor tell whether skipping it was allowed. It is now conditional on the tree
+keeping a store, keeps the same check where one exists, and says to report "no store" rather than
+skip silently. The guarantee is unchanged for every tree that has a store, so this is not a
+weakening.
+
 ## v4
 
 Two additions, both found by shipping `daily-dashboard` and running this repo's

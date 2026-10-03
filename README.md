@@ -88,9 +88,13 @@ Three are procedures an agent may run on its own at a clean boundary. None sets 
 
 `docs/project-state.md` is where the kit itself stands.
 
+### `examples/`
+
+`examples/workspace/` is the workspace the quickstart copies: a `CLAUDE.md` naming where the other files are, the manifest `index.md`, and stubs of the standing files under `.agents/`. The stubs hold comments saying what goes in each, and point at `docs/standing-documents.md` rather than restating it. A gate checks that each stub matches a file that document describes.
+
 ### `hooks/`
 
-Seven `hookify` rules, as examples rather than live configuration. Copy the ones you want into your own `.claude/` directory; they do nothing where they sit.
+Seven rules for the `hookify` plugin, as examples rather than live configuration. They need the plugin installed, and do nothing where they sit; [the installing guide](docs/installing.md#hooks) says how to enable them.
 
 Two block (a forbidden character in generated content, and a packing command without an allow-list). The rest warn on reads that pull sensitive material into context, so a later publish step knows the session is derived from it. They assume a tiered directory scheme; adapt the patterns before enabling them.
 
@@ -115,21 +119,9 @@ The protocol for passing work between agents on different surfaces.
 
 ## Installing the skills
 
-Copy the directories under `skills/` into your Claude skills directory:
+First time: follow the [quickstart](docs/quickstart.md). It is one path, six steps, ending with a session log on disk.
 
-```sh
-cp -r skills/* ~/.claude/skills/
-```
-
-Each skill is one `SKILL.md` and a `CHANGELOG.md`, plus an optional `references/`. They cross-reference each other by name, so copy the whole `skills/` folder or expect broken pointers.
-
-To symlink instead of copy, so that a `git pull` updates them in place:
-
-```sh
-scripts/link-skills.sh
-```
-
-Skills load on their frontmatter `description`. Read `skills/skill-discovery/SKILL.md` for how that resolution works.
+Otherwise, [the installing guide](docs/installing.md) covers workspace-level and user-level installs, symlink or copy, the `hookify` plugin the hooks need, updating and removing.
 
 ## Using the orchestration protocol
 
@@ -165,6 +157,7 @@ The lowest-friction first contribution is a surface descriptor in `orchestration
 | Document | What it answers |
 |---|---|
 | [Quickstart](docs/quickstart.md) | The shortest path from nothing to a working loop |
+| [Installing](docs/installing.md) | Where each part goes, the alternatives, updating and removing, and what comes next |
 | [Governance](GOVERNANCE.md) | Who decides, how a change lands, and what is never delegated |
 | [Contribution guide](CONTRIBUTING.md) | The rules every change passes, and the script that enforces them |
 | [Security policy](SECURITY.md) | What counts as a vulnerability here, and how to report one privately |

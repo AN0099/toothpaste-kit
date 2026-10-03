@@ -61,6 +61,12 @@ One dated file in the provenance layer, `session-<date>-<slug>.md`, created on t
 the day and appended to after that. Append, never rewrite: a later entry contradicting an earlier one
 is a correction worth having both halves of. Head each entry with the time.
 
+**No em dash anywhere in the file, the headings included**, which is where one slips in. The kit
+bans the character in anything an agent writes. Join a date and a slug with a colon:
+`# Session 2026-10-01: store setup`. This is a rule for writing, not a check: the sweep stays with
+`session-close`, and a capture that leaves one behind has made one more correction for the close
+to find.
+
 **Do not invent the directory.** The tree states where its provenance layer lives, in the same
 always-loaded config that names the standing-files list, and that statement is the binding. Read it
 rather than guessing, because the plausible guesses are wrong in a way that does damage: a capture

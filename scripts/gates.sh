@@ -13,10 +13,12 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These six gates cover: the em dash ban, the private task ID ban,
+# check. These eight gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency, skill frontmatter, the
-# reflow script's own selftest, and markdown structure via scripts/mdlint.py,
-# which states its own eighteen-rule coverage in its header. They do NOT cover: en dashes (ranges and
+# reflow script's own selftest, markdown structure via scripts/mdlint.py,
+# which states its own eighteen-rule coverage in its header, and the example
+# workspace's stubs against docs/standing-documents.md via
+# scripts/check-workspace-stubs.py, which states its own coverage too. They do NOT cover: en dashes (ranges and
 # clause separators are not mechanically separable, so that stays a review
 # prompt), prose quality, internal link validity, whether a skill's Scope
 # Pointer is last, or whether any document's claims are true.
@@ -38,8 +40,15 @@ EM=$(printf '\342\200\224')   # U+2014, built rather than typed so this file
 # ---------------------------------------------------------------- 1
 gate_em_dash() {
   gate_start "no em dashes"
-  hits=$(grep -rl -- "$EM" . --exclude-dir=.git 2>/dev/null || true)
-  if [ -n "$hits" ]; then
+  # Options before `--`: after it, --exclude-dir is read as a file name and
+  # .git is searched. Exit 2 means grep could not run the search, and an
+  # empty result from a search that never ran is not a pass.
+  hits=$(grep -rl --exclude-dir=.git -- "$EM" . 2>&1); rc=$?
+  if [ "$rc" -gt 1 ]; then
+    printf '%s\n' "$hits" | sed 's/^/  /'
+    echo "::error::grep could not run this gate (exit $rc)"
+    gate_bad "no em dashes"
+  elif [ -n "$hits" ]; then
     printf '%s\n' "$hits" | sed 's/^/  /'
     echo "::error::em dash found in the files listed above"
     echo "  Exempt by filename if a file must quote one; do not loosen the pattern."
@@ -52,8 +61,12 @@ gate_em_dash() {
 # ---------------------------------------------------------------- 2
 gate_task_ids() {
   gate_start "no private task IDs"
-  hits=$(grep -rnE '\b(P[0-9]+-[0-9]+|OPEN_[0-9]+)\b' . --exclude-dir=.git 2>/dev/null || true)
-  if [ -n "$hits" ]; then
+  hits=$(grep -rnE --exclude-dir=.git '\b(P[0-9]+-[0-9]+|OPEN_[0-9]+)\b' . 2>&1); rc=$?
+  if [ "$rc" -gt 1 ]; then
+    printf '%s\n' "$hits" | sed 's/^/  /'
+    echo "::error::grep could not run this gate (exit $rc)"
+    gate_bad "no private task IDs"
+  elif [ -n "$hits" ]; then
     printf '%s\n' "$hits" | sed 's/^/  /'
     echo "::error::private task ID format found in the lines above"
     echo "  This repo uses TK- ids only. A private-format id usually means"
@@ -151,6 +164,16 @@ gate_markdown() {
   fi
 }
 
+# ---------------------------------------------------------------- 8
+gate_stubs() {
+  gate_start "example workspace matches standing-documents.md"
+  if python3 scripts/check-workspace-stubs.py; then
+    gate_ok "example workspace matches standing-documents.md"
+  else
+    gate_bad "example workspace matches standing-documents.md"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -159,15 +182,17 @@ run_all() {
   gate_frontmatter
   gate_reflow
   gate_markdown
-  printf '\n%s of 7 gates passed\n' "$pass_n"
+  gate_stubs
+  printf '\n%s of 8 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
 }
 
 # A gate that has never returned a hit has not been shown capable of
-# returning one, so each of the first five is run against a planted positive
-# in a scratch tree. Gate 6 carries its own fixture assertions already.
+# returning one, so each of the first five, and the eighth, is run against a
+# planted positive in a scratch tree. Gate 6 carries its own fixture
+# assertions already, and gate 7 plants one positive per rule below.
 run_selftest() {
   tmp=$(mktemp -d) || return 1
   # Each signal gets its own handler WITH an exit. A handler that only cleans
@@ -205,16 +230,28 @@ run_selftest() {
     fi
   }
 
-  printf 'text %s text\n' "$EM" > "$tmp/a.md"
-  grep -rl -- "$EM" "$tmp" >/dev/null 2>&1
-  plant_found $? "em dash gate"
+  # The two search gates run as installed, by calling their own functions in
+  # a planted tree. A copy of a gate's grep line can fire while the line in
+  # the gate is blind, which is what happened before this selftest called
+  # them. The clean fixture holds the same plant inside .git, so it also
+  # proves the .git exclusion works.
+  run_gate() { ( cd "$1" && fail=0 && "$2" >/dev/null 2>&1; exit "$fail" ) }
+  mkdir -p "$tmp/g-bad/.git" "$tmp/g-ok/.git"
+  printf 'text %s text\n' "$EM" > "$tmp/g-bad/a.md"
+  printf 'text %s text\n' "$EM" > "$tmp/g-ok/.git/a.md"
+  run_gate "$tmp/g-bad" gate_em_dash; bad=$?
+  run_gate "$tmp/g-ok" gate_em_dash
+  plant_rejected $bad $? "em dash gate"
 
   # Assembled, for the same reason EM is: a literal here makes this file
   # itself a hit for the gate it is testing, and the real run then fails on
   # the test fixture rather than on the repository.
-  printf 'see P%s-%s for detail\n' 12 34 > "$tmp/b.md"
-  grep -rnE '\b(P[0-9]+-[0-9]+|OPEN_[0-9]+)\b' "$tmp/b.md" >/dev/null 2>&1
-  plant_found $? "private task ID gate"
+  rm -f "$tmp/g-bad/a.md" "$tmp/g-ok/.git/a.md"
+  printf 'see P%s-%s for detail\n' 12 34 > "$tmp/g-bad/b.md"
+  printf 'see P%s-%s for detail\n' 12 34 > "$tmp/g-ok/.git/b.md"
+  run_gate "$tmp/g-bad" gate_task_ids; bad=$?
+  run_gate "$tmp/g-ok" gate_task_ids
+  plant_rejected $bad $? "private task ID gate"
 
   printf '{"unclosed": \n' > "$tmp/c.json"
   python3 -c 'import json,sys; json.load(open(sys.argv[1]))' "$tmp/c.json" 2>/dev/null
@@ -277,9 +314,24 @@ PY
   head -6 "$tmp/skills/withfm/SKILL.md" | grep -q '^name:'
   plant_rejected $bad $? "frontmatter gate"
 
+  # A stub the document does not describe, against a stub it does.
+  # The script takes no paths, so each planted tree has the repository's layout.
+  stubs="$PWD/scripts/check-workspace-stubs.py"
+  for t in st-bad st-ok; do
+    mkdir -p "$tmp/$t/docs" "$tmp/$t/examples/workspace/.agents"
+    printf '## The document set\n\n| Document | Role |\n|---|---|\n| `index.md` | Manifest |\n| `notes.md` | Notes |\n' > "$tmp/$t/docs/standing-documents.md"
+    printf -- '- `.agents/notes.md`\n' > "$tmp/$t/examples/workspace/index.md"
+    : > "$tmp/$t/examples/workspace/.agents/notes.md"
+  done
+  : > "$tmp/st-bad/examples/workspace/.agents/undescribed.md"
+  ( cd "$tmp/st-bad" && python3 "$stubs" ) >/dev/null 2>&1
+  bad=$?
+  ( cd "$tmp/st-ok" && python3 "$stubs" ) >/dev/null 2>&1
+  plant_rejected $bad $? "workspace stub gate"
+
   printf '\n'
   [ "$plant_fail" -eq 0 ] || { echo "selftest: a gate could not be shown to fail. Do not trust a clean run."; return 1; }
-  echo "selftest: all five planted positives fired."
+  echo "selftest: all six planted positives fired."
   echo
   echo "== gate 7 plants its own positives, one per rule =="
   python3 scripts/mdlint.py --selftest >/dev/null 2>&1

@@ -20,8 +20,39 @@ skill lives in that skill's own `CHANGELOG.md`.
   BREAKING pre-1.0; and Deprecation, announced in one release and removable no
   earlier than the second after it, with experimental skills exempt while the
   kit is pre-alpha. Release notes gain a Deprecated heading.
+- `docs/installing.md`, the installing guide: where each part of the kit goes
+  among Claude Code's features, workspace-level against user-level skills and
+  why a user-level copy shadows a workspace one, symlink or copy,
+  `CLAUDE.local.md`, enabling the hooks through the `hookify` plugin, updating,
+  removing, and how a workspace grows (a place for unsorted imports, a
+  repository, tiers). Reported in issue #11.
+- `examples/workspace/`: the workspace the quickstart copies. `CLAUDE.md`
+  naming the provenance layer and the manifest, `index.md`, and stubs of the
+  standing files under `.agents/`, each holding comments rather than content.
+- An eighth gate, `scripts/check-workspace-stubs.py`: every stub in
+  `examples/workspace/` is a file `docs/standing-documents.md` describes, every
+  described file has a stub or a stated exemption, and the stub `index.md`
+  lists every stub under `.agents/`. It has a planted positive in
+  `scripts/gates.sh --selftest`.
+- `docs/releasing.md` step 9 deletes the release branch once the release is
+  published and the local `main` is pulled.
 
 ### Changed
+
+- `docs/quickstart.md` is one path in six steps, from checking the
+  prerequisites to a session log on disk, each step ending with what you should
+  now see. It clones the kit, copies `examples/workspace/`,
+  and installs the skills into the workspace with `scripts/link-skills.sh`. Alternatives, and
+  the material on growing a workspace, moved to `docs/installing.md`. The
+  quickstart no longer creates `intake/`; the guide says what it is for.
+  Reported in issue #11.
+- `README.md`: "Installing the skills" points to the quickstart and the
+  installing guide instead of carrying its own `cp` command, the `hooks/`
+  section says the rules need the `hookify` plugin, and a new `examples/`
+  section describes the example workspace.
+- `CONTRIBUTING.md` lists what `scripts/gates.sh` needs, and its em dash
+  check no longer uses `grep -P`, which only GNU grep has.
+- `docs/project-state.md` names the example workspace and eight gates.
 
 - `README.md` and `docs/project-state.md` list sixteen skills, with
   `weekly-review` among those a person invokes.
@@ -35,9 +66,32 @@ skill lives in that skill's own `CHANGELOG.md`.
   `skill-creation`, `surface-regimes`, `technical-documents`,
   `working-preferences`.
 
+### Fixed
+
+- `scripts/gates.sh`: the em dash and private task ID gates searched `.git`,
+  because `--exclude-dir` followed `--` and was read as a file name, and
+  passed when `grep` could not run at all. Both now fail on a `grep` error,
+  and the selftest runs the two gates themselves on a planted tree instead of
+  a copy of their command line.
+- **BREAKING** `skills/session-close/` v5: phase 1 writes provenance to the
+  layer the tree's `CLAUDE.md` names instead of a path from the tree it was
+  written in; the phase 3 dash sweeps no longer need GNU grep; and the memory
+  store check is stated as the source tree's example, to be substituted, and
+  reported as not applicable where a tree keeps no store. Reported in
+  issue #11.
+  Migration: name your provenance layer in your `CLAUDE.md`; where it names
+  none, the skill now stops and asks instead of writing to
+  `agents/claude/context/`. It skips the deprecation window as a safety fix:
+  the old default could put session reasoning in a repository that later
+  gains a public remote.
+- `skills/session-log/` v2: it writes no em dash, headings included, so
+  `session-close` no longer has to correct its captures. Reported in issue #11.
+
 ### Skill revisions
 
 - `daily-review` v1 to v2.
+- `session-close` v4 to v5, BREAKING.
+- `session-log` v1 to v2.
 - `weekly-review` v1, new.
 
 ## 0.3.0 (2026-09-29)

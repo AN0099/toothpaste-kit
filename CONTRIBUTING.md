@@ -11,7 +11,7 @@ Read `README.md` for what the project does and `philosophy.md` for why it works 
 **No em dashes in AI-generated text.** This is a hard rule. If you drafted anything here with an agent, check the output mechanically before committing:
 
 ```sh
-grep -rnP '\x{2014}' .
+grep -rn "$(printf '\342\200\224')" .
 ```
 
 **Verify completion claims before repeating them.** When an agent reports that it wrote a file, confirm the file exists and holds what it should. An agent auditing its own work does not satisfy this.
@@ -46,11 +46,13 @@ It states its own coverage in its header, including the thirty-four markdownlint
 
 ## Run the checks the way CI runs them
 
+You need a POSIX shell, `git`, `python3`, `find`, and a `grep` with `-r` and `--exclude-dir`, which GNU `grep` has. Nothing else needs installing: the gates use only the Python standard library. A `grep` without those options makes the two search gates fail rather than pass.
+
 ```sh
 ./scripts/gates.sh --selftest
 ```
 
-That is the same script `.github/workflows/gates.yml` runs, which is the point: a check whose local copy and CI copy are separate texts can drift apart, and you find out when a clean local run is rejected by CI. It covers all seven mechanical rules above, including the two greps quoted earlier in this document.
+That is the same script `.github/workflows/gates.yml` runs, which is the point: a check whose local copy and CI copy are separate texts can drift apart, and you find out when a clean local run is rejected by CI. It covers the seven mechanical rules above, including the two greps quoted earlier in this document, and an eighth: the stubs in `examples/workspace/` must match the files `docs/standing-documents.md` describes, checked by `scripts/check-workspace-stubs.py`.
 
 `--selftest` first plants a positive for each gate and confirms the gate fires on it, then runs the real pass. A gate that has never returned a hit has not been shown capable of returning one, so a clean result on its own is weak evidence.
 

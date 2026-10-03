@@ -3,7 +3,7 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-09-30.
+Last updated 2026-10-03.
 
 ## Live
 
@@ -24,6 +24,8 @@ none satisfies `session-log` or `session-close`.
 `hooks/` carries seven `hookify` rule examples, inert where they sit. `scripts/` carries
 `link-skills.sh` and `reflow-md.py`, the latter with a fixture and `--selftest`. `link-skills.sh`
 writes relative symlink targets where `ln -r` exists, so the links survive the tree being moved.
+`examples/workspace/` is the workspace `docs/quickstart.md` copies, and
+`scripts/check-workspace-stubs.py` checks its stubs against `docs/standing-documents.md`.
 
 The orchestration protocol has run relay traffic across Claude, local models, and several vendor
 surfaces. The message schema requires a seven-field capability profile as the normative part, and
@@ -117,7 +119,7 @@ Two skill families are specced and not yet built:
 
 - No test suite in this repo (TK-069). An eval harness covering `document-standards` exists and is not
   ready to ship here. Skills are otherwise validated by use and
-  review. The CI half of this gap is closed: `gates.yml` is installed and runs seven mechanical
+  review. The CI half of this gap is closed: `gates.yml` is installed and runs eight mechanical
   gates plus a second-party markdown lint, so the checks `CONTRIBUTING.md` documents are now
   enforced rather than merely documented.
 - No drift detection for this repo's own documents (TK-070). A checker exists that records a source path
@@ -162,7 +164,7 @@ rather than recalled.
 | Citation metadata | `CITATION.cff`, present, `version` and `date-released` commented out |
 | Issue templates | Four under `.github/ISSUE_TEMPLATE/` |
 | Governance and roles | **Absent.** No `GOVERNANCE.md`, no stated decision process, one maintainer |
-| Automated checks in CI | **Two workflows**, `commit-attribution.yml` and `gates.yml`. The latter runs seven mechanical gates plus a second-party markdown lint |
+| Automated checks in CI | **Two workflows**, `commit-attribution.yml` and `gates.yml`. The latter runs eight mechanical gates plus a second-party markdown lint |
 | Versioning and releases | **Absent.** No tags, no releases, no release notes |
 | Dependency management | **Absent.** No `dependabot.yml`. The repository ships no package manifest, which is why |
 | Static analysis | **Absent.** The tree is Markdown, shell and one Python script; nothing scans the shell or the Python |
