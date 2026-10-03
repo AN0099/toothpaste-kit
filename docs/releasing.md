@@ -232,6 +232,21 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
    whose subject has no row in `docs/security-posture.md` does not belong in
    the README.
 
+9. **Delete the release branch** once the release is published and your local
+   `main` has been pulled. Its commits are in `main` through the merge and in
+   the tag, so the branch holds nothing either of them lacks, and a stale
+   branch reads as work still in flight:
+
+   ```sh
+   git push origin --delete release/0.2.0
+   git branch -d release/0.2.0
+   ```
+
+   `git branch -d` refuses a branch that is not merged into the current branch
+   once its remote copy is gone, which is the check that nothing is lost. Run
+   `git fetch --prune` in other clones, since a plain fetch keeps a deleted
+   branch's remote-tracking reference.
+
 ## Where releases stand
 
 - **0.1.0, cut 2026-09-19.** The first release: a signed tag, a GitHub

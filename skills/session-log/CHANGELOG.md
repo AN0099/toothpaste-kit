@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v2
+
+The capture carries the dash rule itself. A newcomer's first run, reported in issue #11, wrote its
+file heading with an em dash, and `session-close` caught and fixed it at the end of the session.
+The loop worked, and it still made a correction that need not exist. The rule sits beside the
+filename format, where a heading is composed, and says to join a date and a slug with a colon.
+
+It is a rule for writing and not a check. The exclusion list in the skill, which keeps the dash
+sweep in `session-close`, is unchanged: carrying a rule costs nothing at capture time, and running
+a sweep is the first step toward this skill becoming a second copy of the close.
+
 ## v1 (initial)
 
 Mid-session capture for the compaction boundary. Writes the reasoning from the

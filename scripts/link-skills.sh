@@ -1,9 +1,10 @@
 #!/bin/sh
 # Symlink this repository's skills into a Claude skills directory.
 #
-# The README's `cp -r` is simpler and is the right choice if you intend to edit
-# the skills locally. Symlinking instead means `git pull` updates them in place
-# rather than leaving a stale copy behind.
+# docs/installing.md describes copying instead, which is the right choice if you
+# intend to edit the skills locally. Symlinking means `git pull` updates them in
+# place rather than leaving a stale copy behind. docs/quickstart.md uses this
+# script with a workspace target.
 #
 # Usage, from anywhere:
 #   scripts/link-skills.sh                 links into ~/.claude/skills

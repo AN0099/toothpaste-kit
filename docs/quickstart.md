@@ -1,127 +1,124 @@
 # Quickstart
 
-Gets the loop running in an afternoon. Everything after step 3 is
-optional and can wait until something forces it.
+Six steps, in order, from nothing to a first session log on disk. Each step
+ends with what you should now see. If you see something else, stop there:
+the steps after it assume it worked.
 
-This page is deliberately thin. Each section points at the document that
-holds the full statement rather than restating it, because two copies of
-a rule is how the rules start disagreeing.
+This page has one path and no options. Other ways to install, and what each
+part is for, are in [the installing guide](installing.md).
 
-## What you are building
+## What you will have at the end
 
-One durable store that outlives any session, and a short loop that keeps
-it current. The rule that makes it work: **if it is not written into the
-store, it did not happen.** A session transcript is not the store.
+A workspace directory that Claude Code starts in, holding the files the
+kit's skills read, with every skill installed into it. You will have run one
+skill, `session-log`, and it will have written a file. That file is the
+point of the kit: **if work is not written into the store, it did not
+happen.**
 
-Two layers, never mixed in one file. Provenance is written for agents and
-is verbose by design. Human-facing documents are written for a person
-with a task and carry no archaeology. Full statement in
-[document-layers.md](document-layers.md).
+## 1. Check the prerequisites
 
-## 1. The skeleton
+You need Claude Code, git, and a POSIX shell, on Linux. Run:
 
 ```sh
-mkdir -p ~/store/{workspace,intake}
-cd ~/store/workspace
-mkdir -p .agents/context .claude/skills tracked projects
-git init tracked
+claude --version
+git --version
+ls ~/toothpaste-kit ~/tpkit-workspace
 ```
 
-`tracked/` is version controlled and everything beside it is deliberately
-not. `.agents/context/` is the provenance layer and never sits inside the
-repository. `projects/` holds real repositories, each with its own git.
+**You should now see** a version number from each of the first two, and
+`No such file or directory` for both paths in the third. If either path
+exists, stop: the steps below create both, and this page does not cover
+installing over an existing copy.
 
-Write the in-or-out rule down once, in a `TRACKING.md`, and follow it. A
-workable default: **if it is authored, it goes in; if it is accumulated,
-it stays out.**
+## 2. Clone the kit
 
-## 2. The file the agent reads every session
-
-`CLAUDE.md` at the workspace root. Start with where things go and five
-conventions, and add only when something bites you. The skills read the
-first two lines to find where to write, and stop and ask without them:
-
-```markdown
-- The provenance layer is `.agents/context/`.
-- The standing files are listed in `index.md`.
-- No completion claim is fact until verified by someone other than the
-  claimer. Self-audit is not verification.
-- State a check's coverage, or it is not a check.
-- Verify a check against a planted positive before believing a clean
-  result.
-- Two occurrences before a conclusion, including for a diagnosis.
-- Two document layers, never mixed in one file.
+```sh
+git clone https://github.com/AN0099/toothpaste-kit.git ~/toothpaste-kit
 ```
 
-Then write `index.md`, even at ten lines. It is the manifest of what is
-authoritative versus stale, it is read first every session, and it
-outranks memory of past sessions. See
-[standing-documents.md](standing-documents.md) for the full document set
-and how the pieces relate.
+**You should now see** `~/toothpaste-kit/skills/` and
+`~/toothpaste-kit/examples/workspace/` when you run:
 
-## 3. The loop
+```sh
+ls ~/toothpaste-kit/skills ~/toothpaste-kit/examples/workspace
+```
 
-Three skills, each a directory under `.claude/skills/` holding a
-`SKILL.md`.
+The clone is the kit. Your own work never goes inside it, so that updating
+the kit never touches your work.
 
-| Skill | When | What it does |
-|---|---|---|
-| `daily-dashboard` | Session start | Reads the standing files, checks their claims against the tree, reports carry-over and ranked work, then stops |
-| `session-log` | Before a compaction | Captures only what compaction destroys: decisions and the alternative rejected, corrections, open questions, findings no file holds |
-| `session-close` | Session end | Sweeps the session, updates the standing files, runs the mechanical checks |
+## 3. Copy the example workspace
 
-The property that matters: the dashboard **checks the previous session's
-claims against the tree rather than reciting them.** Those disagree more
-often than they agree, and the disagreement is the output.
+```sh
+cp -R ~/toothpaste-kit/examples/workspace ~/tpkit-workspace
+ls -A ~/tpkit-workspace ~/tpkit-workspace/.agents
+```
 
-**Start with `session-log`.** It is the cheapest of the three and it
-prevents the most expensive loss.
+**You should now see** `.agents`, `CLAUDE.md` and `index.md` in the
+workspace, and `context`, `lead-handoff.md`, `task-queue.json`,
+`threads-flagged.md` and `threads-resolved.md` in `.agents`.
 
-## 4. Later, when you need it
+These are the standing files the skills read. `CLAUDE.md` tells every
+session where the others are: the session logs go in `.agents/context/`, and
+`index.md` lists the files that must stay current. The rest are stubs with
+comments saying what goes in them. Leave them as they are for now.
 
-**Sensitivity tiers.** Split by directory rather than by configuration
-once the store holds material with different audiences. A sibling
-directory outside every working tree beats a `.gitignore` line, because a
-line in a config file is a control that fails silently. See
-[security-posture.md](security-posture.md).
+## 4. Install the skills into the workspace
 
-**Git authority.** Decide what an agent may do by where the remote
-points. Anything reachable from the internet is read and edit only.
-Internal remotes can take commits and branch pushes. **A merge into a
-trunk is a decision rather than a record, so a person runs it.**
+```sh
+~/toothpaste-kit/scripts/link-skills.sh ~/tpkit-workspace/.claude/skills
+```
 
-**A second agent.** Give each seat a mailbox directory and let mail be
-commits, with one register file and one writer. Two things that will
-bite: a directory listing reads one branch, so mail on another branch is
-invisible until you diff or merge, and a single-writer register goes
-stale at the writer's rate rather than the work's.
+**You should now see** one `link` line per skill, then a summary line
+ending `0 skipped, into` and the workspace's `.claude/skills` path.
 
-## 5. The rules that do the real work
+Each skill is now a symlink into the clone, so updating the clone updates
+the skills.
 
-1. **A check that has never failed has not been shown able to fail.**
-2. **State a check's coverage or it is not a check.** A check reading part
-   of its field and returning clean is worse than no check, because a
-   clean result stops the search.
-3. **Two occurrences before a conclusion.** One passing trial is not
-   confirmation of a cause.
-4. **A grep is a data point, never sole evidence.** Run it against input
-   known to match and input known not to. A single-line pattern cannot
-   match a sentence that wraps.
-5. **No completion claim is fact until a second party verifies it.**
+## 5. Start Claude Code in the workspace
 
-Everything else here is one of these applied to a specific surface.
+```sh
+cd ~/tpkit-workspace
+claude
+```
 
-## 6. What bites in the first week
+If this is the first time Claude Code has run for your user account, it
+first asks you to choose a theme and to sign in; complete both. It then
+asks whether you trust the folder. Answer yes.
 
-- **Mixing the layers.** Session reasoning in a README makes it
-  unreadable and unpublishable at once.
-- **A gate verified by typing it.** Shell aliases mean the command you
-  type and the command in the script can be different programs. Test the
-  script.
-- **Trusting `--dry-run`.** It proves a command assembles, never that it
-  runs.
-- **Provenance inside a repository that later gains a remote.** Decide
-  the location before the first capture.
-- **Copying the ceremony wholesale.** Much of this is sized for one
-  person with agents, where the alternative to written procedure is one
-  person's memory. Take the method and size the mechanisms yourself.
+**You should now see** `session-log` in the list when you type
+`/session` at the prompt. The skills run when you type their names this
+way; none of the loop's skills starts on its own.
+
+## 6. Run `session-log`
+
+`session-log` records reasoning that a long conversation would otherwise
+lose, so it needs something to record. Type this as a message first:
+
+```text
+We decided to keep the workspace at ~/tpkit-workspace, outside the kit's
+clone, so that updating the kit never touches our own files.
+```
+
+Then type:
+
+```text
+/session-log
+```
+
+When it finishes, type this at the Claude Code prompt to list the folder:
+
+```text
+! ls .agents/context
+```
+
+**You should now see** one file named `session-` followed by today's date
+and a short slug, ending `.md`. It holds an entry headed with the time,
+recording the decision you typed.
+
+## Done
+
+The loop is running. Two more skills complete it: type `/session-close` at
+the end of a working session and `/daily-dashboard` at the start of the
+next one. [The installing guide](installing.md) covers updating and
+removing the kit, installing for every project instead of one, hooks, and
+what to read next.

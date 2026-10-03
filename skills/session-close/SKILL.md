@@ -46,8 +46,9 @@ Read back over the session and ask, explicitly and separately for each category:
    changed; its opening paragraph is usually where this shows.
 
 For each item found, decide its layer before writing it. Provenance material
-(reasoning, decision archaeology, session residue) goes to
-`agents/claude/context/` or the appropriate sensitivity tier. Human-facing
+(reasoning, decision archaeology, session residue) goes to the provenance layer
+your `CLAUDE.md` names, or to the appropriate sensitivity tier. If `CLAUDE.md`
+names no provenance layer, stop and ask rather than picking a path. Human-facing
 material (README, CONTRIBUTING, project state, skill files) goes to the repo,
 lean and without archaeology. Never mix the two in one file.
 
@@ -76,10 +77,16 @@ Move any thread that closed this session from `threads-flagged.md` to
 
 ## Phase 3: Mechanical checks
 
-Run these. Do not eyeball them.
+Run these. Do not eyeball them. Each one builds the character with `printf`
+rather than relying on `grep -P`, which only GNU grep has, and drives the walk
+with `find`, because some environments route `grep` through a wrapper that
+honors ignore files by default and silently skips the directories a sweep most
+needs to reach.
 
 ```sh
-grep -rlP '\x{2014}' --include='*.md' . | grep -v -e em-dash -e banned-words
+EM=$(printf '\342\200\224')
+find . -name '*.md' -not -name '*em-dash*' -not -name '*banned-words*' \
+  -exec grep -l -- "$EM" {} +
 ```
 
 Any file listed is a violation of the standing dash convention and must be fixed
@@ -89,8 +96,9 @@ before close. The two excluded filenames quote the character deliberately.
 second one too, and read its result differently:
 
 ```sh
+EN=$(printf '\342\200\223')
 find . -name '*.md' -not -name '*em-dash*' -not -name '*banned-words*' \
-  -exec grep -lP '\x{2013}' {} +
+  -exec grep -l -- "$EN" {} +
 ```
 
 The first command is a gate: an em dash is a violation wherever it appears. The
@@ -110,35 +118,28 @@ failure mode where a check "looks like coverage" and is worse than no check.
 Write a throwaway file containing the character, confirm the command lists it,
 then delete it.
 
-**Known coverage gap.** Some environments route `grep` through a wrapper that
-honors ignore files by default, which silently excludes the tier tree, the
-unfiled tree, and the archive. Those are exactly the directories where the sweep
-is still recorded as incomplete in `index.md`. When exhaustive coverage is the
-point, drive the walk yourself rather than trusting the default:
-
-```sh
-find . -name '*.md' -not -name '*em-dash*' -not -name '*banned-words*' \
-  -exec grep -lP '\x{2014}' {} +
-```
-
-Verify the memory store is still contained inside the restricted tier:
+**If your tree keeps an agent memory store**, verify it is still contained inside
+the sensitivity tier its contents require. If it keeps none, say so in the report
+rather than skipping the check without a word. The tree this skill came from
+declares its store in `.mcp.json` and checks it with:
 
 ```sh
 grep MEMORY_FILE_PATH .mcp.json
 ```
 
-The path must resolve inside `CLASSIFIED/04-restricted/`. Containment is the
-entire clearance for persisting Restricted content, so a single edited line
-relocates every future write outside the tier controls, silently and with no
-error. See `system/agent-memory-procedure.md`.
+The path must resolve inside the restricted tier's directory. Substitute your own
+declaration file and tier path. Containment is the entire clearance for
+persisting restricted content, so a single edited line relocates every future
+write outside the tier controls, silently and with no error.
 
 **That command reads a declaration, not the running server.** A memory server
-registered outside this file, at user scope or anywhere else the harness accepts
-one, keeps running while the grep goes on passing against a config that no longer
-governs it. This is the same shape as the half-covered dash sweep earlier in this
-phase: the command still succeeds, and its success has stopped meaning anything.
-If the store was ever moved out of `.mcp.json`, query the live server instead and
-correct this line, rather than reading the file that is easy to reach.
+registered outside the declaration file, at user scope or anywhere else the
+harness accepts one, keeps running while the grep goes on passing against a
+config that no longer governs it. This is the same shape as the half-covered dash
+sweep earlier in this phase: the command still succeeds, and its success has
+stopped meaning anything. If the store was ever moved, query the live server
+instead and correct the check, rather than reading the file that is easy to
+reach.
 
 **Prefer a tool that judges each store by where it is and whether it holds data.**
 The grep has passed while the declared file had never been written and the memory
