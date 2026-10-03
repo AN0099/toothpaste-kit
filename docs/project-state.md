@@ -144,9 +144,9 @@ Two skill families are specced and not yet built:
     rows 4.6 and 6.1 now say so.
   - **Still open and the maintainer's:** the education suite that would let the two `MUST`
     criteria be answered Met (TK-071).
-- No versioning scheme *across* the skill set (TK-072). Individual skills still carry their own
-  `CHANGELOG.md`, and the repo-level version does not imply a version for any single skill.
-- Skill interfaces still change without deprecation notice (TK-073).
+- Skill interfaces now have a deprecation rule (`docs/releasing.md`, Deprecation), and no
+  interface change has cited it yet (TK-073). How a skill's revision relates to the kit version
+  is stated in the same file, under Skill revisions (TK-072).
 
 ## Security posture, and what is actually in place
 

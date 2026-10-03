@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v2.1
+## v3 (was v2.1)
 
 Restored the Step 4 rule on load-bearing content, which was absent from the
 published copy while present in the maintainer's live copy and described in this

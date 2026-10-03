@@ -27,6 +27,78 @@ know which set they have, not a list of independent numbers.
 break something, which is what 0.x is for. `README.md` says pre-alpha and that
 stays true until the schema stops changing.
 
+## Skill revisions
+
+**A skill's revision is a label in its own `CHANGELOG.md`, and nowhere else.**
+Each entry there is headed `## vN`, optionally followed by a short title in
+parentheses: an integer, one per entry, unique in the file, newest first. The
+label is not in the frontmatter, not in the skill's name and not a second
+version number. It says the skill changed, and nothing about compatibility; the
+kit version and the BREAKING label below carry that. The reasoning above holds:
+a reader needs to know which set they have, and the revision only lets the
+release notes say which members of the set moved.
+
+**Each release section names the skills whose revision moved**, as
+`name vA to vB`, with BREAKING where it applies. That list is how a reader
+answers "which revision of this skill shipped in that release" without opening
+every skill.
+
+## A skill's interface
+
+A skill's interface is whatever a person, another skill or an adopter's
+`CLAUDE.md` can rely on without reading the procedure:
+
+1. **Identity.** The frontmatter `name`, the directory path, and the skill
+   existing at all.
+2. **Selection.** When the skill fires: the trigger conditions in its
+   `description`, and `disable-model-invocation`, which decides who may
+   invoke it.
+3. **Files.** Every path, filename and format the skill reads or writes,
+   including where it looks for its configuration.
+4. **Vocabulary.** Codes, commands and question formats a person types or
+   reads.
+5. **Cross-references.** Skill names and section names that other skills
+   point at, such as `# Scope Pointer`.
+6. **Stated guarantees.** What the skill promises to do or not to do.
+
+**A breaking change removes, renames, narrows or reverses any of the six.** A
+narrowed `description` and a flipped `disable-model-invocation` both count,
+since either one stops the skill firing for someone who relied on it.
+Weakening a guarantee is breaking; restoring one that was lost is a fix.
+Adding to the interface, rewording, reordering the procedure, new examples, and
+a different model output that keeps every stated guarantee are not breaking.
+
+**Pre-1.0, a break may ship in a MINOR release, labeled.** The entry in the
+skill's `CHANGELOG.md` and the line in the release section both carry
+**BREAKING** and a one-line migration: what to do instead.
+
+## Deprecation
+
+Before a breaking change to anything a published release shipped:
+
+- **Announce it in a release.** A `Deprecated` entry in the release section and
+  in the skill's `CHANGELOG.md`, and a notice in `SKILL.md` beside the affected
+  element and above the procedure, naming the replacement and the earliest
+  release that may remove the old form. The notice goes in `SKILL.md` because
+  that is what an agent reads; a changelog alone is never seen at the moment it
+  matters.
+- **Keep the old form working through the next release.** It may be removed no
+  earlier than the second release after the one that announced it: announced in
+  A, still working in B, removable in C. Releases count, not review dates, since
+  a review may defer.
+- **Never give a retired element a new meaning in the release that retires
+  it.** Retire it first, and reassign it no earlier than a later release. A
+  reader acting on an old name or code with a new meaning does the wrong thing
+  without any sign of it.
+- **A safety or data-loss fix may skip the window**, with the reason recorded
+  in both changelogs. Anything never released needs no window.
+
+**An experimental skill is exempt from the window while the kit is pre-alpha.**
+It says so in the first line of its `SKILL.md` body, and the entry that
+introduces it or marks it says so in its `CHANGELOG.md`. Removing the mark is a
+change to the skill and gets its own revision. The exemption ends when
+`README.md` stops saying pre-alpha.
+
 ## What a release is
 
 A tag, release notes, and nothing else. There is no build artifact, no package
@@ -70,9 +142,10 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
    ```
 
 2. **Write the release notes** as a dated section at the top of the repository
-   `CHANGELOG.md`, under the version number. Added, Changed, Fixed, Removed.
-   Draw on the per-skill `CHANGELOG.md` files for detail rather than repeating
-   them wholesale.
+   `CHANGELOG.md`, under the version number. Added, Changed, Deprecated, Fixed,
+   Removed. Draw on the per-skill `CHANGELOG.md` files for detail rather than
+   repeating them wholesale. Name every skill whose revision moved, as "Skill
+   revisions" above says.
 
 3. **Set `version` and `date-released` in `CITATION.cff` in the tree that gets
    tagged.** They go in on the release branch before the merge, so the merge

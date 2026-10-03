@@ -12,13 +12,33 @@ skill lives in that skill's own `CHANGELOG.md`.
   read back against each task's own verification, and one important task given
   a day, never a due date. It proposes and asks; it moves nothing the person
   did not answer.
+- `docs/releasing.md` says how a skill is versioned and retired (MINOR, a new
+  release rule that leaves existing usage working). Three new sections: Skill
+  revisions, where a skill's `vN` lives only in its own `CHANGELOG.md` and each
+  release names the skills whose revision moved; A skill's interface, six
+  surfaces, including when a skill fires, and what counts as breaking, labeled
+  BREAKING pre-1.0; and Deprecation, announced in one release and removable no
+  earlier than the second after it, with experimental skills exempt while the
+  kit is pre-alpha. Release notes gain a Deprecated heading.
 
 ### Changed
 
 - `README.md` and `docs/project-state.md` list sixteen skills, with
   `weekly-review` among those a person invokes.
-- `skills/daily-review/` v1.1: its Scope Pointer names `weekly-review` as
+- `skills/daily-review/` v2: its Scope Pointer names `weekly-review` as
   shipped.
+- Every `skills/*/CHANGELOG.md` relabeled to the shape `docs/releasing.md` now
+  states (PATCH, no entry text changed): one integer `vN` per heading, unique,
+  newest first, title `# CHANGELOG`. Renumbered: `document-standards` second
+  `v2` to `v4 (was v2)`, `redaction-gate` `v2.1` to `v3 (was v2.1)`, and
+  `daily-review` `v1.1` to `v2`. Reordered newest first: `document-standards`,
+  `skill-creation`, `surface-regimes`, `technical-documents`,
+  `working-preferences`.
+
+### Skill revisions
+
+- `daily-review` v1 to v2.
+- `weekly-review` v1, new.
 
 ## 0.3.0 (2026-09-29)
 
