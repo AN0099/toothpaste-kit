@@ -315,16 +315,18 @@ PY
   plant_rejected $bad $? "frontmatter gate"
 
   # A stub the document does not describe, against a stub it does.
-  mkdir -p "$tmp/ws-bad/.agents" "$tmp/ws-ok/.agents"
-  printf '## The document set\n\n| Document | Role |\n|---|---|\n| `index.md` | Manifest |\n| `notes.md` | Notes |\n' > "$tmp/sd.md"
-  printf -- '- `.agents/notes.md`\n' > "$tmp/ws-ok/index.md"
-  : > "$tmp/ws-ok/.agents/notes.md"
-  cp "$tmp/ws-ok/index.md" "$tmp/ws-bad/index.md"
-  : > "$tmp/ws-bad/.agents/notes.md"
-  : > "$tmp/ws-bad/.agents/undescribed.md"
-  python3 scripts/check-workspace-stubs.py "$tmp/sd.md" "$tmp/ws-bad" >/dev/null 2>&1
+  # The script takes no paths, so each planted tree has the repository's layout.
+  stubs="$PWD/scripts/check-workspace-stubs.py"
+  for t in st-bad st-ok; do
+    mkdir -p "$tmp/$t/docs" "$tmp/$t/examples/workspace/.agents"
+    printf '## The document set\n\n| Document | Role |\n|---|---|\n| `index.md` | Manifest |\n| `notes.md` | Notes |\n' > "$tmp/$t/docs/standing-documents.md"
+    printf -- '- `.agents/notes.md`\n' > "$tmp/$t/examples/workspace/index.md"
+    : > "$tmp/$t/examples/workspace/.agents/notes.md"
+  done
+  : > "$tmp/st-bad/examples/workspace/.agents/undescribed.md"
+  ( cd "$tmp/st-bad" && python3 "$stubs" ) >/dev/null 2>&1
   bad=$?
-  python3 scripts/check-workspace-stubs.py "$tmp/sd.md" "$tmp/ws-ok" >/dev/null 2>&1
+  ( cd "$tmp/st-ok" && python3 "$stubs" ) >/dev/null 2>&1
   plant_rejected $bad $? "workspace stub gate"
 
   printf '\n'

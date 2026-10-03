@@ -19,8 +19,9 @@ says, whether its comments are accurate, or whether `CLAUDE.md` names the
 right paths. A table row whose first cell has no backticked name (such as
 "Procedures") is skipped, and a name containing `*` is a pattern, not a file.
 
-Usage: scripts/check-workspace-stubs.py [DOC WORKSPACE]
-Defaults to docs/standing-documents.md and examples/workspace.
+Usage: scripts/check-workspace-stubs.py, from the repository root. It takes no
+arguments: both paths are fixed, relative to the working directory, so the
+selftest in scripts/gates.sh runs it from inside a planted tree.
 Exits 1 on any finding, 2 if either input is missing.
 """
 
@@ -62,9 +63,12 @@ def stub_files(root):
     return sorted(found)
 
 
-def main(argv):
-    doc = argv[1] if len(argv) > 2 else "docs/standing-documents.md"
-    root = argv[2] if len(argv) > 2 else "examples/workspace"
+DOC = "docs/standing-documents.md"
+ROOT = "examples/workspace"
+
+
+def main():
+    doc, root = DOC, ROOT
     if not os.path.isfile(doc) or not os.path.isdir(root):
         print(f"::error::missing input: {doc} or {root}")
         return 2
@@ -94,4 +98,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main())
