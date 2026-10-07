@@ -44,6 +44,9 @@ Two skill families are specced and not yet built:
 
 ## Recent changes
 
+The changes up to 0.1.0. Each later release has its own section below, newest first, starting
+with Unreleased; `CHANGELOG.md` is the full log.
+
 - **0.1.0 release preparation.** `docs/releasing.md` added, holding the versioning scheme and a
   signed-tag procedure that separates a GitHub signing key from an authentication key.
   `docs/security-posture.md` added as the authoritative per-row posture record, and it owns the
@@ -180,6 +183,18 @@ Since that record, governance, versioning and branch protection have closed; see
 The plan, once the target tier is fixed, belongs in its own document with one row per criterion and
 a pointer to the evidence, because a posture claim without per-criterion evidence is the same
 unverifiable clean result this project's own conventions reject.
+
+## Unreleased
+
+- **`skills/weekly-review/`.** The once-a-week pass over a task board's
+  slower lanes: Waiting blockers, carried work, the Done lane, and one
+  important task given a day.
+- **The issue #11 fix.** `docs/quickstart.md` is one path in six steps;
+  alternatives moved to a new installing guide, `docs/installing.md`; the
+  quickstart copies `examples/workspace/`, whose stubs an eighth gate checks.
+  `session-close` v5 (BREAKING) and `session-log` v2 came with it.
+- **Skill versioning in `docs/releasing.md`.** Skill revisions, a skill's
+  interface, and a Deprecation rule.
 
 ## In v0.3.0
 
