@@ -7,13 +7,13 @@ Last updated 2026-10-03.
 
 ## Live
 
-Sixteen skills in three classes.
+Seventeen skills in three classes.
 
 Seven govern agent behavior and are in daily use: `working-preferences`, `document-standards`,
 `technical-documents`, `surface-regimes`, `skill-creation`, `skill-discovery`, `commands`.
 
-Six are human-invoked procedures: `redaction-gate`, `session-close`,
-`daily-dashboard`, `daily-review`, `weekly-review` and `session-log`. All six set `disable-model-invocation`, which is the point in
+Seven are human-invoked procedures: `redaction-gate`, `session-close`,
+`daily-dashboard`, `daily-review`, `weekly-review`, `session-log` and `merge-proxy`. All seven set `disable-model-invocation`, which is the point in
 each case. A gate a model can invoke to satisfy itself is not a gate, and an agent should not decide
 on its own that a session is over or that a working day has started.
 
@@ -22,7 +22,8 @@ None sets `disable-model-invocation`, because each reads or records and none dec
 none satisfies `session-log` or `session-close`.
 
 `hooks/` carries seven `hookify` rule examples, inert where they sit. `scripts/` carries
-`link-skills.sh` and `reflow-md.py`, the latter with a fixture and `--selftest`. `link-skills.sh`
+`link-skills.sh`, `reflow-md.py` with a fixture and `--selftest`, and `remote-level.sh`, the remote
+classifier `merge-proxy` runs, with its own `--selftest`. `link-skills.sh`
 writes relative symlink targets where `ln -r` exists, so the links survive the tree being moved.
 `examples/workspace/` is the workspace `docs/quickstart.md` copies, and
 `scripts/check-workspace-stubs.py` checks its stubs against `docs/standing-documents.md`.
@@ -122,7 +123,7 @@ with Unreleased; `CHANGELOG.md` is the full log.
 
 - No test suite in this repo (TK-069). An eval harness covering `document-standards` exists and is not
   ready to ship here. Skills are otherwise validated by use and
-  review. The CI half of this gap is closed: `gates.yml` is installed and runs eight mechanical
+  review. The CI half of this gap is closed: `gates.yml` is installed and runs nine mechanical
   gates plus a second-party markdown lint, so the checks `CONTRIBUTING.md` documents are now
   enforced rather than merely documented.
 - No drift detection for this repo's own documents (TK-070). A checker exists that records a source path
@@ -167,7 +168,7 @@ rather than recalled.
 | Citation metadata | `CITATION.cff`, present, `version` and `date-released` commented out |
 | Issue templates | Four under `.github/ISSUE_TEMPLATE/` |
 | Governance and roles | **Absent.** No `GOVERNANCE.md`, no stated decision process, one maintainer |
-| Automated checks in CI | **Two workflows**, `commit-attribution.yml` and `gates.yml`. The latter runs eight mechanical gates plus a second-party markdown lint |
+| Automated checks in CI | **Two workflows**, `commit-attribution.yml` and `gates.yml`. The latter runs nine mechanical gates plus a second-party markdown lint |
 | Versioning and releases | **Absent.** No tags, no releases, no release notes |
 | Dependency management | **Absent.** No `dependabot.yml`. The repository ships no package manifest, which is why |
 | Static analysis | **Absent.** The tree is Markdown, shell and one Python script; nothing scans the shell or the Python |

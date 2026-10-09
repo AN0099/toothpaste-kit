@@ -7,6 +7,15 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `skills/merge-proxy/`, a seventh procedure a person invokes. For the session
+  it is invoked in, an agent may run and push a merge into a trunk on a
+  repository whose remote is internal or absent, after explaining the whole
+  plan and halting for approval of each merge. Never on a GitHub or other
+  internet remote. The decision stays the person's; only the typing moves.
+- `scripts/remote-level.sh`, the remote classifier `merge-proxy` runs first:
+  `none`, `internal` or `external` from where a repository's remotes point,
+  `external` whenever a host cannot be proven internal. A ninth gate runs its
+  `--selftest`.
 - `skills/weekly-review/`. A once-a-week pass over a task board's slower lanes:
   each Waiting blocker chased, carried work named by its count, the Done lane
   read back against each task's own verification, and one important task given
@@ -39,6 +48,8 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `README.md`, `docs/project-state.md` and `CONTRIBUTING.md` list seventeen
+  skills, `remote-level.sh` under `scripts/`, and nine gates.
 - `docs/quickstart.md` is one path in six steps, from checking the
   prerequisites to a session log on disk, each step ending with what you should
   now see. It clones the kit, copies `examples/workspace/`,
