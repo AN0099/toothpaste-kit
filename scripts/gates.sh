@@ -13,12 +13,13 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These eight gates cover: the em dash ban, the private task ID ban,
+# check. These nine gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency, skill frontmatter, the
 # reflow script's own selftest, markdown structure via scripts/mdlint.py,
 # which states its own eighteen-rule coverage in its header, and the example
 # workspace's stubs against docs/standing-documents.md via
-# scripts/check-workspace-stubs.py, which states its own coverage too. They do NOT cover: en dashes (ranges and
+# scripts/check-workspace-stubs.py, which states its own coverage too, and
+# the remote classifier's own selftest in scripts/remote-level.sh. They do NOT cover: en dashes (ranges and
 # clause separators are not mechanically separable, so that stays a review
 # prompt), prose quality, internal link validity, whether a skill's Scope
 # Pointer is last, or whether any document's claims are true.
@@ -174,6 +175,16 @@ gate_stubs() {
   fi
 }
 
+# ---------------------------------------------------------------- 9
+gate_remote_level() {
+  gate_start "remote-level selftest"
+  if bash scripts/remote-level.sh --selftest; then
+    gate_ok "remote-level selftest"
+  else
+    gate_bad "remote-level selftest"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -183,7 +194,8 @@ run_all() {
   gate_reflow
   gate_markdown
   gate_stubs
-  printf '\n%s of 8 gates passed\n' "$pass_n"
+  gate_remote_level
+  printf '\n%s of 9 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -191,7 +203,7 @@ run_all() {
 
 # A gate that has never returned a hit has not been shown capable of
 # returning one, so each of the first five, and the eighth, is run against a
-# planted positive in a scratch tree. Gate 6 carries its own fixture
+# planted positive in a scratch tree. Gates 6 and 9 carry their own fixture
 # assertions already, and gate 7 plants one positive per rule below.
 run_selftest() {
   tmp=$(mktemp -d) || return 1

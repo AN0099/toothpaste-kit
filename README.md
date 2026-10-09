@@ -49,7 +49,7 @@ vendor-agnostic framework is on the roadmap.
 
 ### `skills/`
 
-Sixteen skills, in three classes.
+Seventeen skills, in three classes.
 
 Seven govern agent behavior continuously. An agent loads them on its own when the frontmatter `description` matches what it is doing.
 
@@ -63,7 +63,7 @@ Seven govern agent behavior continuously. An agent loads them on its own when th
 | `skill-discovery` | Whether a recurring need is worth a skill, and finding one that already exists |
 | `commands` | Index for the twenty-seven-command vocabulary, with brevity codes |
 
-Six are procedures a person invokes. All six set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started.
+Seven are procedures a person invokes. All seven set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started.
 
 | Skill | Runs |
 |---|---|
@@ -73,6 +73,7 @@ Six are procedures a person invokes. All six set `disable-model-invocation`, so 
 | `daily-review` | Once a day, before the first task is pulled. Proposes moves across the task board's lanes and ends on questions; assumes a lane-board tool |
 | `weekly-review` | Once a week, after a daily review. Chases Waiting's blockers, names carried work by its count, reads the Done lane back, and schedules one important task; ends on questions |
 | `session-log` | Mid-session, before context is compacted. Captures the reasoning from the recent stretch to one append-only file, and nothing else |
+| `merge-proxy` | When a person wants the agent to type a merge they have decided. For that session, on a repository whose remote is internal or absent, the agent may run and push a trunk merge after explaining the full plan and halting for approval of each one. Never on a GitHub or other internet remote |
 
 Three are procedures an agent may run on its own at a clean boundary. None sets `disable-model-invocation`, because each one reads or records and none decides anything. None of them satisfies `session-log` or `session-close`.
 
@@ -103,6 +104,8 @@ Two block (a forbidden character in generated content, and a packing command wit
 `link-skills.sh` symlinks `skills/` into your Claude skills directory instead of copying, so `git pull` updates them in place. Targets are relative where `ln -r` exists, so the links survive the tree being moved, and absolute otherwise; the script reports which it used.
 
 `reflow-md.py` unwraps hard-wrapped Markdown paragraphs to one line each. Markdown collapses single newlines, so a hard wrap changes nothing about how a document renders; what it does change is that the author's column width gets baked into the file and every reader inherits it. Fenced code, tables, front matter, headings, blockquotes, and list indentation are left alone. Use `--check` for a dry run. `--selftest` runs the bundled fixture in `reflow-md.test.md` against `reflow-md.expected.md` and exits nonzero on failure; run it after any change to the script.
+
+`remote-level.sh PATH` prints a repository's level from where its remotes point: `none`, `internal` (a path or a private address) or `external` (anything else, GitHub included). A host it cannot prove internal is `external`. `merge-proxy` runs it as its first step. `--selftest` proves all three answers on scratch repositories, and a gate runs it.
 
 ### `orchestration/`
 
