@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v3
+
+The lanes table and Scope Pointer name `monthly-review` as part of the kit, now that it ships. No
+change to the procedure.
+
 ## v2
 
 The Scope Pointer names `weekly-review` as part of the kit, now that it ships. No change to the

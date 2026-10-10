@@ -21,6 +21,10 @@ skill lives in that skill's own `CHANGELOG.md`.
   read back against each task's own verification, and one important task given
   a day, never a due date. It proposes and asks; it moves nothing the person
   did not answer.
+- `skills/monthly-review/`. A once-a-month pass: each Someday/Maybe item
+  adopted, kept or rejected, long-stalled Waiting work questioned, and the
+  tool's archive candidates chosen by the person, leaving as reference or as
+  trash. The only review that removes anything from the board.
 - `docs/releasing.md` says how a skill is versioned and retired (MINOR, a new
   release rule that leaves existing usage working). Three new sections: Skill
   revisions, where a skill's `vN` lives only in its own `CHANGELOG.md` and each
