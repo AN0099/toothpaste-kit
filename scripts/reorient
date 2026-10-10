@@ -1,0 +1,284 @@
+#!/usr/bin/env bash
+# reorient: the cheapest true statement of where a workspace stands.
+#
+# The observing half of the `orient` skill. Run it at the start of a session
+# and after every compaction, so the budget is the design constraint: one
+# screen of output, no file contents, no analysis. It prints state and ranks
+# nothing, verifies no claim and runs no gate. The COVERAGE block at the end
+# names what it read and what it did not, because a report that does not state
+# its scope reads as a clean result.
+#
+# Usage: reorient [--fetch] [--wide] [ROOT]
+#        reorient --selftest
+#   ROOT     the workspace; default the current directory
+#   --fetch  update remote refs first (network)
+#   --wide   name every changed file instead of the first three
+#
+# Paths come from the workspace itself, so nothing here names one desk:
+#   provenance layer  the `provenance layer is `PATH`` line in ROOT/CLAUDE.md,
+#                     default .agents/context
+#   manifest          the `listed in `PATH`` line in ROOT/CLAUDE.md, default
+#                     index.md; its "Ensure These are Up-to-Date" list is the
+#                     standing-files set
+#   queues            standing files whose name contains `queue` and ends .json
+#   flag register     the standing file whose name contains `flagged`
+# Repositories read: ROOT itself, ROOT/projects/*, and any in REORIENT_REPOS
+# (colon-separated paths).
+#
+# Env:
+#   REORIENT_INBOX_REPO  a repository whose sibling branches deliver mail into
+#                        inbox-<branch>/. Unset, the MAIL section is off.
+#   REORIENT_FG_LIMIT    seconds; a harness shell older than this is reported.
+#                        Default 180, just over Claude Code's tool timeout.
+set -u
+HERE=$(cd "$(dirname "$0")" && pwd)
+
+selftest() {
+  local tmp out fails=0 pid
+  tmp=$(mktemp -d) || return 1
+  trap 'rm -rf -- "${tmp:?}"' RETURN
+  cp -R "$HERE/../examples/workspace/." "$tmp/" || return 1
+  check() { # $1 label, $2 pattern expected (or !pattern for absent)
+    case "$2" in
+      !*) if printf '%s\n' "$out" | grep -qE -- "${2#!}"; then echo "FAIL $1"; fails=$((fails+1)); else echo "ok   $1"; fi ;;
+      *)  if printf '%s\n' "$out" | grep -qE -- "$2"; then echo "ok   $1"; else echo "FAIL $1"; fails=$((fails+1)); fi ;;
+    esac
+  }
+  # The second tree: the kit's own example workspace, untouched.
+  out=$(bash "$0" "$tmp" 2>&1); rc=$?
+  [ "$rc" -eq 0 ] && echo "ok   exits 0 on the example workspace" || { echo "FAIL exit $rc"; fails=$((fails+1)); }
+  check "standing set read from the manifest"   '^STANDING 5 files, 0 over a week old, 0 defective'
+  check "queue found through the manifest"      '^QUEUE task-queue +0 tasks'
+  check "no capture reported as none"           '^CAP  no session-\[0-9\]\*\.md in '
+  check "flag register without Open says so"    '^FLAG threads-flagged.md has no Open section'
+  check "mail off by default"                   '!^MAIL'
+  check "no timer section"                      '!^TIMER'
+  check "coverage block present"                '^COVERAGE:'
+  # Planted positives: each must change the line it targets.
+  printf '# Session\n\n## 10:00 first: x\n\n## 10:05 [jot] y\n' > "$tmp/.agents/context/session-2026-01-01-plant.md"
+  rm "$tmp/.agents/lead-handoff.md"
+  printf '{"tasks":[{"id":"T-1","status":"pending"}]}\n' > "$tmp/.agents/task-queue.json"
+  printf '# Flags\n\n## Open\n\n### 2026-01-01\n\n<!--flag-->\n**A flag**\n\n## Resolved\n' > "$tmp/.agents/threads-flagged.md"
+  sed -i 's|provenance layer is `.agents/context/`|provenance layer is `.agents/elsewhere/`|' "$tmp/CLAUDE.md"
+  mkdir -p "$tmp/.agents/elsewhere" && mv "$tmp/.agents/context/session-2026-01-01-plant.md" "$tmp/.agents/elsewhere/"
+  bash -c 'sleep 20; :' shell-snapshots/snapshot-bash-plant.sh & pid=$!
+  sleep 1
+  out=$(REORIENT_FG_LIMIT=0 bash "$0" "$tmp" 2>&1)
+  kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
+  check "provenance path read from CLAUDE.md"   '^CAP  session-2026-01-01-plant.md  5 lines, 2 entries'
+  check "partials counted"                      '^PART 1 log, 1 jot, 0 touch since the last close'
+  check "missing standing file named"           'MISSING \.agents/lead-handoff\.md'
+  check "queue counts statuses"                 '^QUEUE task-queue +1 tasks: pending 1'
+  check "marked flags counted"                  '^FLAG 1 date groups, 1 marked flags'
+  check "old harness shell reported"            "^TASK pid $pid "
+  [ "$fails" -eq 0 ] && { echo "reorient: selftest passed"; return 0; }
+  echo "reorient: selftest FAILED ($fails)"; return 1
+}
+
+do_fetch=0; wide=0; ROOT=.
+for a in "$@"; do
+  case "$a" in
+    --selftest) selftest; exit $? ;;
+    --fetch) do_fetch=1 ;;
+    --wide)  wide=1 ;;
+    -*) printf 'reorient: unknown argument %s\n' "$a" >&2; exit 2 ;;
+    *)  ROOT=$a ;;
+  esac
+done
+ROOT=$(cd "$ROOT" 2>/dev/null && pwd) || { printf 'reorient: no such directory\n' >&2; exit 2; }
+
+# Paths from the workspace's own CLAUDE.md, with the example layout as default.
+from_claude() { # $1 sed pattern capturing the path, $2 default
+  local v=""
+  [ -f "$ROOT/CLAUDE.md" ] && v=$(sed -nE "s/.*$1.*/\1/p" "$ROOT/CLAUDE.md" | head -1)
+  printf '%s' "${v:-$2}"
+}
+CTX="$ROOT/$(from_claude 'provenance layer is `([^`]+)`' .agents/context)"; CTX=${CTX%/}
+MAN="$ROOT/$(from_claude 'listed in `([^`]+)`' index.md)"
+
+names() { # $1 count, rest: names
+  local n="$1"; shift
+  [ "$n" -eq 0 ] && return
+  if [ "$wide" -eq 1 ] || [ "$n" -le 3 ]; then printf ' %s' "$@"
+  else printf ' %s %s %s +%d' "$1" "$2" "$3" "$((n - 3))"; fi
+}
+
+repo() { # $1 label, $2 path
+  local lab="$1" dir="$2" br staged dirty untr st ahead behind lvl
+  [ -d "$dir/.git" ] || [ -f "$dir/.git" ] || return 0
+  [ "$do_fetch" -eq 1 ] && git -C "$dir" fetch --quiet 2>/dev/null
+  lvl=$(bash "$HERE/remote-level.sh" "$dir" 2>/dev/null || printf 'external')
+  br=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null || printf '?')
+  [ "$br" = HEAD ] && br="detached@$(git -C "$dir" rev-parse --short HEAD 2>/dev/null)"
+  staged=$(git -C "$dir" diff --cached --name-only 2>/dev/null | wc -l)
+  dirty=$(git -C "$dir" diff --name-only 2>/dev/null | wc -l)
+  untr=$(git -C "$dir" ls-files --others --exclude-standard 2>/dev/null | wc -l)
+  st=$(git -C "$dir" rev-list --left-right --count "@{u}...HEAD" 2>/dev/null || true)
+  if [ -n "$st" ]; then behind=${st%%[!0-9]*}; ahead=${st##*[!0-9]}; else behind=-; ahead=-; fi
+  printf 'GIT  %-14s %-9s %-10s staged %-3s dirty %-3s untracked %-3s ahead %s behind %s\n' \
+    "$lab" "$lvl" "$br" "$staged" "$dirty" "$untr" "${ahead:-0}" "${behind:-0}"
+  if [ "$((staged + dirty + untr))" -gt 0 ]; then
+    printf '     '
+    [ "$staged" -gt 0 ] && { printf ' staged:'; names "$staged" $(git -C "$dir" diff --cached --name-only | sed 's|.*/||'); }
+    [ "$dirty"  -gt 0 ] && { printf ' dirty:';  names "$dirty"  $(git -C "$dir" diff --name-only | sed 's|.*/||'); }
+    [ "$untr"   -gt 0 ] && { printf ' new:';    names "$untr"   $(git -C "$dir" ls-files --others --exclude-standard | sed 's|.*/||'); }
+    printf '\n'
+  fi
+}
+
+printf 'REORIENT %s  %s\n' "$(date '+%Y-%m-%d %H:%M %Z')" "$ROOT"
+
+# Claude Code only: the model and harness version this seat asked for. Read
+# from the user settings file, so it is what was requested, not what runs.
+if [ -f "$HOME/.claude/settings.json" ]; then
+  python3 - "$HOME/.claude/settings.json" "$(claude --version 2>/dev/null | cut -d' ' -f1)" <<'PY'
+import json, re, sys
+try: d = json.load(open(sys.argv[1]))
+except Exception as e: print("PIN  user settings unreadable:", e); raise SystemExit
+m = d.get("model") or "(unset)"
+kind = "pinned" if re.search(r"\d", m) else "ALIAS"
+au = "off" if (d.get("env") or {}).get("DISABLE_AUTOUPDATER") else "ON"
+print("PIN  model %s (%s)  claude-code %s  autoupdate %s" % (m, kind, sys.argv[2] or "?", au))
+PY
+fi
+
+repo "$(basename "$ROOT")" "$ROOT"
+for p in "$ROOT"/projects/*; do [ -d "$p" ] && repo "$(basename "$p")" "$p"; done
+IFS=: read -r -a extra <<< "${REORIENT_REPOS:-}"
+for p in "${extra[@]}"; do [ -n "$p" ] && repo "$(basename "$p")" "$p"; done
+
+# Mail, only where a file inbox is configured. Each sibling branch's files in
+# inbox-<this branch>/ that this branch does not carry. Reachability measures
+# delivery, not reading, so this is an upper bound on what is new.
+IB="${REORIENT_INBOX_REPO:-}"
+if [ -n "$IB" ] && [ -d "$IB/.git" ]; then
+  seat=$(git -C "$IB" rev-parse --abbrev-ref HEAD 2>/dev/null || printf '')
+  box="inbox-$seat"
+  if [ -d "$IB/$box" ]; then
+    for ref in $(git -C "$IB" for-each-ref --format='%(refname:short)' refs/remotes/origin 2>/dev/null); do
+      case "$ref" in origin/HEAD|"origin/$seat") continue ;; esac
+      # Three-dot and added-or-modified only: two-dot compares the tips and
+      # counts this branch's own notes as mail waiting.
+      files=$(git -C "$IB" diff --name-only --diff-filter=AM "HEAD...$ref" -- "$box/" 2>/dev/null | sed 's|.*/||' | sort -r)
+      n=$(printf '%s' "$files" | grep -c . || true)
+      [ "${n:-0}" -gt 0 ] && printf 'MAIL %-8s %s file(s) not in %s:%s\n' "${ref#origin/}" "$n" "$seat" "$(names "$n" $files)"
+    done
+  fi
+fi
+
+# Claude Code only: harness shells older than the foreground limit. Every
+# harness Bash call runs as a shell sourcing shell-snapshots/snapshot-bash-*,
+# foreground and background alike, so age is what separates them: a foreground
+# call is bounded by the tool timeout. This script's own ancestry is excluded.
+FG=${REORIENT_FG_LIMIT:-180}
+Q="'"
+chain=" $$ "
+p=$(ps -o ppid= -p $$ 2>/dev/null | tr -d ' ')
+while [ -n "${p:-}" ] && [ "$p" != 1 ]; do chain="$chain$p "; p=$(ps -o ppid= -p "$p" 2>/dev/null | tr -d ' '); done
+tasks=$(ps -eo pid=,etimes=,args= 2>/dev/null | while read -r pid secs rest; do
+  case "$rest"  in *shell-snapshots/snapshot-bash-*) ;; *) continue ;; esac
+  case "$chain" in *" $pid "*) continue ;; esac
+  [ "$secs" -lt "$FG" ] && continue
+  cmd=${rest#*eval $Q}; cmd=${cmd%%$Q < /dev/null*}
+  printf 'TASK pid %-7s age %4dm  %.60s\n' "$pid" "$((secs / 60))" "$cmd"
+done)
+if [ -n "$tasks" ]; then printf '%s\n' "$tasks"; else printf 'TASK no harness shell older than %ss\n' "$FG"; fi
+
+# Newest capture by mtime. A capture is named for the date it covers, so the
+# glob requires a digit after `session-`; without it a runbook named
+# session-end-... read as the newest capture. An entry is a `# Entry` heading
+# or a `## ` heading carrying an HH:MM time.
+capglob="session-[0-9]*.md"
+if [ -d "$CTX" ]; then
+  cap=$(ls -t "$CTX"/$capglob 2>/dev/null | head -1)
+  if [ -n "${cap:-}" ]; then
+    ents=$(grep -cE '^(# Entry|## .*[0-2][0-9]:[0-5][0-9])' "$cap" 2>/dev/null) || ents=${ents:-0}
+    last=$(grep -E '^(# Entry|## .*[0-2][0-9]:[0-5][0-9])' "$cap" 2>/dev/null | tail -1 | sed 's/^#* *//')
+    printf 'CAP  %s  %s lines, %s entries\n' "$(basename "$cap")" "$(wc -l < "$cap" | tr -d ' ')" "${ents:-0}"
+    printf 'LAST %s\n' "${last:-(no entry heading: # Entry, or ## with an HH:MM time)}"
+    # Partial captures (docs/partial-captures.md) since the newest close. A
+    # close heading contains `session-close run`, starts `## Close,`, or reads
+    # `## HH:MM [TZ], session-close`. Every other timed `## ` heading is a
+    # session-log entry, also residue a close has not processed.
+    awk '
+      /^## / && (/session-close run/ || /^## Close,/ ||
+                 /^## [0-2][0-9]:[0-5][0-9]( [A-Z][A-Z]+)?, session-close( |\(|$)/) { j = 0; t = 0; l = 0; seen = 1; next }
+      /^## / && /\[jot\]/   { j++; next }
+      /^## / && /\[touch\]/ { t++; next }
+      /^## .*[0-2][0-9]:[0-5][0-9]/ { l++ }
+      END { printf "PART %d log, %d jot, %d touch since the last close%s\n", l, j, t,
+                   seen ? "" : " (no close heading in this file)" }' "$cap"
+  else
+    printf 'CAP  no %s in %s\n' "$capglob" "${CTX#$ROOT/}"
+  fi
+else
+  printf 'CAP  provenance layer %s not found\n' "${CTX#$ROOT/}"
+fi
+
+# The standing set, parsed from the manifest so this cannot disagree with it.
+# Queues and the flag register are found in that same list.
+[ -f "$MAN" ] && python3 - "$MAN" "$ROOT" <<'PY'
+import sys, os, re, time, json, collections
+man, root = sys.argv[1], sys.argv[2]
+lines = open(man).read().split("\n")
+try:
+    a = next(i for i, l in enumerate(lines) if l.startswith("## Ensure These are Up-to-Date"))
+except StopIteration:
+    print("STANDING manifest has no up-to-date section"); raise SystemExit
+rels = []
+for l in lines[a + 1:]:
+    if l.startswith("## "): break
+    m = re.match(r"\s*-\s*`([^`]+)`", l)
+    if m: rels.append(m.group(1))
+for rel in rels:
+    base = os.path.basename(rel)
+    if "queue" in base and base.endswith(".json"):
+        label = base[:-5]
+        try: d = json.load(open(os.path.join(root, rel)))
+        except Exception as e: print("QUEUE %s unreadable: %s" % (label, e)); continue
+        t = d.get("tasks", d) if isinstance(d, dict) else d
+        c = collections.Counter(x.get("status", "(no status)") for x in t)
+        print("QUEUE %s %d tasks%s" % (label, len(t), (": " + "  ".join("%s %d" % kv for kv in sorted(c.items()))) if t else ""))
+for rel in rels:
+    if "flagged" not in os.path.basename(rel): continue
+    p = os.path.join(root, rel)
+    if not os.path.exists(p): continue
+    L = open(p).read().split("\n")
+    try:
+        s = next(i for i, l in enumerate(L) if l.startswith("## Open"))
+        e = next(i for i, l in enumerate(L) if l.startswith("## Resolved"))
+    except StopIteration:
+        print("FLAG %s has no Open section" % os.path.basename(rel)); continue
+    sec = L[s:e]
+    # Marked flags are exact; bold at column 0 is the upper bound that also
+    # covers entries written before the marker.
+    print("FLAG %d date groups, %d marked flags, <=%d unmarked bound in Open"
+          % (sum(l.startswith("### ") for l in sec), sum(l == "<!--flag-->" for l in sec),
+             sum(l.startswith("**") for l in sec)))
+    mis = [e + i + 1 for i, l in enumerate(L[e:]) if l == "<!--flag-->" or l.startswith("### ")]
+    if mis: print("     MISFILED %d below Resolved, first at line %d" % (len(mis), mis[0]))
+out, now, stale, bad = [], time.time(), 0, 0
+for rel in rels:
+    p = os.path.join(root, rel)
+    if not os.path.exists(p):
+        out.append("MISSING " + rel); bad += 1; continue
+    d = int((now - os.path.getmtime(p)) // 86400)
+    stale += d >= 7
+    out.append("%4dd %s" % (d, rel))
+print("STANDING %d files, %d over a week old, %d defective" % (len(out), stale, bad))
+for o in out: print("      " + o)
+PY
+[ -f "$MAN" ] || printf 'STANDING no manifest at %s\n' "${MAN#$ROOT/}"
+
+printf 'COVERAGE: git state for the workspace, projects/* and REORIENT_REPOS, with\n'
+printf '          the level scripts/remote-level.sh assigns; MAIL only when\n'
+printf '          REORIENT_INBOX_REPO is set%s; harness shells older\n' "$([ -n "$IB" ] && printf ' (set)' || printf ' (unset, not read)')"
+printf '          than the foreground limit (Claude Code only; elsewhere TASK finds\n'
+printf '          nothing and that is not a clean result); PIN (Claude Code user\n'
+printf '          settings only, what was asked for, not what runs); the newest\n'
+printf '          capture and its partials; queues, flags and standing files found\n'
+printf '          through the manifest.\n'
+printf '          Does not run any gate, verify any claim, judge whether a document\n'
+printf '          is current, or fetch unless asked. STANDING reads mtime, which says\n'
+printf '          when a file was written, never whether it is still true. PART\n'
+printf '          counts the newest capture file only.\n'

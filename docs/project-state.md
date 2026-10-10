@@ -23,7 +23,8 @@ none satisfies `session-log` or `session-close`.
 
 `hooks/` carries seven `hookify` rule examples, inert where they sit. `scripts/` carries
 `link-skills.sh`, `reflow-md.py` with a fixture and `--selftest`, and `remote-level.sh`, the remote
-classifier `merge-proxy` runs, with its own `--selftest`. `link-skills.sh`
+classifier `merge-proxy` runs, with its own `--selftest`, and `reorient`, the observing half of
+`orient`, whose `--selftest` runs it on `examples/workspace/`. `link-skills.sh`
 writes relative symlink targets where `ln -r` exists, so the links survive the tree being moved.
 `examples/workspace/` is the workspace `docs/quickstart.md` copies, and
 `scripts/check-workspace-stubs.py` checks its stubs against `docs/standing-documents.md`.
@@ -123,7 +124,7 @@ with Unreleased; `CHANGELOG.md` is the full log.
 
 - No test suite in this repo (TK-069). An eval harness covering `document-standards` exists and is not
   ready to ship here. Skills are otherwise validated by use and
-  review. The CI half of this gap is closed: `gates.yml` is installed and runs nine mechanical
+  review. The CI half of this gap is closed: `gates.yml` is installed and runs ten mechanical
   gates plus a second-party markdown lint, so the checks `CONTRIBUTING.md` documents are now
   enforced rather than merely documented.
 - No drift detection for this repo's own documents (TK-070). A checker exists that records a source path
@@ -168,7 +169,7 @@ rather than recalled.
 | Citation metadata | `CITATION.cff`, present, `version` and `date-released` commented out |
 | Issue templates | Four under `.github/ISSUE_TEMPLATE/` |
 | Governance and roles | **Absent.** No `GOVERNANCE.md`, no stated decision process, one maintainer |
-| Automated checks in CI | **Two workflows**, `commit-attribution.yml` and `gates.yml`. The latter runs nine mechanical gates plus a second-party markdown lint |
+| Automated checks in CI | **Two workflows**, `commit-attribution.yml` and `gates.yml`. The latter runs ten mechanical gates plus a second-party markdown lint |
 | Versioning and releases | **Absent.** No tags, no releases, no release notes |
 | Dependency management | **Absent.** No `dependabot.yml`. The repository ships no package manifest, which is why |
 | Static analysis | **Absent.** The tree is Markdown, shell and one Python script; nothing scans the shell or the Python |
@@ -193,6 +194,8 @@ unverifiable clean result this project's own conventions reject.
 - **`skills/monthly-review/`.** The once-a-month pass: Someday adopted or
   rejected, long-stalled Waiting work questioned, and archive candidates
   chosen by the person, leaving by the reference or the trash door.
+- **`scripts/reorient`.** The `orient` skill's observing tool, shipped with
+  it at last; a tenth gate runs its selftest on `examples/workspace/`.
 - **The issue #11 fix.** `docs/quickstart.md` is one path in six steps;
   alternatives moved to a new installing guide, `docs/installing.md`; the
   quickstart copies `examples/workspace/`, whose stubs an eighth gate checks.

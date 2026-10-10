@@ -25,6 +25,10 @@ skill lives in that skill's own `CHANGELOG.md`.
   adopted, kept or rejected, long-stalled Waiting work questioned, and the
   tool's archive candidates chosen by the person, leaving as reference or as
   trash. The only review that removes anything from the board.
+- `scripts/reorient`, the observing half of `skills/orient/`, which shipped
+  without it. Paths come from the workspace's `CLAUDE.md` and manifest; mail is
+  off unless `REORIENT_INBOX_REPO` is set. A tenth gate runs its `--selftest`
+  on `examples/workspace/` and against planted positives. `orient` v2 names it.
 - `docs/releasing.md` says how a skill is versioned and retired (MINOR, a new
   release rule that leaves existing usage working). Three new sections: Skill
   revisions, where a skill's `vN` lives only in its own `CHANGELOG.md` and each

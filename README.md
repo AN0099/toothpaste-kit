@@ -108,6 +108,8 @@ Two block (a forbidden character in generated content, and a packing command wit
 
 `remote-level.sh PATH` prints a repository's level from where its remotes point: `none`, `internal` (a path or a private address) or `external` (anything else, GitHub included). A host it cannot prove internal is `external`. `merge-proxy` runs it as its first step. `--selftest` proves all three answers on scratch repositories, and a gate runs it.
 
+`reorient [ROOT]` is the observing half of the `orient` skill: one screen of a workspace's state, git per repository, the newest capture and its partials, queues, flags and standing files found through the manifest, ending in a COVERAGE block. It reads its paths from the workspace's `CLAUDE.md` and manifest, so it names no desk. Mail is read only when `REORIENT_INBOX_REPO` is set. `--selftest` runs it on `examples/workspace/` and against planted positives, and a gate runs it.
+
 ### `orchestration/`
 
 The protocol for passing work between agents on different surfaces.
