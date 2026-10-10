@@ -49,7 +49,7 @@ vendor-agnostic framework is on the roadmap.
 
 ### `skills/`
 
-Seventeen skills, in three classes.
+Eighteen skills, in three classes.
 
 Seven govern agent behavior continuously. An agent loads them on its own when the frontmatter `description` matches what it is doing.
 
@@ -63,7 +63,7 @@ Seven govern agent behavior continuously. An agent loads them on its own when th
 | `skill-discovery` | Whether a recurring need is worth a skill, and finding one that already exists |
 | `commands` | Index for the twenty-seven-command vocabulary, with brevity codes |
 
-Seven are procedures a person invokes. All seven set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started.
+Eight are procedures a person invokes. All eight set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started.
 
 | Skill | Runs |
 |---|---|
@@ -72,6 +72,7 @@ Seven are procedures a person invokes. All seven set `disable-model-invocation`,
 | `daily-dashboard` | At the start of a working session. Reads those documents back, verifies carry-over against the working trees, and ends on questions |
 | `daily-review` | Once a day, before the first task is pulled. Proposes moves across the task board's lanes and ends on questions; assumes a lane-board tool |
 | `weekly-review` | Once a week, after a daily review. Chases Waiting's blockers, names carried work by its count, reads the Done lane back, and schedules one important task; ends on questions |
+| `monthly-review` | Once a month, after a weekly review. Adopts or rejects each Someday item, asks whether long-stalled Waiting work is still committed, and lets the person choose which archive candidates leave the board; ends on questions |
 | `session-log` | Mid-session, before context is compacted. Captures the reasoning from the recent stretch to one append-only file, and nothing else |
 | `merge-proxy` | When a person wants the agent to type a merge they have decided. For that session, on a repository whose remote is internal or absent, the agent may run and push a trunk merge after explaining the full plan and halting for approval of each one. Never on a GitHub or other internet remote |
 

@@ -7,13 +7,13 @@ Last updated 2026-10-03.
 
 ## Live
 
-Seventeen skills in three classes.
+Eighteen skills in three classes.
 
 Seven govern agent behavior and are in daily use: `working-preferences`, `document-standards`,
 `technical-documents`, `surface-regimes`, `skill-creation`, `skill-discovery`, `commands`.
 
-Seven are human-invoked procedures: `redaction-gate`, `session-close`,
-`daily-dashboard`, `daily-review`, `weekly-review`, `session-log` and `merge-proxy`. All seven set `disable-model-invocation`, which is the point in
+Eight are human-invoked procedures: `redaction-gate`, `session-close`,
+`daily-dashboard`, `daily-review`, `weekly-review`, `monthly-review`, `session-log` and `merge-proxy`. All eight set `disable-model-invocation`, which is the point in
 each case. A gate a model can invoke to satisfy itself is not a gate, and an agent should not decide
 on its own that a session is over or that a working day has started.
 
@@ -190,6 +190,9 @@ unverifiable clean result this project's own conventions reject.
 - **`skills/weekly-review/`.** The once-a-week pass over a task board's
   slower lanes: Waiting blockers, carried work, the Done lane, and one
   important task given a day.
+- **`skills/monthly-review/`.** The once-a-month pass: Someday adopted or
+  rejected, long-stalled Waiting work questioned, and archive candidates
+  chosen by the person, leaving by the reference or the trash door.
 - **The issue #11 fix.** `docs/quickstart.md` is one path in six steps;
   alternatives moved to a new installing guide, `docs/installing.md`; the
   quickstart copies `examples/workspace/`, whose stubs an eighth gate checks.

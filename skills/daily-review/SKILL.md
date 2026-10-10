@@ -23,12 +23,12 @@ gives: a model re-deriving lanes from raw JSON is doing a script's job, and doin
 | Lane | Holds | Leaves by |
 |---|---|---|
 | Inbox | captured, not yet clarified | this review |
-| Someday/Maybe | considered and parked | a monthly review, if the tree runs one |
+| Someday/Maybe | considered and parked | `monthly-review` |
 | Next | ready to start, in order | a seat pulling its top task |
 | Waiting | blocked on a named person, task or event | the blocker clearing |
 | Doing | pulled; at most one per seat | finishing, to Verify |
 | Verify | deliverable exists and a second party checked it | the person's word, to Done |
-| Done, Archive | accepted; out of the board | a monthly review, if the tree runs one, archives |
+| Done, Archive | accepted; out of the board | `monthly-review` archives |
 
 **Priority is an Eisenhower quadrant**: Do, Decide, Delegate, Delete. **Urgent is read, not felt**:
 a task is urgent only when it carries a due date and a stated consequence of missing it. Important
@@ -92,6 +92,6 @@ unanswered row stays where it was and is listed as unanswered.
   claims; this reads the board and moves tasks. Run it first when both are wanted.
 - `weekly-review`: Waiting's blockers, carry-over by count, the Done lane, and one Decide task
   scheduled so the important is not starved by the urgent.
-- `monthly-review` (not in this kit): Someday adopted or rejected, and archive candidates chosen by the person.
+- `monthly-review`: Someday adopted or rejected, and archive candidates chosen by the person.
 - `session-close`: updates the standing files at the end of a session. A move made here is already
   in the queue and does not wait for it.

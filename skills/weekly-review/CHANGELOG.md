@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2
+
+The Scope Pointer names `monthly-review` as part of the kit, now that it ships. No change to the
+procedure.
+
 ## v1 (initial)
 
 The once-a-week pass over a task board's slower lanes, the second of the reviews that

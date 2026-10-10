@@ -79,7 +79,7 @@ an unanswered row stays where it was and is listed as unanswered.
   through the next daily review.
 - `daily-dashboard`: the state view. It checks the standing files and working trees against their
   claims; this reads the board.
-- `monthly-review` (not in this kit): Someday adopted or rejected, and archive candidates chosen by
+- `monthly-review`: Someday adopted or rejected, and archive candidates chosen by
   the person. A Waiting task chased here more than once with no change is a candidate for it.
 - `session-close`: updates the standing files at the end of a session. A move made here is already
   in the queue and does not wait for it.
