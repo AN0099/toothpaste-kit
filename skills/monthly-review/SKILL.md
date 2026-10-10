@@ -13,7 +13,7 @@ agent.
 task queue, lanes and **lane-board tool** as `daily-review`, and reads its lanes table from there
 rather than restating it. It also assumes an **archive**: a separate store that archived tasks move
 into with their full record, which the lane-board tool reads when it resolves a dependency, so an
-archived predecessor still counts as complete. `CLAUDE.md` names the command and the archive.
+archived predecessor that left as reference still counts as complete. `CLAUDE.md` names the command and the archive.
 **Check the tool's coverage line before starting**: this review needs each Someday item's added
 date and note, each Waiting task's blocker and note, and the tool's list of archive candidates.
 A field the tool does not print is a reason to extend the tool, not to read the queue by hand.
@@ -25,7 +25,8 @@ purpose, because a week is too short to judge them. **Someday/Maybe fills and is
 parking an idea is cheap, and a list nobody reviews stops being a list of options and becomes a
 place ideas go to be forgotten. **Done fills and never empties**: every finished task stays in view,
 and a board that shows everything ever finished hides what is open. This pass reads both, once a
-month, and is the only procedure that removes anything from the board.
+month, and is the only procedure that archives a task the board has been holding. (The daily
+review's trash door is for Inbox items not yet clarified.)
 
 ## The archive's rules
 
@@ -41,6 +42,10 @@ These hold whatever the person answers, and the proposals in phase 2 never break
 4. **The archive has two doors.** A Done task leaves as **reference**: it happened and may be cited.
    A rejected proposal, or a task no longer worth doing, leaves as **trash**, marked irrelevant
    rather than done, so the record never claims work that was not performed.
+   **Trash never satisfies a dependency.** A task that an open task depends on is not proposed
+   for trash; its row names the dependent and proposes resolving that first, by dropping the
+   dependency or rejecting the dependent too, in the same answer. Otherwise the dependent would
+   read as unblocked by work nobody did.
 5. **An archived task keeps its full record**, with the date it left the board, the review that
    moved it and the door it left by.
 
@@ -59,13 +64,13 @@ not write anything yet.** A step with nothing to propose is one line saying so.
 1. **Someday/Maybe, decided.** Every item in the lane. Propose one of: **adopt** it into Next, with
    a quadrant and a concrete next action; **keep** it parked, with one line on why it is still worth
    keeping; or **reject** it to the archive as trash, with what changed to make it irrelevant (rule
-   3). An item adopted here enters Next's order through the next daily review.
+   3; and rule 4, never while an open task depends on it). An item adopted here enters Next's order through the next daily review.
 2. **Waiting, stalled.** Every Waiting task that weekly reviews have chased more than once with no
    change to its blocker, as their notes record. The weekly review asks whether the blocker is still
    true; this asks whether the task is still committed work. Propose one of: keep it Waiting, with
    the blocker restated and a next action naming who takes it; move it to Someday/Maybe, because
    it is worth keeping and nobody is committed to it; or archive it as trash, because it is no
-   longer worth doing.
+   longer worth doing (rule 4: never while an open task depends on it).
 3. **Done, archived.** Every candidate the tool lists, and only those (rule 2). Propose one of:
    archive it as reference, or keep it in Done with the reason, such as a task about to be cited by
    work that is not yet a task. A long list is normal at the first monthly review and is not a
@@ -85,7 +90,8 @@ An archived task moves to the archive with its full record, the date, "monthly r
 (rule 5); a trash entry is marked irrelevant and never complete. Record each move that stays on the
 board in the task's note with the date and "monthly review". Run the lane-board command again:
 it must validate, the archived count must rise by exactly the number of accepted archive moves,
-and every dependency on an archived task must still resolve. Show the lanes that changed. **Nothing
+every dependency on an archived task must still resolve, and none may resolve through a trash
+entry. Show the lanes that changed. **Nothing
 moves on a task the person did not answer**; an unanswered row stays where it was and is listed as
 unanswered.
 
