@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2
+
+Phase 1 names the kit's own `scripts/reorient`, which now ships, in place of one tree's path. The
+skill shipped its judging half without its observing half until this revision. No change to the
+procedure.
+
 ## v1 (initial generation)
 
 Added in toothpaste-kit 0.2.0. The cheap reorientation: after a compaction, a handoff or a return to

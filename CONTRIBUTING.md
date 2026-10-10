@@ -52,7 +52,7 @@ You need a POSIX shell, `bash`, `git`, `python3`, `find`, and a `grep` with `-r`
 ./scripts/gates.sh --selftest
 ```
 
-That is the same script `.github/workflows/gates.yml` runs, which is the point: a check whose local copy and CI copy are separate texts can drift apart, and you find out when a clean local run is rejected by CI. It covers the seven mechanical rules above, including the two greps quoted earlier in this document, and an eighth: the stubs in `examples/workspace/` must match the files `docs/standing-documents.md` describes, checked by `scripts/check-workspace-stubs.py`. A ninth runs `scripts/remote-level.sh --selftest`, so the classifier `merge-proxy` relies on still gives all three answers.
+That is the same script `.github/workflows/gates.yml` runs, which is the point: a check whose local copy and CI copy are separate texts can drift apart, and you find out when a clean local run is rejected by CI. It covers the seven mechanical rules above, including the two greps quoted earlier in this document, and an eighth: the stubs in `examples/workspace/` must match the files `docs/standing-documents.md` describes, checked by `scripts/check-workspace-stubs.py`. A ninth runs `scripts/remote-level.sh --selftest`, so the classifier `merge-proxy` relies on still gives all three answers. A tenth runs `scripts/reorient --selftest`, on `examples/workspace/` as a second tree and against planted positives.
 
 `--selftest` first plants a positive for each gate and confirms the gate fires on it, then runs the real pass. A gate that has never returned a hit has not been shown capable of returning one, so a clean result on its own is weak evidence.
 

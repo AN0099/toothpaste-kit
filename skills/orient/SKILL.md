@@ -20,8 +20,8 @@ commands and reads all their output. This runs one.
 ## Phase 1: Observe, with the tool that already exists
 
 ```sh
-just reorient          # or tracked/system/bin/reorient
-just reorient --fetch  # when remote state matters; REFS says how stale it is
+scripts/reorient          # from the workspace root, or name it: scripts/reorient ROOT
+scripts/reorient --fetch  # when remote state matters
 ```
 
 One command. Read its output. **Do not go looking for more.** It ends with a `COVERAGE` block

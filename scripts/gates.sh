@@ -13,13 +13,15 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These nine gates cover: the em dash ban, the private task ID ban,
+# check. These ten gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency, skill frontmatter, the
 # reflow script's own selftest, markdown structure via scripts/mdlint.py,
 # which states its own eighteen-rule coverage in its header, and the example
 # workspace's stubs against docs/standing-documents.md via
 # scripts/check-workspace-stubs.py, which states its own coverage too, and
-# the remote classifier's own selftest in scripts/remote-level.sh. They do NOT cover: en dashes (ranges and
+# the remote classifier's own selftest in scripts/remote-level.sh, and
+# scripts/reorient's selftest, which runs it on examples/workspace as a second
+# tree and against planted positives. They do NOT cover: en dashes (ranges and
 # clause separators are not mechanically separable, so that stays a review
 # prompt), prose quality, internal link validity, whether a skill's Scope
 # Pointer is last, or whether any document's claims are true.
@@ -185,6 +187,15 @@ gate_remote_level() {
   fi
 }
 
+gate_reorient() {
+  gate_start "reorient selftest"
+  if bash scripts/reorient --selftest; then
+    gate_ok "reorient selftest"
+  else
+    gate_bad "reorient selftest"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -195,7 +206,8 @@ run_all() {
   gate_markdown
   gate_stubs
   gate_remote_level
-  printf '\n%s of 9 gates passed\n' "$pass_n"
+  gate_reorient
+  printf '\n%s of 10 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
