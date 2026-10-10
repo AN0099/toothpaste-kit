@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v2
+
+**Trash never satisfies a dependency.** v1 let steps 1 and 2 trash a task that an open task
+depended on, while the archive counts an archived predecessor as complete, so the dependent read as
+unblocked by work nobody did. A task with an open dependent is no longer proposed for trash, and
+phase 4 checks that no dependency resolves through a trash entry. Also corrected: v1 called this
+the only procedure that removes anything from the board, which the daily review's trash door for
+unclarified Inbox items contradicted.
+
 ## v1 (initial)
 
 The once-a-month pass, the last of the reviews `daily-review` named and the kit did not ship. The
@@ -8,7 +17,7 @@ it, so Someday/Maybe and Done only grow.
 
 Three things are deliberate.
 
-**Only this review removes anything from the board.** A tool lists archive candidates by two
+**Only this review archives a task the board has been holding.** A tool lists archive candidates by two
 mechanical conditions; the person chooses. A Done task the tool does not list is never proposed,
 and a disagreement with the tool is reported as a finding about the tool.
 

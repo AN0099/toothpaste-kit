@@ -24,7 +24,8 @@ skill lives in that skill's own `CHANGELOG.md`.
 - `skills/monthly-review/`. A once-a-month pass: each Someday/Maybe item
   adopted, kept or rejected, long-stalled Waiting work questioned, and the
   tool's archive candidates chosen by the person, leaving as reference or as
-  trash. The only review that removes anything from the board.
+  trash. The only review that archives a task the board has been holding, and trash
+  never satisfies a dependency (v2, after a second-party check of v1).
 - `scripts/reorient`, the observing half of `skills/orient/`, which shipped
   without it. Paths come from the workspace's `CLAUDE.md` and manifest; mail is
   off unless `REORIENT_INBOX_REPO` is set. A tenth gate runs its `--selftest`
