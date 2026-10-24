@@ -1,0 +1,122 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# The one definition of an allowed branch or tag name. Every layer that can
+# run a script calls this one: .githooks/pre-push, gate 13 in scripts/gates.sh
+# and the branch-name job in .github/workflows/gates.yml. The GitHub rulesets
+# in .github/rulesets/ cannot call a script, so branch-names.json repeats the
+# prefix list; change both together, and the selftest fails if they differ.
+#
+# Why: a branch name is published the moment it is pushed, and copies of
+# public push events persist outside GitHub, so deleting the branch or the
+# repository does not take the name back. A tool that names a task branch
+# from the opening words of the request that started the task makes any
+# automatic name a path for those words to reach the forge. Names are
+# therefore chosen, short and drawn from a fixed vocabulary; see
+# CONTRIBUTING.md, "Branch and tag names".
+#
+# Allowed:
+#   main
+#   <prefix>/<words>   prefix from the list below; words are lowercase a-z
+#                      and 0-9, joined by single hyphens or dots (dots so a
+#                      version reads as one, release/0.4.0); 40 characters total
+#   v<major>.<minor>.<patch> for tags, checked with --tag
+#
+# Usage: scripts/check-branch-name NAME          exit 0 if allowed, 1 if not
+#        scripts/check-branch-name --tag NAME    the same, for a tag
+#        scripts/check-branch-name --selftest    prove the rule both ways
+
+set -u
+
+PREFIXES='feat fix docs chore sync acmm record ci quality skills scripts release test licence'
+MAX=40
+
+check_branch() {
+  name=$1
+  [ "$name" = main ] && return 0
+  if [ "${#name}" -gt "$MAX" ]; then
+    echo "branch name rejected: '$name' is ${#name} characters, the limit is $MAX" >&2
+    return 1
+  fi
+  prefix=${name%%/*}
+  rest=${name#*/}
+  ok_prefix=no
+  for p in $PREFIXES; do [ "$prefix" = "$p" ] && ok_prefix=yes; done
+  if [ "$ok_prefix" = no ] || [ "$prefix" = "$name" ]; then
+    echo "branch name rejected: '$name' must start with one of: $PREFIXES, then a slash" >&2
+    return 1
+  fi
+  if ! printf '%s\n' "$rest" | grep -Eq '^[a-z0-9]+([.-][a-z0-9]+)*$'; then
+    echo "branch name rejected: '$name' after the prefix must be lowercase a-z and 0-9, joined by single hyphens or dots" >&2
+    return 1
+  fi
+  return 0
+}
+
+check_tag() {
+  if printf '%s\n' "$1" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then return 0; fi
+  echo "tag name rejected: '$1' must look like v1.2.3" >&2
+  return 1
+}
+
+selftest() {
+  fail=0
+  expect() { # $1 want (0 or 1), $2 kind, $3 name
+    if [ "$2" = tag ]; then check_tag "$3" 2>/dev/null; else check_branch "$3" 2>/dev/null; fi
+    got=$?
+    if [ "$got" -ne "$1" ]; then echo "FAIL  $2 '$3': wanted exit $1, got $got"; fail=1; fi
+  }
+  for n in main chore/branch-name-gate sync/toothpaste-kit-64b3c49 acmm/phase-1 \
+           record/history docs/a fix/x1-y2 feat/abcdefghij-abcdefghij-abcdefghij-a feat/a.b \
+           ci/auto-qa-tuner quality/test-hooks-gate release/0.4.0 docs/v0.2.0-doi \
+           docs/state-after-0.1.0 scripts/reorient-selftest-r81 skills/session-log-v3 test/x licence/apache-2.0; do
+    expect 0 branch "$n"
+  done
+  # The shape of the near miss: an automatic task slug pushed as-is, and the
+  # same slug under a local/ prefix, as task tools name their branches. The
+  # slug here is made up; the real one stays out of this repository.
+  for n in made-up-request-slug-that-runs-well-past-the-limit-x9z8 \
+           local/made-up-request-slug-that-runs-well-past-the-limit-x9z8 \
+           local/short wip/x feat feat/ /x feat/Upper feat/a--b feat/-a feat/a- \
+           feat/a_b feat/a..b feat/.a feat/a. feat/a.-b feat/a/b feat/abcdefghij-abcdefghij-abcdefghij-abc \
+           AN0099-patch-1 123-title-of-an-issue dependabot/github_actions/actions/checkout-7 \
+           HEAD Main; do
+    expect 1 branch "$n"
+  done
+  expect 0 tag v1.2.3
+  expect 1 tag v1.2
+  expect 1 tag release-notes
+  # The ruleset repeats PREFIXES because GitHub cannot call this script.
+  # Fail if the two lists have drifted apart.
+  ruleset="$(dirname "$0")/../.github/rulesets/branch-names.json"
+  if [ -f "$ruleset" ]; then
+    in_ruleset=$(sed -n 's|.*"refs/heads/\([a-z]*\)/\*".*|\1|p' "$ruleset" | sort | tr '\n' ' ')
+    in_script=$(printf '%s\n' $PREFIXES | sort | tr '\n' ' ')
+    # Any other exclusion, such as refs/heads/* or a prefix with **, widens
+    # the ruleset past the rule without changing the prefix list above.
+    others=$(grep -o '"refs/heads/[^"]*"' "$ruleset" | grep -Ev '^"refs/heads/(main|[a-z]+/[*])"$')
+    if [ -n "$others" ]; then
+      echo "FAIL  $ruleset excludes more than main and <prefix>/*: $others"
+      fail=1
+    fi
+    if [ "$in_ruleset" != "$in_script" ]; then
+      echo "FAIL  prefixes differ: script has '$in_script', $ruleset has '$in_ruleset'"
+      fail=1
+    fi
+  else
+    echo "FAIL  $ruleset not found, so the prefix lists cannot be compared"
+    fail=1
+  fi
+  if [ "$fail" -eq 0 ]; then echo "check-branch-name: selftest passed"; fi
+  return "$fail"
+}
+
+case "${1:-}" in
+  --selftest) selftest; exit $? ;;
+  --tag) [ $# -eq 2 ] || { echo "usage: $0 --tag NAME" >&2; exit 2; }; check_tag "$2"; exit $? ;;
+  ''|-*) echo "usage: $0 NAME | --tag NAME | --selftest" >&2; exit 2 ;;
+  *) [ $# -eq 1 ] || { echo "usage: $0 NAME" >&2; exit 2; }; check_branch "$1"; exit $? ;;
+esac

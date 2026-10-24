@@ -28,10 +28,28 @@ skill lives in that skill's own `CHANGELOG.md`.
   licence text is also in `LICENSES/Apache-2.0.txt`. `scripts/compliance.sh`
   runs `reuse lint` with a planted-file selftest, and
   `.github/workflows/compliance.yml` runs it in CI with a pinned `reuse`.
-  `scripts/gates.sh` is unchanged and still needs nothing installed.
+  `scripts/gates.sh` still needs nothing installed.
+- Branch and tag names: `scripts/check-branch-name` is the one definition of
+  an allowed name, `<prefix>/<words>` from a fixed prefix list, 40 characters
+  at most, and `v<major>.<minor>.<patch>` for tags. `.githooks/pre-push` runs
+  it before a push, gate 13 selftests it and checks the ruleset's prefix list
+  against it, the `branch-name` job in `gates.yml` checks a pull request's
+  branch, and `.github/rulesets/` holds the forge rulesets for the
+  maintainer to apply. `hooks/hookify.branch-name-guard.local.md` is the
+  example agent rule: push only to an explicit destination, never skip the
+  hooks; its cases are in `tests/branch-guard-cases.tsv`, run by the hooks
+  gate. CONTRIBUTING.md, "Branch and tag names".
 
 ### Changed
 
+- `.githooks/commit-msg` also refuses `Assisted-by:` and `Agent-<name>:`
+  trailers, and the `commit-attribution` workflow now runs that hook on each
+  commit instead of a copy of its pattern, so the two cannot drift. Gate 14
+  runs the hook against `tests/attribution-cases.tsv`.
+- `scripts/gates.sh` stops with one message when `python3` is missing,
+  instead of failing gate by gate.
+- `docs/quickstart.md` step 1 says where to install Claude Code and that it
+  needs an account.
 - **Licence: Apache License 2.0 from this release.** `LICENSE` is the
   unmodified official text, and `CITATION.cff`, `README.md`, `GOVERNANCE.md`,
   `references.md`, `docs/security-posture.md` and `docs/project-state.md` name

@@ -17,7 +17,10 @@ happen.**
 
 ## 1. Check the prerequisites
 
-You need Claude Code, git, and a POSIX shell, on Linux. Run:
+You need Claude Code, git, and a POSIX shell, on Linux. Claude Code
+needs a Claude account, which steps 5 and 6 use; install it from the
+[Claude Code setup guide](https://code.claude.com/docs/en/setup) if
+`claude --version` below finds nothing. Run:
 
 ```sh
 claude --version

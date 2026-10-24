@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Refuse to push a branch or tag whose name scripts/check-branch-name rejects.
+# This runs before anything leaves the machine, which is the only point at
+# which a bad name can still be kept private.
+#
+# Enable once per clone, the same setting as .githooks/commit-msg:
+#   git config core.hooksPath .githooks
+# An agent does not run that line: hooks/hookify.branch-name-guard.local.md
+# blocks any git command naming core.hooksPath.
+#
+# `--no-verify` skips this hook. The server-side ruleset in
+# .github/rulesets/branch-names.json still refuses a name outside the allowed
+# prefixes; case, characters and length are checked only here and by the
+# branch-name job in .github/workflows/gates.yml.
+
+top=$(git rev-parse --show-toplevel) || exit 1
+check="$top/scripts/check-branch-name"
+if [ ! -x "$check" ]; then
+  echo "pre-push: $check is missing, so no name can be checked; refusing to push" >&2
+  exit 1
+fi
+
+zero=0000000000000000000000000000000000000000
+fail=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  # Deleting a remote branch is always allowed, so a bad name can be removed.
+  [ "$local_sha" = "$zero" ] && continue
+  case "$remote_ref" in
+    refs/heads/*) "$check" "${remote_ref#refs/heads/}" || fail=1 ;;
+    refs/tags/*)  "$check" --tag "${remote_ref#refs/tags/}" || fail=1 ;;
+    *) echo "pre-push: refusing to push to '$remote_ref', which is not a branch or tag" >&2; fail=1 ;;
+  esac
+done
+
+if [ "$fail" -ne 0 ]; then
+  echo >&2
+  echo "pre-push: nothing was pushed. Push under an allowed name instead:" >&2
+  echo "  git push origin HEAD:refs/heads/<prefix>/<short-name>" >&2
+  echo "See CONTRIBUTING.md, \"Branch and tag names\"." >&2
+  exit 1
+fi
+exit 0

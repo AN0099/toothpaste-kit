@@ -4,7 +4,8 @@
 
 name: commit-attribution
 
-# Rejects AI attribution trailers in commit messages.
+# Rejects AI attribution trailers in commit messages, by running
+# .githooks/commit-msg on each commit's message.
 #
 # This is the binding check. The commit-msg hook in .githooks/ is opt-in per
 # clone and bypassable with --no-verify; this runs regardless. Make it a
@@ -44,14 +45,16 @@ jobs:
             echo "Scanning ${RANGE}"
           fi
 
-          PATTERN='Co-Authored-By:.*(Claude|Anthropic)|Claude-Session:|Generated with .*Claude'
+          # The pattern lives in one place, .githooks/commit-msg, so this job and
+          # a contributor's local hook cannot drift apart.
+          MSG="${RUNNER_TEMP}/commit-msg"
           FAILED=0
 
           for sha in $(git rev-list "${RANGE}"); do
-            if git log -1 --format='%B' "${sha}" | grep -qiE "${PATTERN}"; then
+            git log -1 --format='%B' "${sha}" > "${MSG}"
+            if ! sh .githooks/commit-msg "${MSG}"; then
               echo "::error::${sha} carries an AI attribution trailer"
               git log -1 --format='%h %s' "${sha}"
-              git log -1 --format='%B' "${sha}" | grep -niE "${PATTERN}" || true
               FAILED=1
             fi
           done

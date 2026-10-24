@@ -176,6 +176,23 @@ the entry names none.
   [`commit-attribution.yml`](../.github/workflows/commit-attribution.yml).** The same proposal for
   the same reason: no timeout, and no run has taken a minute.
 
+## L4: the fourth change
+
+Branch and tag names, and a wider attribution check. No issue names a criterion, so the entry names
+none.
+
+- **[`scripts/check-branch-name`](../scripts/check-branch-name).** The one definition of an allowed
+  branch or tag name, run by [`.githooks/pre-push`](../.githooks/pre-push), gate 13 in
+  [`scripts/gates.sh`](../scripts/gates.sh), and the `branch-name` job in
+  [`gates.yml`](../.github/workflows/gates.yml). The rulesets in
+  [`.github/rulesets/`](../.github/rulesets/) apply its prefix list at the forge, and
+  [`hooks/hookify.branch-name-guard.local.md`](../hooks/hookify.branch-name-guard.local.md) is the
+  agent rule, its cases in [`tests/branch-guard-cases.tsv`](../tests/branch-guard-cases.tsv).
+- **[`.githooks/commit-msg`](../.githooks/commit-msg), run by
+  [`commit-attribution.yml`](../.github/workflows/commit-attribution.yml).** Now also refuses the
+  `Assisted-by:` and `Agent-<name>:` trailers, and the workflow runs the hook rather than a copy of
+  its pattern. Gate 14 runs it against [`tests/attribution-cases.tsv`](../tests/attribution-cases.tsv).
+
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
 

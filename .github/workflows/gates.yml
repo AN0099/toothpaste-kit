@@ -41,6 +41,37 @@ jobs:
       - name: Mechanical gates
         run: ./scripts/gates.sh --selftest
 
+  # The branch name rule, applied to this pull request's own branch. Gate 13
+  # selftests the rule; this checks the name being merged, which a local run
+  # cannot see. By now the name is already public, so this is the backstop:
+  # the pre-push hook and the ruleset in .github/rulesets/ stop a name before
+  # it is published, and this keeps such a branch from merging. Tags are left
+  # to the hook and the tag-names ruleset, since this workflow does not run
+  # on a tag push.
+  branch-name:
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # The name reaches the script through env, never pasted into the
+      # command, so a crafted branch name cannot inject shell. Dependabot
+      # names its branches from dependency files, not from requests, so its
+      # own prefix is exempt for the Dependabot account alone; the ruleset
+      # bypass is for the Dependabot app only (app id 29110).
+      - name: Check this pull request's branch name
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          case "$ACTOR:$HEAD_REF" in
+            'dependabot[bot]:dependabot/'*) echo "Dependabot branch, exempt"; exit 0 ;;
+          esac
+          ./scripts/check-branch-name "$HEAD_REF"
+
   # The independent party. scripts/mdlint.py reimplements nineteen markdownlint
   # rules so that nothing has to be installed at the desk; this job runs the
   # real tool against the same nineteen, so a clean local result has been

@@ -52,7 +52,7 @@ You need a POSIX shell, `bash`, `git`, `python3`, `find`, and a `grep` with `-r`
 ./scripts/gates.sh --selftest
 ```
 
-That is the same script `.github/workflows/gates.yml` runs, which is the point: a check whose local copy and CI copy are separate texts can drift apart, and you find out when a clean local run is rejected by CI. It covers the seven mechanical rules above, including the two greps quoted earlier in this document, and an eighth: the stubs in `examples/workspace/` must match the files `docs/standing-documents.md` describes, checked by `scripts/check-workspace-stubs.py`. A ninth runs `scripts/remote-level.sh --selftest`, so the classifier `merge-proxy` relies on still gives all three answers. A tenth runs `scripts/reorient --selftest`, on `examples/workspace/` as a second tree and against planted positives. An eleventh runs `scripts/link-skills.sh --selftest`, which links the skills into a temporary directory and checks each link. A twelfth runs `scripts/check-hooks.py`, which checks the structure and patterns of the rules in `hooks/` and that the blocking ones fire on planted commands.
+That is the same script `.github/workflows/gates.yml` runs, which is the point: a check whose local copy and CI copy are separate texts can drift apart, and you find out when a clean local run is rejected by CI. It covers the seven mechanical rules above, including the two greps quoted earlier in this document, and an eighth: the stubs in `examples/workspace/` must match the files `docs/standing-documents.md` describes, checked by `scripts/check-workspace-stubs.py`. A ninth runs `scripts/remote-level.sh --selftest`, so the classifier `merge-proxy` relies on still gives all three answers. A tenth runs `scripts/reorient --selftest`, on `examples/workspace/` as a second tree and against planted positives. An eleventh runs `scripts/link-skills.sh --selftest`, which links the skills into a temporary directory and checks each link. A twelfth runs `scripts/check-hooks.py`, which checks the structure and patterns of the rules in `hooks/` and that the blocking ones fire on planted commands, the branch name guard's from `tests/branch-guard-cases.tsv`. A thirteenth runs `scripts/check-branch-name --selftest`, the branch and tag name rule below. A fourteenth runs `.githooks/commit-msg` against the trailers in `tests/attribution-cases.tsv`.
 
 `--selftest` first shows that each gate can fire, by planting a positive and confirming the gate catches it or by running the gate tool's own selftest, then runs the real pass. A gate that has never returned a hit has not been shown capable of returning one, so a clean result on its own is weak evidence.
 
@@ -78,13 +78,29 @@ The description decides when the skill loads, so it should state what the skill 
 
 `orchestration/protocol.md` and the two JSON schemas define the message contract between agents. Changing a field means changing the schema, the protocol document, and `taxonomy.md` together, since they are read by separate agents that will not notice a partial update.
 
+## Branch and tag names
+
+A branch name is public the moment it is pushed, and copies of public push events persist outside the forge, so deleting a branch does not take its name back. Choose every name; never push one a tool made up. The same holds for a tag, a pull request title, a commit subject and a file name: words from a request never become one unchosen. Only branch and tag names are checked mechanically.
+
+- A branch is `main` or `<prefix>/<words>`: a prefix from the list in `scripts/check-branch-name`, a slash, then lowercase `a-z` and `0-9` joined by single hyphens or dots, 40 characters at most. `docs/fix-typo` and `release/0.5.0` pass.
+- A tag is `v<major>.<minor>.<patch>`, as `docs/releasing.md` sets out.
+- Names the forge suggests, such as `<user>-patch-1` or a branch titled from an issue, are refused. The Dependabot app is exempt: the branch ruleset lets it create any branch, and the `branch-name` job exempts it on its own `dependabot/` prefix only.
+
+Check a name before you push it:
+
+```sh
+scripts/check-branch-name docs/fix-typo
+```
+
+`scripts/check-branch-name` is the one definition. `.githooks/pre-push` runs it before anything leaves your machine, enabled by the same `git config core.hooksPath .githooks` as the commit hook below; the `branch-name` job in `.github/workflows/gates.yml` runs it on a pull request's branch; and the rulesets in `.github/rulesets/`, once the maintainer has applied them, refuse at the forge a branch outside the allowed prefixes and a tag not starting `v`; case, characters and length are checked only by the hook and the job. The rulesets cannot call a script, so `branch-names.json` repeats the prefix list, and gate 13 fails if the two differ. An agent pushes only with an explicit destination, `git push origin HEAD:refs/heads/<prefix>/<words>`; `hooks/hookify.branch-name-guard.local.md` is the example rule that holds it to that.
+
 ## Commits and pull requests
 
 Configure `user.email` before your first commit. Use the noreply address your forge provides, not a personal mailbox. An address in a public commit log is permanent, scraped quickly, and part of the commit hash, so correcting it later rewrites history.
 
 One logical change per commit. Commit messages should say what changed and why. Keep generated output, index databases, and packed repository files out of the repo. `.gitignore` covers the known cases.
 
-**No tool attribution in commit messages or pull request bodies.** No `Co-Authored-By` line naming an AI, no session links, no generated-with footers. A commit message records what changed and why; which editor, model, or agent was in the loop is not part of that and is not something a reader can act on.
+**No tool attribution in commit messages or pull request bodies.** No `Co-Authored-By` line naming an AI, no session links, no generated-with footers, and no provenance trailers such as `Assisted-by:` or `Agent-<name>:`. The hook checks the trailer forms in `tests/attribution-cases.tsv`; any other line crediting a tool is a review item. A commit message records what changed and why; which editor, model, or agent was in the loop is not part of that and is not something a reader can act on.
 
 Three layers enforce this, and only the third binds:
 
@@ -96,7 +112,7 @@ Three layers enforce this, and only the third binds:
    ```
 
    Git does not transmit hooks on clone, so this is opt-in, and `--no-verify` walks past it. Treat it as a fast local failure rather than a guarantee.
-3. The `commit-attribution` workflow scans every commit in a pull request. It is the layer that binds, provided the maintainer has set it as a required status check in the ruleset on `main`. Without that setting it reports a failure and blocks nothing. Where it is required, a branch that reaches review with a trailer in its history needs those messages rewritten and the branch force-pushed.
+3. The `commit-attribution` workflow runs the same `commit-msg` hook on every commit in a pull request, so the two cannot disagree. It is the layer that binds, provided the maintainer has set it as a required status check in the ruleset on `main`. Without that setting it reports a failure and blocks nothing. Where it is required, a branch that reaches review with a trailer in its history needs those messages rewritten and the branch force-pushed.
 
 Human co-author trailers are fine and expected. The rule is about tools.
 
