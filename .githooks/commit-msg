@@ -4,7 +4,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# Reject AI attribution trailers in commit messages.
+# Reject AI attribution trailers in commit messages. The commit-attribution
+# workflow runs this same file on every commit in a pull request.
 #
 # Enable once per clone:
 #   git config core.hooksPath .githooks
@@ -15,12 +16,15 @@
 
 msg_file="$1"
 
-pattern='^Co-Authored-By:.*\(Claude\|Anthropic\)\|^Claude-Session:\|Generated with .*Claude'
+# Extended regex, read case-insensitively. Assisted-by and the Agent-*
+# trailers are provenance trailers some tools write; tests/attribution-cases.tsv
+# holds the cases gate 14 in scripts/gates.sh runs this hook against.
+pattern='^Co-Authored-By[[:space:]]*:.*(Claude|Anthropic)|^Claude-Session[[:space:]]*:|Generated with .*Claude|^Assisted-by[[:space:]]*:|^Agent-[A-Za-z-]+[[:space:]]*:'
 
-if grep -qi "$pattern" "$msg_file"; then
+if grep -qiE "$pattern" "$msg_file"; then
     echo "commit-msg: rejected, AI attribution trailer found." >&2
     echo >&2
-    grep -niE 'Co-Authored-By:.*(Claude|Anthropic)|Claude-Session:|Generated with .*Claude' "$msg_file" >&2
+    grep -niE "$pattern" "$msg_file" >&2
     echo >&2
     echo "This repository does not carry tool attribution in commit messages." >&2
     echo "Remove the lines above and commit again." >&2

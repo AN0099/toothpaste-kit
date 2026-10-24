@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These twelve gates cover: the em dash ban, the private task ID ban,
+# check. These fourteen gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency, skill frontmatter, the
 # reflow script's own selftest, markdown structure via scripts/mdlint.py,
 # which states its own nineteen-rule coverage in its header, and the example
@@ -29,7 +29,11 @@
 # tree and against planted positives, and scripts/link-skills.sh's selftest,
 # which links the skills into a temporary directory and checks each link, and
 # the hooks/ rules' structure, regex validity and planted cases via
-# scripts/check-hooks.py, which states its own coverage. They
+# scripts/check-hooks.py, which states its own coverage, including the branch
+# name guard's cases in tests/branch-guard-cases.tsv, and the branch and tag
+# name rule's selftest in scripts/check-branch-name, which also fails if the
+# ruleset's prefix list has drifted from the script's, and the commit-msg
+# hook's attribution pattern against tests/attribution-cases.tsv. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -39,6 +43,13 @@
 #        scripts/gates.sh --selftest show each gate can fire, then run them
 
 set -u
+
+# Most gates run python3. Without it they fail with a message about the gate,
+# not about python3, so say so once, before any gate runs.
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "gates: python3 is not installed, and most gates need it. Install python3 and run again."
+  exit 2
+fi
 
 fail=0
 pass_n=0
@@ -223,6 +234,46 @@ gate_reorient() {
   fi
 }
 
+# ---------------------------------------------------------------- 13
+gate_branch_names() {
+  gate_start "branch and tag name rule"
+  if sh scripts/check-branch-name --selftest; then
+    gate_ok "branch and tag name rule"
+  else
+    gate_bad "branch and tag name rule"
+  fi
+}
+
+# ---------------------------------------------------------------- 14
+# Runs the hook itself, so the pattern tested is the one installed. ATTR_HOOK
+# lets the selftest point it at a weakened copy.
+gate_attribution() {
+  gate_start "commit attribution hook"
+  hook=${ATTR_HOOK:-.githooks/commit-msg}
+  msg=$(mktemp) || { gate_bad "commit attribution hook: no scratch file"; return; }
+  tab=$(printf '\t')
+  n=0
+  bad=0
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in ''|'#'*) continue ;; esac
+    want=${line%%"$tab"*}
+    trailer=${line#*"$tab"}
+    printf 'subject\n\nbody\n\n%s\n' "$trailer" > "$msg"
+    if sh "$hook" "$msg" >/dev/null 2>&1; then got=allow; else got=block; fi
+    n=$((n + 1))
+    if [ "$got" != "$want" ]; then
+      printf '  wanted %s, got %s: %s\n' "$want" "$got" "$trailer"; bad=1
+    fi
+  done < tests/attribution-cases.tsv
+  rm -f "${msg:?}"
+  printf '  %s cases\n' "$n"
+  if [ "$n" -gt 0 ] && [ "$bad" -eq 0 ]; then
+    gate_ok "commit attribution hook"
+  else
+    gate_bad "commit attribution hook"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -236,7 +287,9 @@ run_all() {
   gate_reorient
   gate_link_skills
   gate_hooks
-  printf '\n%s of 12 gates passed\n' "$pass_n"
+  gate_branch_names
+  gate_attribution
+  printf '\n%s of 14 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -244,9 +297,9 @@ run_all() {
 
 # A gate that has never returned a hit has not been shown capable of
 # returning one, so each of the first five, and the eighth, is run against a
-# planted positive in a scratch tree. Gates 6, 9, 10 and 11 run their tools'
-# own selftests, which carry their own planted cases, and gate 7 plants one
-# positive per rule below.
+# planted positive in a scratch tree, as are 12, 13 and 14. Gates 6, 9, 10 and
+# 11 run their tools' own selftests, which carry their own planted cases, and
+# gate 7 plants one positive per rule below.
 run_selftest() {
   tmp=$(mktemp -d) || return 1
   # Each signal gets its own handler WITH an exit. A handler that only cleans
@@ -400,9 +453,28 @@ PY
   ( cd "$tmp/hk-ok" && python3 "$hk" ) >/dev/null 2>&1
   plant_rejected $bad $? "hooks gate, planted case"
 
+  # Gate 13: the rule's own selftest must fail when the ruleset's prefix list
+  # drifts from the script's. The copy drops one prefix from the ruleset.
+  for d in bn-bad bn-ok; do
+    mkdir -p "$tmp/$d/scripts" "$tmp/$d/.github/rulesets" && cp scripts/check-branch-name "$tmp/$d/scripts/"
+  done
+  cp .github/rulesets/branch-names.json "$tmp/bn-ok/.github/rulesets/"
+  grep -v 'refs/heads/licence/' .github/rulesets/branch-names.json > "$tmp/bn-bad/.github/rulesets/branch-names.json"
+  sh "$tmp/bn-bad/scripts/check-branch-name" --selftest >/dev/null 2>&1
+  bad=$?
+  sh "$tmp/bn-ok/scripts/check-branch-name" --selftest >/dev/null 2>&1
+  plant_rejected $bad $? "branch name gate, prefix drift"
+
+  # Gate 14: a copy of the hook missing one trailer must fail its cases.
+  sed 's/Assisted-by/Assisted-xx/' .githooks/commit-msg > "$tmp/commit-msg-weak"
+  ( fail=0; ATTR_HOOK="$tmp/commit-msg-weak" gate_attribution >/dev/null 2>&1; exit "$fail" )
+  bad=$?
+  ( fail=0; gate_attribution >/dev/null 2>&1; exit "$fail" )
+  plant_rejected $bad $? "attribution gate, weakened hook"
+
   printf '\n'
   [ "$plant_fail" -eq 0 ] || { echo "selftest: a gate could not be shown to fail. Do not trust a clean run."; return 1; }
-  echo "selftest: all eight planted positives fired."
+  echo "selftest: all ten planted positives fired."
   echo
   echo "== gate 7 plants its own positives, one per rule =="
   python3 scripts/mdlint.py --selftest >/dev/null 2>&1

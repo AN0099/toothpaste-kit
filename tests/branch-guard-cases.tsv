@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Cases for hooks/hookify.branch-name-guard.local.md, read by scripts/check-hooks.py.
+# Each line: block or allow, a tab, then a shell command as an agent would send it.
+# The first case is the command behind the near miss the guard describes.
+block	git push -u origin HEAD
+block	git push origin HEAD
+block	git push
+block	git push origin
+block	git push --all origin
+block	git push --mirror origin
+block	git push origin feat/x
+block	cd repo && git push origin HEAD
+block	git commit -m 'x' && git push origin HEAD
+block	git push origin HEAD:refs/heads/feat/x; git push origin HEAD
+block	git push --no-verify origin HEAD:refs/heads/feat/x
+block	git commit --no-verify -m x
+block	git commit -n -m x
+block	git commit -anm x
+block	git -c core.hooksPath=/dev/null push origin HEAD:refs/heads/feat/x
+block	git config core.hooksPath x
+block	git config core.hookspath x
+block	gh pr create --title x --body y
+block	gh pr create --fill
+allow	git push origin HEAD:refs/heads/chore/branch-name-gate
+allow	git push origin refs/heads/recreate/main:refs/heads/main
+allow	git push --dry-run origin HEAD:refs/heads/feat/x
+allow	git push origin :refs/heads/bad-name
+allow	gh pr create --repo AN0099/toothpaste-kit --base main --head chore/x --title t
+allow	gh pr create --head=chore/x --title t
+allow	gh pr view 1
+allow	git commit -m x
+allow	git commit -m 'push it'
+allow	git commit --amend --no-edit
+allow	git log --oneline -n 5
+allow	git log --format=%H
+allow	git status
+block	git push https://github.com/o/r HEAD
+block	git push git@github.com:o/r.git HEAD
+block	git push --force-with-lease=main:abc origin HEAD
+block	git push -o x:y origin HEAD
+block	git push origin HEAD # note: later
+block	git commit --no-veri -m x
+block	git push --no-verif origin HEAD:refs/heads/feat/x
+block	git config core.HOOKSPATH x
+block	git -c CORE.hooksPath=/dev/null push origin HEAD:refs/heads/feat/x
+allow	git push origin refs/tags/v0.5.0:refs/tags/v0.5.0
+block	git -C . push origin HEAD
+block	git --no-pager push origin HEAD
+block	git -c a=b -C . push -u origin HEAD
+block	GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/dev/null git push origin HEAD:refs/heads/feat/x
+allow	git -C . push origin HEAD:refs/heads/feat/x
+allow	git --no-pager log --oneline

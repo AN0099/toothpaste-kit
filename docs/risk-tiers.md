@@ -87,6 +87,10 @@ This tier covers skills under `skills/`, hook rules under `hooks/` and agent con
   `pull-requests: write` to label pull requests; row 4.4 records the practice.
 - A workflow binds only once it is a required status check in the ruleset on the default branch.
   Source: `docs/security-posture.md`, row 4.6.
+- The rulesets in `.github/rulesets/` and the branch name guard,
+  `hooks/hookify.branch-name-guard.local.md`, are tier 4, although the guard sits in `hooks/`: its
+  cases in `tests/branch-guard-cases.tsv` are a gate, and a weakened pattern fails open. Source:
+  `CONTRIBUTING.md`, "Branch and tag names".
 - `.github/copilot-instructions.md` meets the requirement in
   [Per-tool instruction files](#per-tool-instruction-files). Source: that section.
 

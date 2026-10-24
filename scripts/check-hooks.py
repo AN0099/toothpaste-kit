@@ -13,10 +13,12 @@ hold for the rule to fire. Nothing else reads them, so this checks:
    `action` is `block` or `warn`, and there is at least one condition.
 2. Every `regex_match` pattern compiles.
 3. Planted cases: for the blocking rules named in CASES, one input that must
-   fire the rule and one that must not.
+   fire the rule and one that must not, and for branch-name-guard every case
+   in tests/branch-guard-cases.tsv.
 
 Coverage, stated because a check that does not state its coverage is not a
-check: structure, regex validity and the planted cases below. The warn-level
+check: structure, regex validity and the planted cases below. A pattern may be
+written bare or as a single-quoted YAML scalar, where '' stands for '. The warn-level
 rules get structure and regex validity only. It evaluates conditions with
 Python's `re`, which is how hookify reads them; it does not run the harness.
 
@@ -56,6 +58,28 @@ CASES = {
         ("content", "a - b", False),
     ],
 }
+# The guard's cases live beside the tests, one per line, so a new case needs no
+# change here. Found from this file, so a copy of hooks/ elsewhere still reads them.
+GUARD_CASES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
+                           "tests", "branch-guard-cases.tsv")
+
+
+def guard_cases():
+    cases = []
+    for n, line in enumerate(open(GUARD_CASES, encoding="utf-8").read().splitlines(), 1):
+        if not line.strip() or line.startswith("#"):
+            continue
+        want, _, cmd = line.partition("\t")
+        if want not in ("block", "allow") or not cmd:
+            sys.exit(f"::error file={GUARD_CASES}::line {n} is not 'block|allow<TAB>command'")
+        cases.append(("command", cmd, want == "block"))
+    if not cases:
+        sys.exit(f"::error file={GUARD_CASES}::no cases")
+    return cases
+
+
+CASES["branch-name-guard"] = guard_cases()
+
 # Fields a case does not set but the rule's other conditions read.
 DEFAULT_FIELDS = {"file_path": "docs/note.md"}
 
@@ -75,7 +99,10 @@ def parse(path):
             continue
         m = re.match(r"\s+(operator|pattern): (.*)", line)
         if m and cur is not None:
-            cur[m.group(1)] = m.group(2)
+            val = m.group(2)
+            if m.group(1) == "pattern" and len(val) >= 2 and val[0] == val[-1] == "'":
+                val = val[1:-1].replace("''", "'")
+            cur[m.group(1)] = val
             continue
         m = re.match(r"([a-z_]+): (.*)", line)
         if m:

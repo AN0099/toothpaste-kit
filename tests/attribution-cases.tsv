@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Cases for .githooks/commit-msg, read by gate 14 in scripts/gates.sh.
+# Each line: block or allow, a tab, then one line of a commit message. The gate
+# wraps it in a subject and body and runs the hook on the result.
+block	Co-Authored-By: Claude <ai@example.com>
+block	co-authored-by: Claude Opus <ai@example.com>
+block	Co-Authored-By: Anthropic Agent <ai@example.com>
+block	Claude-Session: https://example.com/session/1
+block	Generated with Claude Code
+block	Assisted-by: Claude Code
+block	Assisted-by: any assistant at all
+block	assisted-by: lowercase
+block	Agent-Model: some-model
+block	Agent-Session: 1234
+block	agent-name: lowercase
+allow	Co-Authored-By: A Person <person@example.com>
+allow	Signed-off-by: A Person <person@example.com>
+allow	Reviewed-by: A Person <person@example.com>
+allow	Agent-based dispatch is described in docs/.
+allow	The commit was assisted by a pair review.
+block	Co-Authored-By : Claude <ai@example.com>
+block	Claude-Session : https://example.com/session/1
+block	Assisted-by : Claude
+block	Agent-session-id: 1
