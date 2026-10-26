@@ -1,6 +1,6 @@
 ---
 name: technical-documents
-description: Document-type presets and audience-specific vocabulary for technical documents (runbooks, incident postmortems, ADRs, README files, on-call handoff notes, change-management docs, SOPs) aimed at senior network admin, DevOps, and DevSecOps readers. Extends document-standards; does not redefine its dials, checklist, or anti-slop references.
+description: Document-type presets and vocabulary for technical documents (runbooks, postmortems, ADRs, READMEs, handoffs, SOPs) for network admin and DevOps readers. Extends document-standards; does not redefine its dials, checklist or anti-slop references.
 ---
 
 # When to Use

@@ -1,6 +1,6 @@
 ---
 name: daily-dashboard
-description: Open a working day with a dashboard of where the tree actually stands. Reads the standing files, verifies carry-over work against the working trees rather than trusting the last session's closing report, then presents project state, ranked todos, roadmap, and the decisions waiting on the human. Invoke at the start of a working session. The mirror of session-close, which writes what this reads; it does not capture session residue, and it does not begin the work it lists.
+description: Open a working day; verify carry-over against the trees, then show project state, ranked todos, roadmap and pending decisions. Mirror of session-close, which writes what this reads; does not capture residue or start the work.
 disable-model-invocation: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: surface-regimes
-description: Detects which of three behavioral regimes the current session runs under, interactive-synchronous, autonomous-asynchronous, or programmatic-contractual, and adjusts working-preferences dials and mechanics, and document-standards/technical-documents applicability, accordingly. Regime is derived from a session's capability profile rather than from a vendor's product name, so it holds on any vendor's surface. Applies to any single session on any agent surface, not only multi-agent relay threads. Trigger on any mention of Cowork, Routine, headless, Agent SDK, raw API call, a CLI or IDE coding agent from any vendor, or an explicit regime, capability, or surface field in a relay or handoff message.
+description: Detect the session's regime (interactive, autonomous or programmatic) from its capabilities and adjust working-preferences and document rules. Trigger on Cowork, Routine, headless, Agent SDK, raw API, CLI/IDE agents or a regime field.
 ---
 
 # Purpose

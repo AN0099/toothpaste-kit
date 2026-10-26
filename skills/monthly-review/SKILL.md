@@ -1,6 +1,6 @@
 ---
 name: monthly-review
-description: Once-a-month pass over the parts of the task board that only a long interval shows. Adopts or rejects each Someday/Maybe item, asks whether each long-stalled Waiting task is still committed work, and lets the person choose which of the tool's archive candidates leave the board, and by which door. A tool prepares every list; the person decides every move, and nothing moves before they answer. Invoke once a month, after that week's weekly review. Does not replace the weekly review, which chases blockers and reads the Done lane.
+description: Monthly pass over the task board; adopt or reject Someday/Maybe items, recheck long-stalled Waiting tasks, choose archive candidates. The person decides every move. Run after that week's weekly-review, which it does not replace.
 disable-model-invocation: true
 ---
 

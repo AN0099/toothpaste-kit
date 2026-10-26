@@ -1,6 +1,6 @@
 ---
 name: daily-review
-description: Once-a-day pass over the task board's lanes. Clarifies the Inbox to empty, checks each open task's priority quadrant, carries unfinished Doing work forward with its count, offers the Verify lane for close, and sets the order of Next and the day's Most Important Task. A tool prepares every list; the person decides every move, and nothing moves before they answer. Invoke once a day, after the dashboard if one is run. Does not replace the dashboard, which is the state view and may run any number of times.
+description: Daily pass over the task board; empty the Inbox, check priorities, carry Doing forward, offer Verify for close, order Next and pick the Most Important Task. The person decides every move. Does not replace daily-dashboard, the state view.
 disable-model-invocation: true
 ---
 

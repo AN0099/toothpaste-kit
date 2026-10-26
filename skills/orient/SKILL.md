@@ -1,6 +1,6 @@
 ---
 name: orient
-description: Re-establish where things actually stand before acting. Runs the tree's own reorient tool for the mechanical half, then answers four questions against its output: what moved, where the record disagrees with the tree, which carried assumption did not survive, and whether the next action changes. Deliberately cheap. Use after a compaction, after a handoff, when returning to a session, or before acting on any summary. Not a replacement for daily-dashboard, which opens a working day and ranks the work.
+description: Re-establish where things stand before acting; run the reorient tool, then check what moved, record-versus-tree drift and broken assumptions. Use after compaction, handoff or return. Not daily-dashboard, which opens a day and ranks work.
 ---
 
 # When to Use

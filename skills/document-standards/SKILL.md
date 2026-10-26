@@ -1,6 +1,6 @@
 ---
 name: document-standards
-description: Universal writing and quality standards for any standalone document Claude generates, reports, essays, letters, resumes, README files, technical docs, and everything else. Covers formality/density/audience dials, a Content Read step, a pre-flight checklist, and a full anti-slop reference. Does not cover conversational chat responses (see working-preferences) or document-type presets specific to network admin and DevOps audiences (see technical-documents).
+description: Writing and quality standards for any standalone document; dials, Content Read, pre-flight checklist, full anti-slop reference. Not for chat replies (see working-preferences) or technical document-type presets (see technical-documents).
 ---
 
 # When to Use

@@ -1,6 +1,6 @@
 ---
 name: redaction-gate
-description: Run the pre-publish redaction pass before content crosses a sensitivity tier boundary outward, such as a vendor API call, a Git commit, a repomix pack, or a handoff to an agent on another account. Checks candidate output against the local restricted corpus.
+description: Pre-publish redaction pass before content crosses a sensitivity tier outward (vendor API call, Git commit, repomix pack, cross-account handoff). Checks candidate output against the local restricted corpus.
 disable-model-invocation: true
 ---
 
