@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These fourteen gates cover: the em dash ban, the private task ID ban,
+# check. These fifteen gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency, skill frontmatter, the
 # reflow script's own selftest, markdown structure via scripts/mdlint.py,
 # which states its own nineteen-rule coverage in its header, and the example
@@ -33,7 +33,9 @@
 # name guard's cases in tests/branch-guard-cases.tsv, and the branch and tag
 # name rule's selftest in scripts/check-branch-name, which also fails if the
 # ruleset's prefix list has drifted from the script's, and the commit-msg
-# hook's attribution pattern against tests/attribution-cases.tsv. They
+# hook's attribution pattern against tests/attribution-cases.tsv, and the
+# question block checker's selftest in scripts/check-qblock against
+# tests/qblock-cases/, which states its own eight-rule coverage. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -274,6 +276,16 @@ gate_attribution() {
   fi
 }
 
+# ---------------------------------------------------------------- 15
+gate_qblock() {
+  gate_start "question block checker"
+  if python3 scripts/check-qblock --selftest; then
+    gate_ok "question block checker"
+  else
+    gate_bad "question block checker"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -289,7 +301,8 @@ run_all() {
   gate_hooks
   gate_branch_names
   gate_attribution
-  printf '\n%s of 14 gates passed\n' "$pass_n"
+  gate_qblock
+  printf '\n%s of 15 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -297,7 +310,7 @@ run_all() {
 
 # A gate that has never returned a hit has not been shown capable of
 # returning one, so each of the first five, and the eighth, is run against a
-# planted positive in a scratch tree, as are 12, 13 and 14. Gates 6, 9, 10 and
+# planted positive in a scratch tree, as are 12, 13, 14 and 15. Gates 6, 9, 10 and
 # 11 run their tools' own selftests, which carry their own planted cases, and
 # gate 7 plants one positive per rule below.
 run_selftest() {
@@ -472,9 +485,20 @@ PY
   ( fail=0; gate_attribution >/dev/null 2>&1; exit "$fail" )
   plant_rejected $bad $? "attribution gate, weakened hook"
 
+  # Gate 15: the selftest must fail when a fail case is filed as a pass case.
+  for d in qb-bad qb-ok; do
+    mkdir -p "$tmp/$d/scripts" "$tmp/$d/tests" && cp scripts/check-qblock "$tmp/$d/scripts/"
+    cp -R tests/qblock-cases "$tmp/$d/tests/"
+  done
+  mv "$tmp/qb-bad/tests/qblock-cases/fail-no-block.md" "$tmp/qb-bad/tests/qblock-cases/pass-no-block.md"
+  python3 "$tmp/qb-bad/scripts/check-qblock" --selftest >/dev/null 2>&1
+  bad=$?
+  python3 "$tmp/qb-ok/scripts/check-qblock" --selftest >/dev/null 2>&1
+  plant_rejected $bad $? "question block gate, fail case filed as pass"
+
   printf '\n'
   [ "$plant_fail" -eq 0 ] || { echo "selftest: a gate could not be shown to fail. Do not trust a clean run."; return 1; }
-  echo "selftest: all ten planted positives fired."
+  echo "selftest: all eleven planted positives fired."
   echo
   echo "== gate 7 plants its own positives, one per rule =="
   python3 scripts/mdlint.py --selftest >/dev/null 2>&1
