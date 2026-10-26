@@ -53,3 +53,16 @@ block	git -c a=b -C . push -u origin HEAD
 block	GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/dev/null git push origin HEAD:refs/heads/feat/x
 allow	git -C . push origin HEAD:refs/heads/feat/x
 allow	git --no-pager log --oneline
+block	git -P push origin HEAD
+block	git -p push origin HEAD
+block	git --git-dir /x push origin HEAD
+block	git -C "my dir" push origin HEAD
+allow	git -P push origin HEAD:refs/heads/feat/x
+allow	git -p push origin HEAD:refs/heads/feat/x
+allow	git --git-dir /x push origin HEAD:refs/heads/feat/x
+allow	git -C "my dir" push origin HEAD:refs/heads/feat/x
+allow	git -P log --oneline
+allow	git --git-dir /x log --oneline
+allow	git -C "my dir" status
+block	git -C 'my dir' push origin HEAD
+allow	git -C 'my dir' push origin HEAD:refs/heads/feat/x
