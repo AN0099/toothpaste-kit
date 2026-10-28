@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v4
+
+Where it says a tree's `CLAUDE.md` names the provenance layer, it now points to
+`examples/workspace/CLAUDE.md` for what that statement looks like, and says it is an example, not
+your tree's path. No change to the procedure.
+
 ## v3
 
 The description names what the capture records, the decisions, corrections, open questions and
