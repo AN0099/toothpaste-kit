@@ -71,8 +71,12 @@ comments saying what goes in them. Leave them as they are for now.
 ~/toothpaste-kit/scripts/link-skills.sh ~/tpkit-workspace/.claude/skills
 ```
 
-**You should now see** one `link` line per skill, then a summary line
-ending `0 skipped, into` and the workspace's `.claude/skills` path.
+It prints its plan before writing anything; add `--dry-run` to see that
+plan without writing (docs/installing.md has the detail).
+
+**You should now see** the plan, then one `link` line per skill, then a
+summary line ending `0 skipped, into` and the workspace's `.claude/skills`
+path.
 
 Each skill is now a symlink into the clone, so updating the clone updates
 the skills.
