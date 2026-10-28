@@ -14,9 +14,15 @@
 # Usage, from anywhere:
 #   scripts/link-skills.sh                 links into ~/.claude/skills
 #   scripts/link-skills.sh /path/to/skills links into that directory
+#   scripts/link-skills.sh --dry-run [DIR] prints the target directory and
+#                                          every link it would create or skip;
+#                                          writes nothing
 #   scripts/link-skills.sh --selftest      runs it in a temporary directory and
 #                                          checks the result; scripts/gates.sh
 #                                          runs this (TK-111)
+#
+# Before writing anything, it prints the directory it will write to and every
+# link it will create or skip. --dry-run stops there and writes nothing.
 #
 # Re-runnable. Existing symlinks are replaced. A real directory of the same name
 # is left alone and reported, so a hand-edited local skill is never clobbered.
@@ -69,17 +75,67 @@ if [ "${1:-}" = --selftest ]; then
     if sh "$tmp/fake/scripts/$(basename -- "$self")" "$tmp/dest2" > "$tmp/out3" 2>&1; then
         bad "a tree with no skills/ exited 0"
     else grep -q 'no skills directory' "$tmp/out3" && ok "a tree with no skills/ exits non-zero and says why" || bad "no skills/ failed without its message"; fi
+    # --dry-run must print the plan but create nothing, not even the directory.
+    if sh "$self" --dry-run "$tmp/dryrun-dest" > "$tmp/out4" 2>&1; then
+        if [ -e "$tmp/dryrun-dest" ]; then
+            bad "--dry-run created $tmp/dryrun-dest"
+        elif grep -q "^Target directory: $tmp/dryrun-dest$" "$tmp/out4" \
+            && grep -q "would link  $keep" "$tmp/out4" \
+            && grep -q "^dry-run: nothing written$" "$tmp/out4"; then
+            ok "--dry-run prints the target and the plan, and writes nothing"
+        else bad "--dry-run did not print the expected plan: $(cat "$tmp/out4")"; fi
+    else bad "--dry-run exited non-zero"; fi
+    # A normal run must print the plan before it writes its first link or skip.
+    rm -rf "$tmp/order-dest"
+    sh "$self" "$tmp/order-dest" > "$tmp/out5" 2>&1 || true
+    plan_line=$(grep -n '^Target directory:' "$tmp/out5" | head -1 | cut -d: -f1)
+    write_line=$(grep -nE '^(link|skip)  ' "$tmp/out5" | head -1 | cut -d: -f1)
+    if [ -n "$plan_line" ] && [ -n "$write_line" ] && [ "$plan_line" -lt "$write_line" ]; then
+        ok "the plan is printed before any link or skip line"
+    else bad "the plan did not print before writing"; fi
     [ "$fails" -eq 0 ] && { echo "link-skills: selftest passed"; exit 0; }
     echo "link-skills: selftest FAILED ($fails)"; exit 1
 fi
 
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 src="$repo_root/skills"
-dest="${1:-$HOME/.claude/skills}"
+
+dry_run=0
+dest=""
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run) dry_run=1 ;;
+        -*) echo "error: unknown option $arg" >&2; exit 2 ;;
+        *) dest=$arg ;;
+    esac
+done
+dest=${dest:-$HOME/.claude/skills}
 
 if [ ! -d "$src" ]; then
     echo "error: no skills directory at $src" >&2
     exit 1
+fi
+
+echo "Target directory: $dest"
+plan_linked=0
+plan_skipped=0
+for d in "$src"/*/; do
+    [ -d "$d" ] || continue
+    name=$(basename "$d")
+    target="$dest/$name"
+    if [ -e "$target" ] && [ ! -L "$target" ]; then
+        echo "  would skip  $name (a real directory is already there)"
+        plan_skipped=$((plan_skipped + 1))
+    else
+        echo "  would link  $name"
+        plan_linked=$((plan_linked + 1))
+    fi
+done
+echo "$plan_linked to link, $plan_skipped to skip"
+
+if [ "$dry_run" -eq 1 ]; then
+    echo "dry-run: nothing written"
+    exit 0
 fi
 
 mkdir -p "$dest"

@@ -65,6 +65,12 @@ stay where it is. Targets are relative where `ln -r` exists, so moving
 the clone and the workspace together keeps the links working; on systems
 without it, such as macOS, they are absolute and the script says so.
 
+Before it writes anything, the script prints the target directory and its
+plan: a `would link` or `would skip` line for each skill. Add `--dry-run`
+to see that same plan and write nothing, which is the way to check the
+target directory before committing to it, particularly the user-level
+default when you run the script with no argument at all.
+
 Copy instead if you intend to edit the skills yourself:
 
 ```sh
