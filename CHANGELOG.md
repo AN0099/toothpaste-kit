@@ -3,7 +3,12 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
-## Unreleased
+## 0.5.0 (2026-10-27)
+
+A MINOR release under `docs/releasing.md`. The licence moves to Apache 2.0, with REUSE
+compliance and a Developer Certificate of Origin sign-off; the ACMM L2, L3 and L4 files arrive;
+`scripts/gates.sh` goes from ten gates to fourteen; and branch and tag names get one rule. No
+skill is added and no skill revision is BREAKING.
 
 ### Added
 
@@ -39,6 +44,33 @@ skill lives in that skill's own `CHANGELOG.md`.
   example agent rule: push only to an explicit destination, never skip the
   hooks; its cases are in `tests/branch-guard-cases.tsv`, run by the hooks
   gate. CONTRIBUTING.md, "Branch and tag names".
+- `orchestration/rounds.md`: the rounds protocol, by which work is checked by
+  a seat other than its author before it reaches the maintainer, with report
+  and finding numbering and the major, minor and nit severity scale (pull
+  request #53).
+- `scripts/check-hooks.py`, gate 12: each rule in `hooks/` parses, and each
+  blocking rule fires on its planted cases (pull request #51).
+- `scripts/auto-qa-tuner.py`, run weekly by `.github/workflows/auto-qa.yml`:
+  proposes a timeout for each job in `.github/auto-qa-tuning.json` from its
+  last 100 runs, in the job summary, and never edits a workflow (pull
+  request #52).
+- `.github/workflows/ai-fix.yml`: an issue labelled `ai-fix` gets one fixed
+  comment routing it to the maintainers. No agent runs in CI and no stored
+  secret is used (pull request #48).
+- ACMM L4 part a (pull request #45): `SECURITY-AI.md`, the AI security policy;
+  `docs/risk-tiers.md`, change classification; `.github/labeler.yml` and its
+  workflow, labelling pull requests by path; `.github/workflows/nightly.yml`,
+  the gates selftest every night; and `docs/reflections/`, filed
+  cross-session lessons.
+- ACMM L2 (pull request #37): `CLAUDE.md`, `.github/copilot-instructions.md`
+  and `.cursor/rules/agents.mdc` point at `AGENTS.md`;
+  `docs/prompts/README.md` catalogs the skills; `docs/corrections.md` and an
+  empty `corrections.jsonl` give the Correction Protocol's records a format.
+- Contributor files (pull request #30): `AGENTS.md`, a pull request template,
+  `.editorconfig`, and `tests/run` with `tests/README.md` as the test entry
+  point. `scripts/link-skills.sh --selftest`, gate 11.
+- `docs/glossary.md`, each term of art with the file that defines it (pull
+  request #29), and `docs/concepts.md`, a concepts index (pull request #43).
 
 ### Changed
 
@@ -70,6 +102,24 @@ skill lives in that skill's own `CHANGELOG.md`.
   workflow instead of a count, which had gone stale twice.
 - `daily-review` step 5: the Most Important Task is the person's first task
   in Next, in the order the review proposes, the rule the lane board marks.
+- `scripts/reorient` names what it skips: a path that is not a repository
+  gets a line, MAIL says `none` when nothing is new, and TASK says
+  `not checked` when `ps` is missing (pull requests #30 and #36).
+- `session-log`'s description names what the capture records, the decisions,
+  corrections, open questions and findings, where it said it writes the
+  reasoning; `orient` and `session-close` describe it the same way (pull
+  request #22).
+
+### Skill revisions
+
+- `daily-review` v3 to v4.
+- `document-standards` v4 to v5.
+- `orient` v2 to v3.
+- `session-close` v5 to v6.
+- `session-log` v2 to v3.
+- `surface-regimes` v3 to v4.
+- `technical-documents` v2 to v3.
+- `working-preferences` v5 to v6.
 
 ## 0.4.0 (2026-10-13)
 

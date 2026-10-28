@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v4
+
+One line points to `skill-creation` for making a skill and `skill-discovery` for deciding
+whether a need justifies one, or locating one (pull request #43). No change to the procedure.
+
 ## v3 (decoupled from vendor product names)
 
 Follows the 2026-09-05 schema inversion in `orchestration/`, which made a seven-field `capability`
