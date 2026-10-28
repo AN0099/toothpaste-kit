@@ -1,0 +1,276 @@
+#!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+"""Check a reply's closing question block against working-preferences.
+
+The rules are skills/working-preferences/SKILL.md, "Questions and Answers",
+with docs/glossary.md "Question block" and "Readback". This is the single
+implementation; chocolate-factory wraps it. Its cases and its first rules come
+from chocolate-factory scripts/check-qblock (commit 534bd42), changed where
+that script and the kit text differ, so this enforces the kit text.
+
+COVERAGE. Eight rules, each tagged with the SKILL.md line it enforces:
+
+  1  SKILL.md:195  the reply ends with exactly three question lines,
+                   "Qn. ... (codes)", each followed only by its own "N = ..."
+                   lines, and nothing after them
+  2  SKILL.md:195, :251  the three are labeled Q1, Q2, Q3, in that order
+  3  SKILL.md:195, :206, :143-157  every code in a code list is a digit 1 to 4
+                   or one of the 27 brevity codes in the table
+  4  SKILL.md:206, :210  every digit offered is defined directly under its
+                   question, and every definition is offered; four at most
+  5  SKILL.md:218  a reply that follows a question block opens with
+                   "Readback:"
+  6  SKILL.md:213  an open question keeps its number, its wording and its
+                   option lines: with a previous block, a slot changes
+                   wording or options, or goes missing, only if the readback
+                   names that question outside a parenthesised meaning.
+                   Option lines compare
+                   as a set, so their order and indentation are free
+  7  SKILL.md:213  every Qn the body names, outside inline code, is in the
+                   block or answered in the readback, so a carried question is
+                   shown in full rather than referred to
+  8  SKILL.md:218  every answer the readback restates as "Qn <code>" is
+                   followed by its meaning in parentheses, "Q1 f (commit)",
+                   not only its letter
+
+NOT checked, because a machine cannot read them: that f does what the question
+names (:205), that 1 is the recommendation (:206), that option lines are
+indented (:206, accepted either way), one code type per block, which the skill
+qualifies with "where possible" (:207), that d means stop (:209), that the
+irreversible answer is named (:211), whether the question is worth asking or a
+default would do (:214, :215), whether the meaning rule 8 finds is the right
+one or the readback reads each answer correctly (:218 to :220), an answer the
+readback restates in prose rather than as "Qn <code>", which rule 8 cannot
+find, and the answer grammar itself
+(:216), which governs the operator's message, not the reply. Rule 5 cannot
+tell whether the operator's message held answers, so it keys on a previous
+block being supplied. Rule 6 compares wording and option lines, not the code
+list in parentheses, so "(f / d)" becoming "(f / j / d)" on an open question
+passes. A Qn the readback names in prose, outside parentheses, counts as
+answered whether or not the prose answers it, since "Q1 defaulted" is an
+answer a machine cannot tell from a mention. The turn-ending exceptions at :252 to :254 are not detected:
+apply the checker only to replies that need a decision.
+
+Usage:
+  scripts/check-qblock [FILE|-] [--previous FILE]
+      check one reply, from FILE or stdin, optionally after the reply that
+      held the previous block. Exit 0 passes, 1 names each rule broken,
+      2 is a usage error.
+  scripts/check-qblock --selftest
+      run tests/qblock-cases/; fails unless every case holds and every rule
+      has at least one pass case and one fail case
+"""
+import pathlib
+import re
+import sys
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+CASES = ROOT / "tests" / "qblock-cases"
+
+RULES = {
+    1: "SKILL.md:195",
+    2: "SKILL.md:195, :251",
+    3: "SKILL.md:195, :206, :143-157",
+    4: "SKILL.md:206, :210",
+    5: "SKILL.md:218",
+    6: "SKILL.md:213",
+    7: "SKILL.md:213",
+    8: "SKILL.md:218",
+}
+
+# The Brevity Code table, SKILL.md:143 to 157. Twenty-seven codes.
+BREVITY = {
+    "f", "j", "d", "k", "s", "l",
+    "fk", "jd", "sk", "dl", "fl", "js", "kd", "sj",
+    "fj", "kf", "ls", "dj", "sl", "jf", "lf",
+    "sdj", "sdk", "dfj", "dfk", "sfj", "sfk",
+}
+DIGITS = {"1", "2", "3", "4"}
+
+QLINE = re.compile(r"^Q(\d+)\. (.*)\(([^()]*)\)\s*$")
+OPTION = re.compile(r"^\s*([1-4]) = \S")
+MENTION = re.compile(r"\b[Qq](\d+)\b")
+SETTLED = re.compile(r"\b[Qq](\d+)\b")
+INLINE_CODE = re.compile(r"`[^`]*`")
+ANSWER = re.compile(r"\b[Qq](\d+) +([A-Za-z]{1,3}|[1-4])\b(\s*\()?")
+PAREN = re.compile(r"\([^()]*\)")
+
+
+def block_of(text):
+    """Return (questions, first block line) for the trailing block.
+
+    Each question is (number, wording, code list, option lines under it).
+    An option line is kept whole with its spacing collapsed, since indentation
+    is accepted either way, so its first character is the digit it defines.
+    Lines are the non-blank lines of text. Questions is empty when the text
+    does not end with a question line or its options.
+    """
+    lines = [l for l in text.rstrip().splitlines() if l.strip()]
+    qs, opts = [], []
+    i = len(lines) - 1
+    while i >= 0:
+        q = QLINE.match(lines[i])
+        o = OPTION.match(lines[i])
+        if q:
+            qs.insert(0, (int(q.group(1)), q.group(2).strip(), q.group(3), opts))
+            opts = []
+        elif o:
+            opts.insert(0, " ".join(lines[i].split()))
+        else:
+            break
+        i -= 1
+    return qs, i + 1 + len(opts)
+
+
+def check(text, previous=None):
+    """Return [(rule, reason)] for every rule the reply breaks."""
+    out = []
+    lines = [l for l in text.rstrip().splitlines() if l.strip()]
+    qs, start = block_of(text)
+
+    if not qs:
+        out.append((1, "it does not end with a question block, or text follows the last question"))
+    elif len(qs) != 3:
+        out.append((1, f"the closing block has {len(qs)} questions, not 3"))
+
+    for pos, (n, _, codes, opts) in enumerate(qs, 1):
+        if n != pos:
+            out.append((2, f"question {pos} of the block is labeled Q{n}; the block is Q1, Q2, Q3 in order"))
+        listed = [c.strip() for c in re.split(r"[,/]", codes)]
+        bad = [c for c in listed if c not in BREVITY | DIGITS]
+        if bad or not codes.strip():
+            out.append((3, f"Q{n} accepts ({codes.strip()}), and {', '.join(bad) or 'an empty list'} is not a code"))
+        offered = sorted({c for c in listed if c in DIGITS})
+        defined = sorted({o[0] for o in opts})
+        if offered != defined:
+            out.append((4, f"Q{n} offers digits {offered or 'none'} but defines {defined or 'none'} under it"))
+
+    readback = lines[0] if lines and lines[0].startswith("Readback:") else ""
+    # A Qn inside another answer's meaning is a mention, not an answer.
+    settled = {int(n) for n in SETTLED.findall(PAREN.sub("()", readback))}
+    before = dict((n, (w, o)) for n, w, _, o in block_of(previous)[0]) if previous else {}
+
+    if previous is not None and not readback:
+        out.append((5, 'it follows a question block but does not open with "Readback:"'))
+
+    # A meaning's own words are emptied first, so a Qn quoted inside one is
+    # not read as a second answer.
+    for m in ANSWER.finditer(PAREN.sub("()", INLINE_CODE.sub("", readback))):
+        n, code, meaning = m.groups()
+        if code.lower() in BREVITY | DIGITS and not meaning:
+            out.append((8, f"the readback gives Q{n} {code} without its meaning; restate it, as in \"Q{n} {code} (...)\""))
+
+    now = dict((n, (w, o)) for n, w, _, o in qs)
+    for n, (wording, options) in before.items():
+        if n in settled:
+            continue
+        if n not in now:
+            out.append((6, f"Q{n} was open and is gone from the block; carry it on its number"))
+        elif now[n][0] != wording:
+            out.append((6, f"Q{n} changed wording but the readback does not answer Q{n}; an open question keeps its number and wording"))
+        elif sorted(now[n][1]) != sorted(options):
+            out.append((6, f"Q{n} changed its option lines but the readback does not answer Q{n}; an open question keeps its options with it"))
+
+    body = lines[1 if readback else 0:start]
+    for line in body:
+        if QLINE.match(line) or OPTION.match(line):
+            continue
+        for m in MENTION.finditer(INLINE_CODE.sub("", line)):
+            n = int(m.group(1))
+            if n not in now and n not in settled:
+                out.append((7, f"Q{n} is named but not in the block or answered in the readback; show it in full"))
+
+    return list(dict.fromkeys(out))
+
+
+def report(reasons):
+    for rule, reason in reasons:
+        print(f"check-qblock: rule {rule} ({RULES[rule]}): {reason}")
+
+
+FRONT = re.compile(r"---\n(.*?)\n---\n", re.S)
+PREVIOUS = re.compile(r"<!-- previous:\n(.*?)\n-->\n", re.S)
+
+
+def load_case(path):
+    """Return (rules, reply, previous) from a case file.
+
+    A case opens with YAML frontmatter, so mdlint's MD041 is met by its name
+    key. Its "rules:" line lists the rules it exercises: for a fail case,
+    exactly the rules that must fire. An optional "<!-- previous:" comment
+    holds the previous block. The rest is the reply.
+    """
+    text = path.read_text(encoding="utf-8")
+    m = FRONT.match(text)
+    if not m:
+        sys.exit(f"check-qblock: {path.name} has no frontmatter")
+    r = re.search(r"^rules: *([\d ]+)$", m.group(1), re.M)
+    if not r:
+        sys.exit(f"check-qblock: {path.name} has no rules: line")
+    rules = {int(x) for x in r.group(1).split()}
+    text = text[m.end():].lstrip("\n")
+    p = PREVIOUS.match(text)
+    if p:
+        return rules, text[p.end():], p.group(1)
+    return rules, text, None
+
+
+def selftest():
+    wrong = count = 0
+    seen = {r: {"pass": 0, "fail": 0} for r in RULES}
+    for case in sorted(CASES.glob("*.md")):
+        want = case.name.split("-", 1)[0]
+        if want not in ("pass", "fail"):
+            sys.exit(f"check-qblock: {case.name} must start with pass- or fail-")
+        rules, reply, previous = load_case(case)
+        fired = {r for r, _ in check(reply, previous)}
+        count += 1
+        for r in rules & set(RULES):
+            seen[r][want] += 1
+        if want == "pass" and fired:
+            wrong += 1
+            print(f"MISS {case.name}: wanted pass, rules {sorted(fired)} fired", file=sys.stderr)
+        elif want == "fail" and fired != rules:
+            wrong += 1
+            print(f"MISS {case.name}: wanted rules {sorted(rules)} to fire, got {sorted(fired) or 'none'}", file=sys.stderr)
+    thin = [r for r, c in seen.items() if not c["pass"] or not c["fail"]]
+    for r in thin:
+        print(f"THIN rule {r}: {seen[r]['pass']} pass, {seen[r]['fail']} fail cases; needs one of each", file=sys.stderr)
+    if wrong or thin or not count:
+        print(f"check-qblock: {wrong} of {count} cases wrong, {len(thin)} rules thin", file=sys.stderr)
+        return 1
+    per = ", ".join(f"{r}:{c['pass']}/{c['fail']}" for r, c in seen.items())
+    print(f"check-qblock: {count} of {count} cases hold; rule:pass/fail {per}")
+    return 0
+
+
+def main(argv):
+    args = argv[1:]
+    if args == ["--selftest"]:
+        return selftest()
+    previous = None
+    if "--previous" in args:
+        i = args.index("--previous")
+        if i + 1 >= len(args):
+            print(__doc__, file=sys.stderr)
+            return 2
+        previous = pathlib.Path(args[i + 1]).read_text(encoding="utf-8")
+        del args[i:i + 2]
+    if len(args) > 1 or any(a.startswith("--") for a in args):
+        print(__doc__, file=sys.stderr)
+        return 2
+    if not args or args[0] == "-":
+        text = sys.stdin.read()
+    else:
+        text = pathlib.Path(args[0]).read_text(encoding="utf-8")
+    reasons = check(text, previous)
+    report(reasons)
+    return 1 if reasons else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
