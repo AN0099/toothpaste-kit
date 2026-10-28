@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v6
+
+One line points to `skill-creation` for making a skill and `skill-discovery` for deciding
+whether a need justifies one, or locating one (pull request #43). No change to the procedure.
+
 ## v5 (context cadence)
 
 - **Added Context Cadence**, a banded table for when the agent raises the context window's size and when it offers a compaction. Patches two observed failures, so it is load-bearing under Failure-Mode Preservation: a session ran far past the degradation point and the operator had to ask for the reminder the agent owed unprompted; and the opposite risk the operator named when adding it, compacting so often that working context is cut off before it stops being needed. The 40k spacing rule and the clean-boundary definition exist for the second; the unprompted status line exists for the first.

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v3
+
+One line points to `skill-creation` for making a skill and `skill-discovery` for deciding
+whether a need justifies one, or locating one (pull request #43). No change to the procedure.
+
 ## v2 (RCA remediation, turn-7 postmortem)
 
 Companion entry to `working-preferences` v2 and `document-standards` v3; see `working-preferences/CHANGELOG.md` for the full root-cause statement.
