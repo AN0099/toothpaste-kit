@@ -1,6 +1,6 @@
 ---
 name: session-log
-description: Mid-session capture, run when the conversation is about to be compacted, handed off, or otherwise lose its detail while the work is unfinished. Records the decisions, corrections, open questions and findings from the recent stretch to one append-only file in a single pass, with no verification sweep and no standing-file updates. Deliberately cheaper and narrower than session-close, which it does not replace and does not satisfy.
+description: Mid-session capture before compaction or handoff while work is unfinished; one append-only pass of decisions, corrections, questions and findings, no verification or standing-file updates. Does not replace or satisfy session-close.
 disable-model-invocation: true
 ---
 

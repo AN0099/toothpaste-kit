@@ -19,7 +19,8 @@
 #
 # Coverage, stated because a check that does not state its coverage is not a
 # check. These fourteen gates cover: the em dash ban, the private task ID ban,
-# JSON wellformedness, registry self-consistency, skill frontmatter, the
+# JSON wellformedness, registry self-consistency, skill frontmatter (presence,
+# and each description's length and one-line YAML scalar rules), the
 # reflow script's own selftest, markdown structure via scripts/mdlint.py,
 # which states its own nineteen-rule coverage in its header, and the example
 # workspace's stubs against docs/standing-documents.md via
@@ -154,8 +155,54 @@ PY
 }
 
 # ---------------------------------------------------------------- 5
+# The description is checked against the YAML rules for a one-line scalar
+# rather than parsed, because the gates run on python3 alone and no YAML
+# parser ships with it. A presence check passed skills/orient with an
+# unquoted ": " that a strict loader rejects. Covers: at most 250 characters
+# as written, one line, and for a plain value no ": " or trailing ":", no
+# " #" (the rest is a comment), no leading indicator; a quoted value must
+# close, may be followed by a comment, and is otherwise accepted. Does NOT
+# cover block scalars, tags, anchors, or the name field's value. The
+# selftest calls this same function.
+check_descriptions() {
+  python3 - "$@" <<'PY'
+import re, sys
+MAX = 250
+def problems(v):
+    p = []
+    if len(v) > MAX: p.append("longer than %d characters (%d)" % (MAX, len(v)))
+    if v[:1] == '"':
+        if not re.fullmatch(r'"(?:[^"\\]|\\.)*"(?:\s+#.*)?', v): p.append("double quote not closed")
+    elif v[:1] == "'":
+        if not re.fullmatch(r"'(?:[^']|'')*'(?:\s+#.*)?", v): p.append("single quote not closed")
+    elif not v: p.append("empty")
+    else:
+        if v[0] in ",[]{}#&*!|>%@`" or (v[0] in "-?:" and v[1:2] in ("", " ")):
+            p.append("plain value starts with indicator %r" % v[0])
+        if re.search(r":(\s|$)", v): p.append('plain value contains ": " (quote it, or use "; ")')
+        if re.search(r"\s#", v): p.append('plain value contains " #", which starts a comment')
+    return p
+bad = 0
+for f in sys.argv[1:]:
+    lines = open(f, encoding="utf-8").read().split("\n")
+    end = lines.index("---", 1) if lines[:1] == ["---"] and "---" in lines[1:] else 0
+    for i in range(1, end):
+        if not lines[i].startswith("description:"): continue
+        p = problems(lines[i][len("description:"):].strip())
+        # A blank line inside a plain value folds, so the value continues
+        # past it: look at the next line that is not blank.
+        nxt = next((l for l in lines[i + 1:end] if l.strip()), "")
+        if nxt[:1] in (" ", "\t"):
+            p.append("continues onto a second line")
+        for m in p:
+            print("::error file=%s,line=%d::frontmatter description %s" % (f, i + 1, m))
+            bad = 1
+sys.exit(bad)
+PY
+}
+
 gate_frontmatter() {
-  gate_start "skill frontmatter present"
+  gate_start "skill frontmatter present and valid"
   bad=0
   n=0
   for f in skills/*/SKILL.md; do
@@ -163,8 +210,9 @@ gate_frontmatter() {
     head -6 "$f" | grep -q '^name:' || { echo "::error file=$f::missing frontmatter name"; bad=1; }
     head -6 "$f" | grep -q '^description:' || { echo "::error file=$f::missing frontmatter description"; bad=1; }
   done
+  check_descriptions skills/*/SKILL.md || bad=1
   echo "  checked $n skills"
-  [ "$bad" -eq 0 ] && gate_ok "skill frontmatter present" || gate_bad "skill frontmatter present"
+  [ "$bad" -eq 0 ] && gate_ok "skill frontmatter present and valid" || gate_bad "skill frontmatter present and valid"
 }
 
 # ---------------------------------------------------------------- 6
@@ -420,6 +468,40 @@ PY
   printf -- '---\nname: withfm\ndescription: has one\n---\n' > "$tmp/skills/withfm/SKILL.md"
   head -6 "$tmp/skills/withfm/SKILL.md" | grep -q '^name:'
   plant_rejected $bad $? "frontmatter gate"
+
+  # One plant per description rule, each against the same clean fixture, which
+  # holds one passing case per allowed form. A rule that stopped firing fails
+  # its own line here rather than hiding behind another rule's plant.
+  fm() { printf -- '---\nname: x\ndescription: %s\n---\n' "$2" > "$tmp/$1.md"; }
+  {
+    printf -- '---\nname: ok\ndescription: plain text, a:b and a#b, see sibling\n'
+    printf 'description: "quoted: with \\" escaped # inside" # and a comment\n'
+    printf "description: 'single: it''s fine'\n"
+    printf 'description: -leading dash word\n'
+    printf 'description: %0250d\n---\n' 0
+  } > "$tmp/fm-ok.md"
+  check_descriptions "$tmp/fm-ok.md" >/dev/null; good=$?
+  fm long "$(printf '%0251d' 0)"
+  fm colon 'index of things: with a colon'
+  fm colonend 'ends with a colon:'
+  fm hash 'text # then a comment'
+  fm indicator '&anchor-looking start'
+  fm dquote '"never closed'
+  fm squote "'it's not doubled'"
+  printf -- '---\nname: x\ndescription: first line\n  second line\n---\n' > "$tmp/multi.md"
+  printf -- '---\nname: x\ndescription: first line\n\n  after a blank line\n---\n' > "$tmp/multiblank.md"
+  for p in long colon colonend hash indicator dquote squote multi multiblank; do
+    check_descriptions "$tmp/$p.md" >/dev/null; bad=$?
+    plant_rejected $bad $good "frontmatter description: $p"
+  done
+  # The rules above, through the gate as installed, so a gate that stopped
+  # calling check_descriptions is caught too. The plant is the orient case.
+  mkdir -p "$tmp/fg-bad/skills/a" "$tmp/fg-ok/skills/a"
+  printf -- '---\nname: a\ndescription: Orient first: then act\n---\n' > "$tmp/fg-bad/skills/a/SKILL.md"
+  printf -- '---\nname: a\ndescription: Orient first; then act\n---\n' > "$tmp/fg-ok/skills/a/SKILL.md"
+  run_gate "$tmp/fg-bad" gate_frontmatter; bad=$?
+  run_gate "$tmp/fg-ok" gate_frontmatter
+  plant_rejected $bad $? "frontmatter gate, description as installed"
 
   # A stub the document does not describe, against a stub it does.
   # The script takes no paths, so each planted tree has the repository's layout.

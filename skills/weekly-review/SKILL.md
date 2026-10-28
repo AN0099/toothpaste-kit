@@ -1,6 +1,6 @@
 ---
 name: weekly-review
-description: Once-a-week pass over the task board's slower lanes. Chases each Waiting task's blocker, names every task carried in Doing by its count, reads the week's Done lane back against what was planned, and schedules one important task that nothing urgent is forcing. A tool prepares every list; the person decides every move, and nothing moves before they answer. Invoke once a week, after a daily review. Does not replace the daily review, which empties the Inbox and orders Next.
+description: Weekly pass over the task board; chase Waiting blockers, name carried Doing tasks, read Done against plan, schedule one important non-urgent task. The person decides every move. Run after a daily-review, which it does not replace.
 disable-model-invocation: true
 ---
 

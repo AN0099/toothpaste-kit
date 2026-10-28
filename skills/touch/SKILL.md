@@ -1,6 +1,6 @@
 ---
 name: touch
-description: Agent-callable single-fact update to a standing file, made right after the work it records. One queue status, one new flag, or one state line, plus a marked ledger line in the day's capture file. Never moves, resolves or rewrites; never runs checks. Does not replace or satisfy session-close.
+description: Agent-callable single-fact update to a standing file right after the work it records; one queue status, flag or state line, plus a ledger line. Never moves, resolves, rewrites or runs checks. Does not replace or satisfy session-close.
 ---
 
 # When to Use

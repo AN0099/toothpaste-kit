@@ -1,6 +1,6 @@
 ---
 name: merge-proxy
-description: Session-scoped accommodation, invoked by a person only. Lets the agent run a merge into a trunk and push it, on a repository whose remote is internal or absent, after explaining the exact plan in full and halting for explicit approval of that plan. The decision stays the person's; only the keystrokes move. Never applies to a public or internet remote, including GitHub.
+description: Session-scoped, invoked by a person only. The agent merges into a trunk and pushes on an internal or absent remote, after stating the full plan and getting explicit approval. Never applies to a public or internet remote, including GitHub.
 disable-model-invocation: true
 ---
 

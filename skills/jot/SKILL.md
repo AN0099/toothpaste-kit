@@ -1,6 +1,6 @@
 ---
 name: jot
-description: Agent-callable micro-capture at a clean boundary. Appends one short, marked entry of decisions, corrections and findings from the stretch just finished to the day's capture file. Costs about one reply. Does not replace or satisfy session-log or session-close.
+description: Agent-callable micro-capture at a clean boundary; appends one short marked entry of decisions, corrections and findings to the day's capture file. Costs about one reply. Does not replace or satisfy session-log or session-close.
 ---
 
 # When to Use
