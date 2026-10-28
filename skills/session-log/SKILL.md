@@ -71,7 +71,9 @@ to find.
 always-loaded config that names the standing-files list, and that statement is the binding. Read it
 rather than guessing, because the plausible guesses are wrong in a way that does damage: a capture
 written into the repo puts session residue in a tree that may later get a remote, which is the exact
-mixing the two-layer rule forbids. If the tree says nothing, stop and ask rather than picking a path.
+mixing the two-layer rule forbids. `examples/workspace/CLAUDE.md` shows what that statement looks
+like; it is an example, not your tree's path. If the tree says nothing, stop and ask rather than
+picking a path.
 
 Provenance is verbose by default and stays out of any public repo. Nothing written here goes into a
 human-facing document.

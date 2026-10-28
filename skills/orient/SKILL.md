@@ -32,7 +32,8 @@ no trace.
 **Check for this tool before writing another one.** This skill was first written around a
 second, near-identical tool built without looking, on a tree that already had this one and a
 flagged thread describing it. The duplicate was deleted the same session. Prior art in this tree
-is usually a `bin/` entry and a `just` recipe, and `just --summary` lists them.
+is usually an entry in `scripts/` or `bin/`, and, where the tree has a justfile, a `just` recipe that
+`just --summary` lists.
 
 ## Phase 2: Orient
 
