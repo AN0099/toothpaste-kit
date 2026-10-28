@@ -1,6 +1,6 @@
 ---
 name: skill-discovery
-description: How a recurring need gets recognized as worth turning into a skill, and how an existing skill in this system gets located once built. Covers the worthiness test and the discovery process itself, not what happens inside a skill once it's triggered (each skill's own frontmatter description handles that) or how to structure a new skill file (see skill-creation).
+description: How a recurring need is judged worth a skill, and how an existing skill is located. Not what a skill does once triggered (its own description) or how to structure a new skill file (see skill-creation).
 ---
 
 # When to Use

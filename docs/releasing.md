@@ -268,6 +268,10 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
   `scripts/check-workspace-stubs.py`, `scripts/remote-level.sh` and
   `scripts/reorient`.
   `session-close` v5 is BREAKING, which a MINOR bump may carry while MAJOR is 0.
+  The 0.4.0 version DOI is `10.5281/zenodo.23354409`.
+- **0.5.0, cut 2026-10-27.** MINOR, because it adds gates, scripts and
+  workflows and changes no interface. It is the first release under Apache 2.0;
+  0.1.0 to 0.4.0 stay MIT.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

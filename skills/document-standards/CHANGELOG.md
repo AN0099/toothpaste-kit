@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v5
+
+One line points to `skill-creation` for making a skill and `skill-discovery` for deciding
+whether a need justifies one, or locating one (pull request #43). No change to the procedure.
+
 ## v4 (was v2)
 
 Two internal contradictions removed. Both were found by running the skill against live document

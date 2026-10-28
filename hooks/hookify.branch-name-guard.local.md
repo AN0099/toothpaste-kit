@@ -7,7 +7,7 @@ tool_matcher: Bash
 conditions:
   - field: command
     operator: regex_match
-    pattern: '\bgit\b[^\n;&|]*\s(--no-ver[a-z]*\b|\S*(?i:core\.hookspath))|\bgit\b[^\n;&|]*\bcommit\b[^\n;&|]*\s-[a-zA-Z]*n[a-zA-Z]*(\s|$)|\bgit\b(\s+(-[cC]\s+\S+|--[a-z][a-z-]*(=\S+)?))*\s+push\b(?![^\n;&|#]*\s\S*:refs/(heads|tags)/)|\bgh\s+pr\s+create\b(?![^\n;&|]*\s--head[\s=])|\bGIT_CONFIG_(COUNT|KEY_[0-9]+|PARAMETERS)='
+    pattern: '\bgit\b[^\n;&|]*\s(--no-ver[a-z]*\b|\S*(?i:core\.hookspath))|\bgit\b[^\n;&|]*\bcommit\b[^\n;&|]*\s-[a-zA-Z]*n[a-zA-Z]*(\s|$)|\bgit\b(\s+(-[cC]\s+("[^"]*"|''[^'']*''|\S+)|-[pP]|--[a-z][a-z-]*(=\S+|\s+("[^"]*"|''[^'']*''|\S+))?))*\s+push\b(?![^\n;&|#]*\s\S*:refs/(heads|tags)/)|\bgh\s+pr\s+create\b(?![^\n;&|]*\s--head[\s=])|\bGIT_CONFIG_(COUNT|KEY_[0-9]+|PARAMETERS)='
 ---
 
 **Blocked: this git command could publish a branch name nobody chose, or skip the check that stops one.**
@@ -18,10 +18,12 @@ This rule exists because of a near miss. `git push -u origin HEAD` published a t
 
 **What this blocks:**
 
-1. `git push` without an explicit destination, a refspec ending in `:refs/heads/<name>` or `:refs/tags/<name>`, such as `git push`, `git push origin HEAD`, `git push -u origin HEAD`, `git -C <dir> push origin HEAD`, `git push origin <branch>` or `git push --all`. Each of these takes the remote name from whatever the local branch happens to be called. One qualified refspec lets the whole command through, so push one refspec at a time: a second, unqualified one beside it is not caught.
+1. `git push` without an explicit destination, a refspec ending in `:refs/heads/<name>` or `:refs/tags/<name>`, such as `git push`, `git push origin HEAD`, `git push -u origin HEAD`, `git -C <dir> push origin HEAD`, `git push origin <branch>` or `git push --all`. Global options before `push` do not hide it: `-p`, `-P`, `-c` or `-C` with a value (quoted, spaces included, as in `git -C "my dir" push`), and a long option written with `=` or with its value as a separate word, as in `git --git-dir /x push`. Each of these takes the remote name from whatever the local branch happens to be called. One qualified refspec lets the whole command through, so push one refspec at a time: a second, unqualified one beside it is not caught.
 2. `--no-verify` on any git command, abbreviated or not, and `git commit -n`. These skip `.githooks/pre-push` and the commit hooks.
 3. Any git command naming `core.hooksPath`, in any case, including `git -c core.hooksPath=...`, and any `GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_<n>` or `GIT_CONFIG_PARAMETERS` assignment, which can set it from the environment. Either would redirect or disable the hooks.
 4. `gh pr create` without `--head`. Without it, `gh` can push the current branch under its own name.
+
+**Known limits, not caught:** an unqualified push still gets through when a global option's value is written as `--git-dir="my dir"`, `-C my\ dir`, `-C $'my dir'` or the attached `-C"dir"`, and when `push` is reached through a git alias. No pattern can catch an alias, because it lives in the user's git config, not in the command. These are not widened on purpose; the pre-push hook and `scripts/check-branch-name` remain the checks behind this rule.
 
 The cases this rule must block and allow are in `tests/branch-guard-cases.tsv`, and `scripts/check-hooks.py` tests this file's pattern against them.
 

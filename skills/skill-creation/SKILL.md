@@ -1,6 +1,6 @@
 ---
 name: skill-creation
-description: How to add a new skill to this system, once the decision to build one is already made. Naming convention, required section shape, a sizing target and split ceiling, and the integration and pre-publish checklists a new skill runs through before it counts as live. Does not decide whether a recurring need is worth a skill in the first place (see skill-discovery) or check a skill file's prose against content-quality standards (see document-standards, which still governs SKILL.md and CHANGELOG.md as generated documents).
+description: How to add a skill once the decision is made; naming, section shape, sizing, integration and pre-publish checklists. Not whether a need deserves a skill (see skill-discovery) or prose quality checks (see document-standards).
 ---
 
 # When to Use

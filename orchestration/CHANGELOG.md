@@ -42,6 +42,8 @@ a paragraph one author wrote into a property the whole registry has, and makes t
 sweepable by a staleness checker rather than only readable. `unknown` is a legitimate value for
 `audit` and is used where the evidence conflicts.
 
+**`ingestion/CLAUDE-EXPORT-DIGEST-SPEC.md` merged into `ingestion/VENDOR-AGNOSTIC-DIGEST-SPEC.md` (0.6.0).** The vendor-agnostic spec pointed at the Claude spec for its Steps 1 to 9 and failure list, so it could not stand alone. Both now live in one file, with Claude's export shapes kept as a worked mapping example.
+
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
 

@@ -1,6 +1,6 @@
 ---
 name: working-preferences
-description: Standing behavioral defaults, register, prohibitions, correction protocol, and command vocabulary for working with this user. Near-always relevant, load for any task requiring sustained interaction, judgment calls, or multi-step work. Does not cover technical document authoring standards (see document-standards) or frontend/UI design (deferred, not yet built).
+description: Standing behavioral defaults, register, prohibitions, correction protocol and command vocabulary. Load for sustained interaction, judgment calls or multi-step work. Not for technical document standards (see document-standards).
 ---
 
 # Role & Register

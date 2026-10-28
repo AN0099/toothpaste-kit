@@ -1,6 +1,6 @@
 ---
 name: commands
-description: Gateway and index for the project command vocabulary. Lists all twenty-seven commands with their brevity codes and one-line summaries, and resolves HELP and MAN directly. Does not hold the behavioral rules themselves; those live in working-preferences, which is the source of truth for what each command does.
+description: Index of the twenty-seven project commands with brevity codes and one-line summaries; resolves HELP and MAN. Does not hold the behavioral rules; working-preferences is the source of truth for each command.
 ---
 # Scope
 Discoverability index for the twenty-seven commands in the project command vocabulary, with the brevity code for each. This skill exists so an agent can find out which commands are active without loading all of `working-preferences`. HELP and MAN resolve here. Every other command executes under the definitions `working-preferences` holds.
