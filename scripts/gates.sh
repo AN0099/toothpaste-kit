@@ -407,11 +407,13 @@ run_selftest() {
   trap 'rm -rf "$tmp"; exit 130' INT
   trap 'rm -rf "$tmp"; exit 143' TERM
   plant_fail=0
+  plant_n=0 # counted as the plants run, so the closing line cannot drift from the code
   # The two senses are opposite and conflating them reports backwards, which
   # is how the first draft of this selftest "failed" against gates that were
   # working. A search gate fires by FINDING the plant, so exit 0 is correct.
   # A validity gate fires by REJECTING the plant, so non-zero is correct.
   plant_found() {    # expects exit 0: the search found the planted positive
+    plant_n=$((plant_n + 1))
     if [ "$1" -eq 0 ]; then
       printf 'PLANT ok    %s fires on a planted positive\n' "$2"
     else
@@ -425,6 +427,7 @@ run_selftest() {
   # both. So a validity plant takes two exit codes, and the clean fixture is
   # what makes the rejection mean anything.
   plant_rejected() { # $1 exit on the bad fixture, $2 exit on the good one
+    plant_n=$((plant_n + 1))
     if [ "$1" -ne 0 ] && [ "$2" -eq 0 ]; then
       printf 'PLANT ok    %s rejects a plant and accepts a clean fixture\n' "$3"
     elif [ "$1" -eq 0 ]; then
@@ -652,7 +655,7 @@ JSON
 
   printf '\n'
   [ "$plant_fail" -eq 0 ] || { echo "selftest: a gate could not be shown to fail. Do not trust a clean run."; return 1; }
-  echo "selftest: all thirteen planted positives fired."
+  echo "selftest: all $plant_n planted positives fired."
   echo
   echo "== gate 7 plants its own positives, one per rule =="
   python3 scripts/mdlint.py --selftest >/dev/null 2>&1
