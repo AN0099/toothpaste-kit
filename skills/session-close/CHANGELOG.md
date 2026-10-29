@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v7
+
+Phases 1 and 2 point to `examples/workspace/CLAUDE.md` for what a tree's provenance-layer and
+standing-files lines look like, and say it is an example, not your tree's path. No change to the
+procedure.
+
 ## v6
 
 The scope pointer to `session-log` says it records decisions and findings, where it said it

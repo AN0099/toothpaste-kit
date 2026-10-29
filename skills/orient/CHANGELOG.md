@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v4
+
+Phase 1's pointer to prior art names `scripts/` and `bin/`, and `just --summary` only where the tree has a
+justfile; it named a `just` recipe in a kit that ships no justfile. No change to the procedure.
+
 ## v3
 
 The scope pointer to `session-log` says it records decisions and findings, where it said it

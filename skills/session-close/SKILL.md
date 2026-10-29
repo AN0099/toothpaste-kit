@@ -47,7 +47,8 @@ Read back over the session and ask, explicitly and separately for each category:
 
 For each item found, decide its layer before writing it. Provenance material
 (reasoning, decision archaeology, session residue) goes to the provenance layer
-your `CLAUDE.md` names, or to the appropriate sensitivity tier. If `CLAUDE.md`
+your `CLAUDE.md` names, or to the appropriate sensitivity tier.
+`examples/workspace/CLAUDE.md` shows what that line looks like. If `CLAUDE.md`
 names no provenance layer, stop and ask rather than picking a path. Human-facing
 material (README, CONTRIBUTING, project state, skill files) goes to the repo,
 lean and without archaeology. Never mix the two in one file.
@@ -61,9 +62,10 @@ clean.
 
 Your tree should name, in one place, the files that must stay current, and
 `CLAUDE.md` is where to say which place that is, since it loads into every
-session. Check each one and state explicitly whether it needed a change, rather
-than silently skipping it. Substitute your own list here. The shape that has
-worked:
+session. `examples/workspace/CLAUDE.md` shows what that line looks like; it is
+an example, not your tree's path. Check each one and state explicitly whether
+it needed a change, rather than silently skipping it. Substitute your own list
+here. The shape that has worked:
 
 - The manifest naming what is authoritative versus stale
 - The task or work queue
