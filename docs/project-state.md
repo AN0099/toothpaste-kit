@@ -3,7 +3,7 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-10-22.
+Last updated 2026-10-28.
 
 ## Live
 
@@ -194,6 +194,35 @@ unverifiable clean result this project's own conventions reject.
 
 ## Unreleased
 
+Merged to `main` after 0.5.0, listed under Unreleased in `CHANGELOG.md`.
+
+- **Orchestration digest (pull request #60).** One digest spec, with the extraction packet linked
+  from it.
+- **Branch guard (pull request #61).** The branch guard sees quoted global options, and its known
+  limits are stated.
+- **Frontmatter gate (pull request #63).** A gate checks each skill description's length and YAML
+  form.
+- **`scripts/check-qblock` (pull request #62).** A checker for the closing question block, with
+  cases in `tests/qblock-cases/`.
+- **Session skill pointers (pull request #65).** `orient`, `session-log` and `session-close` point
+  at the shipped `examples/workspace/CLAUDE.md`.
+- **`scripts/link-skills.sh` (pull request #66).** Prints its plan before writing, and `--dry-run`
+  writes nothing.
+- **Registry schema check (pull request #67).** `scripts/schema-check.py` validates every vendor
+  file against the registry schema.
+- **Commit provenance (pull request #68).** Commits record tool help as `Assisted-by:` and
+  `Agent-Effort:` trailers and need a sign-off; `scripts/check-pr-body` checks a pull request body
+  against the template.
+
+## In v0.5.0
+
+- **Licence and provenance.** The licence moves to Apache 2.0 (pull request #57), with REUSE
+  compliance (pull request #58): every file declares its copyright and licence, and
+  `scripts/compliance.sh` runs `reuse lint`. Contributions carry a Developer Certificate of Origin
+  sign-off.
+- **Branch and tag names (pull request #59).** `scripts/check-branch-name` is the one definition of
+  an allowed name, run by `.githooks/pre-push`, a gate and the `branch-name` CI job.
+- **`scripts/gates.sh`** goes from ten gates to fourteen.
 - **The second L4 change.** `.github/workflows/ai-fix.yml` acknowledges the `ai-fix` label
   once per issue and routes the issue to the desk; no agent runs in CI and no stored secret is
   used. `SECURITY-AI.md`, `docs/acmm.md` and security posture rows 3.7 and 4.4 name it.

@@ -3,6 +3,40 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
+## Unreleased
+
+### Added
+
+- `scripts/check-qblock` (pull request #62): checks a reply's closing question
+  block against `skills/working-preferences/SKILL.md`, "Questions and
+  Answers", with 30 planted cases in `tests/qblock-cases/` run from
+  `scripts/gates.sh`.
+- `scripts/schema-check.py` (pull request #67): validates every
+  `orchestration/registry/*.json` file against its schema; the registry gate
+  runs it.
+- `scripts/link-skills.sh --dry-run` (pull request #66): prints the plan and
+  writes nothing. Every run now prints its plan before writing.
+
+### Changed
+
+- `orchestration/ingestion/VENDOR-AGNOSTIC-DIGEST-SPEC.md` (pull request #60):
+  one spec, its duplicate sections merged, with
+  `CONVERSATION-EXTRACTION-PACKET.md` linked as a fast first pass.
+- The branch-name hook (pull request #61) sees `push` behind quoted and
+  separate-word global options, and lists the forms it still does not catch.
+- The frontmatter gate (pull request #63) checks each skill `description` for
+  length, one line, and the plain-scalar YAML rules; 17 descriptions are
+  shortened to fit.
+- Commits (pull request #68): provenance is recorded as `Assisted-by:` and
+  `Agent-Effort:` trailers, every commit needs a `Signed-off-by:` line, and
+  `scripts/check-pr-body` checks a pull request body against the template.
+
+### Skill revisions
+
+- `orient` v4, `session-log` v4, `session-close` v7 (pull request #65): each
+  points at the kit's shipped `examples/workspace/CLAUDE.md`, and `orient`
+  names `scripts/` and `bin/` where a tree has no justfile.
+
 ## 0.5.0 (2026-10-27)
 
 A MINOR release under `docs/releasing.md`. The licence moves to Apache 2.0, with REUSE
