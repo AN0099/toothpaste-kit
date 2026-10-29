@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+"""Check a pull request body against .github/pull_request_template.md.
+
+usage: scripts/check-pr-body BODY_FILE
+       scripts/check-pr-body --event      read the body from $GITHUB_EVENT_PATH
+       scripts/check-pr-body --selftest
+
+Fails (exit 1) on any of:
+  heading     a template heading missing, or headings out of order
+  comment     a template <!-- comment --> left in the body
+  wrapped     a paragraph broken across lines; GitHub shows each break
+  unticked    an empty box; a box that does not apply is replaced by a
+              "Does not apply" line, never left empty or ticked
+  provenance  "Yes" ticked under "Drafted with an agent?" and no filled
+              Provenance section, when the template has one
+
+The template is read on every run, so the check follows it. Headings inside
+code fences do not count. It does NOT check that the boxes ticked are true,
+that a Provenance line matches the commits, or anything about the prose.
+"""
+
+import json
+import os
+import pathlib
+import re
+import sys
+import tempfile
+
+TEMPLATE = pathlib.Path(".github/pull_request_template.md")
+# A line starting one of these is a block of its own, so a line after it is
+# not a wrapped continuation.
+BLOCK_START = re.compile(r"^\s*(#|[-*+] |\d+\. |\||>|<|```|\[)")
+PROVENANCE = re.compile(
+    r"<details>\s*<summary>Provenance</summary>(.*?)</details>", re.S)
+YES_TICKED = re.compile(r"^- \[[xX]\] Yes\b", re.M)
+
+
+def strip_comments(text):
+    return re.sub(r"<!--.*?-->", "", text, flags=re.S)
+
+
+def headings(text):
+    out, fence = [], False
+    for line in text.splitlines():
+        if line.startswith("```"):
+            fence = not fence
+        elif not fence and re.match(r"^#{1,6} ", line):
+            out.append(line.strip())
+    return out
+
+
+def unticked(text):
+    """Every box ticked; under "Drafted with an agent?" exactly one of Yes or No."""
+    found, section, fence, agent = [], "", False, []
+    for line in text.splitlines():
+        if line.startswith("```"):
+            fence = not fence
+        elif not fence and re.match(r"^#{1,6} ", line):
+            section = line.lstrip("# ").strip()
+        elif not fence and re.match(r"^\s*- \[[ xX]\] ", line):
+            if section == "Drafted with an agent?":
+                agent.append(line)
+            elif re.match(r"^\s*- \[ \] ", line):
+                found.append(f"unticked: {section}: {line.strip()}")
+    if agent and sum(1 for a in agent if re.match(r"^\s*- \[[xX]\]", a)) != 1:
+        found.append("unticked: Drafted with an agent?: tick exactly one of Yes or No")
+    return found
+
+
+def check(body, template):
+    found = []
+    have, pos = headings(body), 0
+    for h in headings(strip_comments(template)):
+        try:
+            pos = have.index(h, pos) + 1
+        except ValueError:
+            found.append(f"heading: missing or out of order: {h}")
+    if "<!--" in body:
+        found.append("comment: a template comment is still in the body")
+    fence, prev = False, ""
+    for n, line in enumerate(body.splitlines(), 1):
+        if line.startswith("```"):
+            fence, prev = not fence, ""
+            continue
+        if fence:
+            continue
+        if (prev.strip() and line.strip()
+                and not BLOCK_START.match(prev) and not BLOCK_START.match(line)):
+            found.append(f"wrapped: line {n} continues the paragraph above it")
+        prev = line
+    found += unticked(body)
+    if PROVENANCE.search(template) and YES_TICKED.search(body):
+        m = PROVENANCE.search(body)
+        if not m or not strip_comments(m.group(1)).strip():
+            found.append("provenance: Yes is ticked and the Provenance section is missing or empty")
+    return found
+
+
+def selftest():
+    template = ("# What this changes\n\n<!-- say it -->\n\n## Checks\n\n"
+                "```sh\n# not a heading\n```\n\n## Drafted with an agent?\n\n"
+                "- [ ] Yes\n- [ ] No\n\n<details>\n<summary>Provenance</summary>\n\n"
+                "<!-- trailers -->\n\n</details>\n")
+    prov = "\n\n<details>\n<summary>Provenance</summary>\n\nAssisted-by: m via t/1\n\n</details>\n"
+    good = "# What this changes\n\nOne line.\n\n## Checks\n\n- [x] done\n\n## Drafted with an agent?\n\n"
+    cases = [
+        ("clean, agent", good + "- [x] Yes\n- [ ] No" + prov, set()),
+        ("clean, no agent", good + "- [ ] Yes\n- [x] No\n", set()),
+        ("missing heading", "# What this changes\n\nText.\n", {"heading"}),
+        ("out of order", "## Checks\n\n# What this changes\n\n## Drafted with an agent?\n", {"heading"}),
+        ("comment left", good + "- [ ] Yes\n- [x] No\n\n<!-- left -->\n", {"comment"}),
+        ("wrapped", good.replace("One line.", "One\nline.") + "- [ ] Yes\n- [x] No\n", {"wrapped"}),
+        ("empty box", good.replace("- [x] done", "- [ ] done") + "- [ ] Yes\n- [x] No\n", {"unticked"}),
+        ("neither yes nor no", good + "- [ ] Yes\n- [ ] No\n", {"unticked"}),
+        ("no provenance", good + "- [x] Yes\n- [ ] No\n", {"provenance"}),
+        ("empty provenance", good + "- [x] Yes\n- [ ] No\n\n<details>\n<summary>Provenance</summary>\n\n</details>\n",
+         {"provenance"}),
+    ]
+    ok = True
+    for name, body, want in cases:
+        got = {f.split(":")[0] for f in check(body, template)}
+        print(f"{'ok  ' if got == want else 'FAIL'}  {name}" + ("" if got == want else f": want {sorted(want)}, got {sorted(got)}"))
+        ok = ok and got == want
+    # The file paths main() uses, end to end, so the event reader is exercised too.
+    with tempfile.TemporaryDirectory() as d:
+        event = pathlib.Path(d) / "event.json"
+        event.write_text(json.dumps({"pull_request": {"body": "# What this changes\n"}}))
+        got = read_event(event)
+        ok_event = got == "# What this changes\n"
+        print(f"{'ok  ' if ok_event else 'FAIL'}  event body read")
+        ok = ok and ok_event
+    print("check-pr-body selftest:", "passed" if ok else "FAILED")
+    return 0 if ok else 1
+
+
+def read_event(path):
+    return json.loads(pathlib.Path(path).read_text())["pull_request"].get("body") or ""
+
+
+def main(argv):
+    if argv == ["--selftest"]:
+        return selftest()
+    if argv == ["--event"]:
+        body = read_event(os.environ["GITHUB_EVENT_PATH"])
+    elif len(argv) == 1 and not argv[0].startswith("-"):
+        body = pathlib.Path(argv[0]).read_text()
+    else:
+        print(__doc__.strip())
+        return 2
+    found = check(body.replace("\r\n", "\n"), TEMPLATE.read_text())
+    for f in found:
+        print("FAIL", f)
+    print(f"check-pr-body: {len(found)} findings")
+    return 1 if found else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

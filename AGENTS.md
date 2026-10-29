@@ -10,8 +10,9 @@ rules; nothing here adds one.
   `./scripts/compliance.sh --selftest`.
 - **Skills:** read `skills/skill-creation/SKILL.md` before changing one.
 - **Branch names:** `CONTRIBUTING.md`, "Branch and tag names", checked by `scripts/check-branch-name`.
-- **Commits:** `CONTRIBUTING.md`, "Commits and pull requests": no tool attribution in commits or PR
-  bodies.
+- **Commits:** `CONTRIBUTING.md`, "Commits and pull requests": provenance as `Assisted-by:` and
+  `Agent-Effort:` trailers with values read from the tool, never a co-author line, session link or
+  footer. The `Signed-off-by:` line is the human's; an agent never adds one for them.
 - **Pull requests:** `.github/pull_request_template.md` lists what a reviewer expects.
 
 <!--

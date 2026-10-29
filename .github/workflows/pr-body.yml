@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: pr-body
+
+# Checks a pull request's body against .github/pull_request_template.md: every
+# heading in order, no template comment left, no paragraph broken across lines,
+# and a filled Provenance section when an agent drafted the change. Runs again
+# when the body is edited, which the gates workflow does not.
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # The body is read from the event file, never pasted into the command,
+      # so text in a pull request body cannot inject shell.
+      - name: Check the pull request body
+        run: python3 scripts/check-pr-body --event

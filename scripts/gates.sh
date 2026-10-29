@@ -37,9 +37,12 @@
 # name guard's cases in tests/branch-guard-cases.tsv, and the branch and tag
 # name rule's selftest in scripts/check-branch-name, which also fails if the
 # ruleset's prefix list has drifted from the script's, and the commit-msg
-# hook's attribution pattern against tests/attribution-cases.tsv, and the
+# hook's attribution, provenance and sign-off rules against
+# tests/attribution-cases.tsv and three sign-off cases, and the
 # question block checker's selftest in scripts/check-qblock against
-# tests/qblock-cases/, which states its own eight-rule coverage. They
+# tests/qblock-cases/, which states its own eight-rule coverage, and the pull
+# request body checker's selftest in scripts/check-pr-body, which plants each
+# finding it reports. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -314,13 +317,29 @@ gate_attribution() {
     case "$line" in ''|'#'*) continue ;; esac
     want=${line%%"$tab"*}
     trailer=${line#*"$tab"}
-    printf 'subject\n\nbody\n\n%s\n' "$trailer" > "$msg"
-    if sh "$hook" "$msg" >/dev/null 2>&1; then got=allow; else got=block; fi
+    # %b splits a case of several trailers joined by \n into lines.
+    printf 'subject\n\nbody\n\n%b\nSigned-off-by: Test Author <author@example.com>\n' "$trailer" > "$msg"
+    if GIT_AUTHOR_NAME='Test Author' GIT_AUTHOR_EMAIL=author@example.com \
+      sh "$hook" "$msg" >/dev/null 2>&1; then got=allow; else got=block; fi
     n=$((n + 1))
     if [ "$got" != "$want" ]; then
       printf '  wanted %s, got %s: %s\n' "$want" "$got" "$trailer"; bad=1
     fi
   done < tests/attribution-cases.tsv
+  # The sign-off rule: the author's own line passes, another person's or none
+  # fails.
+  for c in 'allow:Signed-off-by: Test Author <author@example.com>' \
+           'block:Signed-off-by: Someone Else <else@example.com>' \
+           'block:no sign-off'; do
+    want=${c%%:*}
+    printf 'subject\n\n%s\n' "${c#*:}" > "$msg"
+    if GIT_AUTHOR_NAME='Test Author' GIT_AUTHOR_EMAIL=author@example.com \
+      sh "$hook" "$msg" >/dev/null 2>&1; then got=allow; else got=block; fi
+    n=$((n + 1))
+    if [ "$got" != "$want" ]; then
+      printf '  wanted %s, got %s: %s\n' "$want" "$got" "${c#*:}"; bad=1
+    fi
+  done
   rm -f "${msg:?}"
   printf '  %s cases\n' "$n"
   if [ "$n" -gt 0 ] && [ "$bad" -eq 0 ]; then
@@ -340,6 +359,16 @@ gate_qblock() {
   fi
 }
 
+# ---------------------------------------------------------------- 16
+gate_pr_body() {
+  gate_start "pull request body checker"
+  if python3 scripts/check-pr-body --selftest >/dev/null; then
+    gate_ok "pull request body checker"
+  else
+    gate_bad "pull request body checker"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -356,7 +385,8 @@ run_all() {
   gate_branch_names
   gate_attribution
   gate_qblock
-  printf '\n%s of 15 gates passed\n' "$pass_n"
+  gate_pr_body
+  printf '\n%s of 16 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -364,7 +394,7 @@ run_all() {
 
 # A gate that has never returned a hit has not been shown capable of
 # returning one, so each of the first five, and the eighth, is run against a
-# planted positive in a scratch tree, as are 12, 13, 14 and 15. Gates 6, 9, 10 and
+# planted positive in a scratch tree, as are 12, 13, 14, 15 and 16. Gates 6, 9, 10 and
 # 11 run their tools' own selftests, which carry their own planted cases, and
 # gate 7 plants one positive per rule below.
 run_selftest() {
@@ -612,9 +642,17 @@ JSON
   python3 "$tmp/qb-ok/scripts/check-qblock" --selftest >/dev/null 2>&1
   plant_rejected $bad $? "question block gate, fail case filed as pass"
 
+  # Gate 16: a copy of the checker without its empty-box rule must fail its
+  # own selftest.
+  mkdir -p "$tmp/pb/scripts" && grep -v 'found += unticked(body)' scripts/check-pr-body > "$tmp/pb/scripts/check-pr-body"
+  python3 "$tmp/pb/scripts/check-pr-body" --selftest >/dev/null 2>&1
+  bad=$?
+  python3 scripts/check-pr-body --selftest >/dev/null 2>&1
+  plant_rejected $bad $? "pull request body gate, rule removed"
+
   printf '\n'
   [ "$plant_fail" -eq 0 ] || { echo "selftest: a gate could not be shown to fail. Do not trust a clean run."; return 1; }
-  echo "selftest: all twelve planted positives fired."
+  echo "selftest: all thirteen planted positives fired."
   echo
   echo "== gate 7 plants its own positives, one per rule =="
   python3 scripts/mdlint.py --selftest >/dev/null 2>&1

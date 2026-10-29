@@ -100,7 +100,16 @@ Configure `user.email` before your first commit. Use the noreply address your fo
 
 One logical change per commit. Commit messages should say what changed and why. Keep generated output, index databases, and packed repository files out of the repo. `.gitignore` covers the known cases.
 
-**No tool attribution in commit messages or pull request bodies.** No `Co-Authored-By` line naming an AI, no session links, no generated-with footers, and no provenance trailers such as `Assisted-by:` or `Agent-<name>:`. The hook checks the trailer forms in `tests/attribution-cases.tsv`; any other line crediting a tool is a review item. A commit message records what changed and why; which editor, model, or agent was in the loop is not part of that and is not something a reader can act on.
+**Record which tool helped as provenance, never as attribution.** If an assistant drafted part of a commit, add one `Assisted-by:` trailer for each assistant whose model you know, and `Agent-Effort:` where the tool reports its effort level:
+
+```text
+Assisted-by: <model> via <tool>/<version>
+Agent-Effort: low | medium | high | xhigh | max
+```
+
+For example, `Assisted-by: claude-opus-5-5 via claude-code/2.1.308`. Take each value from the tool itself, never from memory. If an agent's model is not on record, leave its trailer out and say so in the pull request's Provenance section; a partial trailer reads as the whole story. A reviewer uses provenance to decide how closely to read a change, and it is where a licence question about the change would start.
+
+No `Co-Authored-By` line naming an AI, no session links, and no generated-with footers. A co-author line claims an authorship a tool cannot certify, and the `Signed-off-by:` line is yours alone (see "Licence and sign-off"). The hook checks the forms in `tests/attribution-cases.tsv`; any other line crediting a tool is a review item.
 
 Three layers enforce this, and only the third binds:
 
@@ -111,8 +120,8 @@ Three layers enforce this, and only the third binds:
    git config core.hooksPath .githooks
    ```
 
-   Git does not transmit hooks on clone, so this is opt-in, and `--no-verify` walks past it. Treat it as a fast local failure rather than a guarantee.
-3. The `commit-attribution` workflow runs the same `commit-msg` hook on every commit in a pull request, so the two cannot disagree. It is the layer that binds, provided the maintainer has set it as a required status check in the ruleset on `main`. Without that setting it reports a failure and blocks nothing. Where it is required, a branch that reaches review with a trailer in its history needs those messages rewritten and the branch force-pushed.
+   Git does not transmit hooks on clone, so this is opt-in, and `--no-verify` walks past it. Treat it as a fast local failure rather than a guarantee. The same hook refuses a commit with no `Signed-off-by:` line for its author, so a missing `-s` fails on your machine rather than in the `dco` workflow.
+3. The `commit-attribution` workflow runs the same `commit-msg` hook on every commit in a pull request, with its sign-off check off since the `dco` workflow holds that, so the two cannot disagree. It is the layer that binds, provided the maintainer has set it as a required status check in the ruleset on `main`. Without that setting it reports a failure and blocks nothing. Where it is required, a branch that reaches review with a trailer in its history needs those messages rewritten and the branch force-pushed.
 
 Human co-author trailers are fine and expected. The rule is about tools.
 
