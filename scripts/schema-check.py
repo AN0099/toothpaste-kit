@@ -20,7 +20,9 @@ enum, format (date, date-time, uri). $schema, $id, title, description and
 definitions are recognized as structure or annotations, not applied to an
 instance.
 
-No CLI arguments. Run from the repository root, as scripts/gates.sh does.
+No CLI arguments; any argument is refused with exit 2, so a mistyped flag
+cannot run the check and read as a pass. Run from the repository root, as
+scripts/gates.sh does.
 """
 
 import glob
@@ -164,6 +166,9 @@ def validate(instance, schema, current_file, path, errors):
 
 
 def main():
+    if sys.argv[1:]:
+        print(f"error: schema-check.py takes no arguments, got {' '.join(sys.argv[1:])}", file=sys.stderr)
+        return 2
     errors = []
 
     schema_doc = load_schema_file(SCHEMA_PATH)
