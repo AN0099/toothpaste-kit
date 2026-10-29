@@ -1,21 +1,12 @@
 # Toothpaste Kit: `tp-kit`
 
-A skill library, an agent relay protocol, and a set of mechanical gates for
-running multi-agent work with a person in charge of it. Judged on control
-fidelity rather than capability: legible state, cheap correction, a reliable
-halt.
+A skill library, an agent relay protocol, and a set of mechanical gates for running multi-agent work with a person in charge of it. Judged on control fidelity rather than capability: legible state, cheap correction, a reliable halt.
 
-**Status: work in progress, pre-alpha.** The skills are in daily use and the
-interfaces still change.
+**Status: work in progress, pre-alpha.** The skills are in daily use and the interfaces still change.
 
 [![gates workflow status](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml/badge.svg?branch=main)](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml) [![licence: Apache 2.0](https://img.shields.io/badge/licence-Apache%202.0-blue.svg)](LICENSE) [![concept DOI, resolves to the newest version](https://zenodo.org/badge/DOI/10.5281/zenodo.22850481.svg)](https://doi.org/10.5281/zenodo.22850481) [![latest tagged release](https://img.shields.io/github/v/release/AN0099/toothpaste-kit?label=release)](https://github.com/AN0099/toothpaste-kit/releases) [![Software Heritage archive status](https://archive.softwareheritage.org/badge/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/)](https://archive.softwareheritage.org/browse/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/) [![OpenSSF Best Practices level](https://www.bestpractices.dev/projects/14726/badge)](https://www.bestpractices.dev/projects/14726) [![REUSE status](https://api.reuse.software/badge/github.com/AN0099/toothpaste-kit)](https://api.reuse.software/info/github.com/AN0099/toothpaste-kit)
 
-**Accessibility is a requirement here, not an afterthought.** The documents this
-repository ships are authored against
-[WCAG techniques for Markdown, with the technique IDs stated](docs/document-accessibility.md),
-and `scripts/mdlint.py` enforces the mechanically checkable half of them. The
-other side, [the accessibility of the interface this work is done through](docs/accessibility.md),
-is documented with it.
+**Accessibility is a requirement here, not an afterthought.** The documents this repository ships are authored against [WCAG techniques for Markdown, with the technique IDs stated](docs/document-accessibility.md), and `scripts/mdlint.py` enforces the mechanically checkable half of them. The other side, [the accessibility of the interface this work is done through](docs/accessibility.md), is documented with it.
 
 A Bridle Works project, maintained by Aidan Naveja.
 
@@ -41,15 +32,9 @@ Where to go, by what you came for.
 
 ## What this kit is
 
-This is documentation for both the user and the agent. It holds an information
-corpus, a skill library, a vendor-independent capability taxonomy, a message
-schema for relaying work between agents and humans across surfaces, and a
-routing rule that gates dispatch on content sensitivity.
+This is documentation for both the user and the agent. It holds an information corpus, a skill library, a vendor-independent capability taxonomy, a message schema for relaying work between agents and humans across surfaces, and a routing rule that gates dispatch on content sensitivity.
 
-It is currently designed around a local Claude Code instance as the lead
-orchestrator. Most of it is Agent Skills compatible, plain shell and Python
-scripts, and Markdown, so it stays portable across vendors. A modular,
-vendor-agnostic framework is on the roadmap.
+It is currently designed around a local Claude Code instance as the lead orchestrator. Most of it is Agent Skills compatible, plain shell and Python scripts, and Markdown, so it stays portable across vendors. A modular, vendor-agnostic framework is on the roadmap.
 
 ## What is here
 
@@ -214,23 +199,17 @@ The lowest-friction first contribution is a surface descriptor in `orchestration
 
 ## Why this exists
 
-The reasoning, the two images this project thinks in, and what it refuses to
-optimise for are in [the philosophy document](philosophy.md).
+The reasoning, the two images this project thinks in, and what it refuses to optimise for are in [the philosophy document](philosophy.md).
 
 ## License and citation
 
-Apache License 2.0, from release 0.5.0. See [the licence](LICENSE). Releases
-0.1.0 to 0.4.0 were published under MIT and stay under it.
+Apache License 2.0, from release 0.5.0. See [the licence](LICENSE). Releases 0.1.0 to 0.4.0 were published under MIT and stay under it.
 
-Copyright 2026 Aidan Naveja. Contributions are accepted under the same licence,
-each commit signed off under the Developer Certificate of Origin; see
-[`CONTRIBUTING.md`](CONTRIBUTING.md#licence-and-sign-off).
+Copyright 2026 Aidan Naveja. Contributions are accepted under the same licence, each commit signed off under the Developer Certificate of Origin; see [`CONTRIBUTING.md`](CONTRIBUTING.md#licence-and-sign-off).
 
-[`CITATION.cff`](CITATION.cff) carries citation metadata for anyone referencing
-this work.
+[`CITATION.cff`](CITATION.cff) carries citation metadata for anyone referencing this work.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
 
-SPDX-License-Identifier: Apache-2.0
--->
+SPDX-License-Identifier: Apache-2.0 -->
