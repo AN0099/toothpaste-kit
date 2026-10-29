@@ -152,7 +152,7 @@ The output is gitignored on purpose. It is a near-complete copy of the repositor
 
 ## Contributing
 
-Read `CONTRIBUTING.md`. It covers the rules that apply to every change, the structure a skill has to follow, and how this repo handles commit attribution.
+Read `CONTRIBUTING.md`. It covers the rules that apply to every change, the structure a skill has to follow, how a commit is signed off, and how it records which tool helped.
 
 The lowest-friction first contribution is a surface descriptor in `orchestration/registry/`. It adds support for a vendor this project does not cover yet, cannot break anyone else's traffic, and needs no knowledge of the rest of the protocol. `orchestration/registry/README.md` has the format.
 

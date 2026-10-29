@@ -4,31 +4,68 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# Reject AI attribution trailers in commit messages. The commit-attribution
-# workflow runs this same file on every commit in a pull request.
+# Check a commit message before the commit is made: no AI attribution, any
+# provenance trailer in its one allowed form, and a sign-off by the author.
+# The commit-attribution workflow runs this same file on every commit in a
+# pull request, with the sign-off check off, since the dco workflow holds that.
 #
 # Enable once per clone:
 #   git config core.hooksPath .githooks
 #
 # This is a convenience, not the enforcement. Hooks do not travel with a clone
-# and `--no-verify` bypasses them. The binding check is the required status
-# check on the default branch. See CONTRIBUTING.md.
+# and `--no-verify` bypasses them. The binding checks are the required status
+# checks on the default branch. See CONTRIBUTING.md.
 
 msg_file="$1"
 
-# Extended regex, read case-insensitively. Assisted-by and the Agent-*
-# trailers are provenance trailers some tools write; tests/attribution-cases.tsv
-# holds the cases gate 14 in scripts/gates.sh runs this hook against.
-pattern='^Co-Authored-By[[:space:]]*:.*(Claude|Anthropic)|^Claude-Session[[:space:]]*:|Generated with .*Claude|^Assisted-by[[:space:]]*:|^Agent-[A-Za-z-]+[[:space:]]*:'
+# Extended regex, read case-insensitively. tests/attribution-cases.tsv holds
+# the cases gate 14 in scripts/gates.sh runs this hook against.
+pattern='^Co-Authored-By[[:space:]]*:.*(Claude|Anthropic)|^Claude-Session[[:space:]]*:|Generated with .*Claude'
 
 if grep -qiE "$pattern" "$msg_file"; then
-    echo "commit-msg: rejected, AI attribution trailer found." >&2
+    echo "commit-msg: rejected, AI attribution found." >&2
     echo >&2
     grep -niE "$pattern" "$msg_file" >&2
     echo >&2
-    echo "This repository does not carry tool attribution in commit messages." >&2
+    echo "This repository records which tool helped as a provenance trailer, not" >&2
+    echo "as a co-author, a session link or a footer. See CONTRIBUTING.md." >&2
     echo "Remove the lines above and commit again." >&2
     exit 1
+fi
+
+# Provenance trailers. Any line that looks like one must be one of the two
+# allowed forms exactly, so a misspelled or free-text trailer cannot pass as
+# provenance. Keys are matched case-insensitively to find them and
+# case-sensitively to accept them.
+provenance='^Assisted-by[[:space:]]*:|^Agent-[A-Za-z-]+[[:space:]]*:'
+allowed='^Assisted-by: [A-Za-z0-9._-]+ via [A-Za-z0-9._-]+/[0-9][A-Za-z0-9.+-]*$|^Agent-Effort: (low|medium|high|xhigh|max)$'
+
+bad_provenance=$(grep -iE "$provenance" "$msg_file" | grep -vE "$allowed")
+if [ -n "$bad_provenance" ]; then
+    echo "commit-msg: rejected, malformed provenance trailer." >&2
+    echo >&2
+    printf '%s\n' "$bad_provenance" >&2
+    echo >&2
+    echo "The two allowed forms are:" >&2
+    echo "  Assisted-by: <model> via <tool>/<version>" >&2
+    echo "  Agent-Effort: low | medium | high | xhigh | max" >&2
+    exit 1
+fi
+
+# Sign-off by the author, matched by email as the dco workflow matches it.
+if [ "${COMMIT_MSG_SKIP_SIGNOFF:-}" != 1 ]; then
+    ident=$(git var GIT_AUTHOR_IDENT 2>/dev/null)
+    email=$(printf '%s\n' "$ident" | sed -n 's/.*<\(.*\)>.*/\1/p')
+    if [ -z "$email" ]; then
+        echo "commit-msg: rejected, no author email to match a sign-off against." >&2
+        echo "Set user.email and commit again." >&2
+        exit 1
+    fi
+    if ! grep -iE '^Signed-off-by[[:space:]]*:' "$msg_file" | grep -qiF "<$email>"; then
+        echo "commit-msg: rejected, no Signed-off-by line for the author, $email." >&2
+        echo "Commit with -s. See CONTRIBUTING.md, \"Licence and sign-off\"." >&2
+        exit 1
+    fi
 fi
 
 exit 0

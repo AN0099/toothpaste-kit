@@ -4,13 +4,22 @@
 #
 # Cases for .githooks/commit-msg, read by gate 14 in scripts/gates.sh.
 # Each line: block or allow, a tab, then one line of a commit message. The gate
-# wraps it in a subject and body and runs the hook on the result.
+# wraps it in a subject and body, adds a sign-off for a test author, and runs
+# the hook on the result. A line of \n-joined trailers is split into lines.
 block	Co-Authored-By: Claude <ai@example.com>
 block	co-authored-by: Claude Opus <ai@example.com>
 block	Co-Authored-By: Anthropic Agent <ai@example.com>
 block	Claude-Session: https://example.com/session/1
 block	Generated with Claude Code
 block	Assisted-by: Claude Code
+allow	Assisted-by: claude-opus-5-5 via claude-code/2.1.308
+allow	Agent-Effort: low
+allow	Assisted-by: claude-opus-5-5 via claude-code/2.1.308\nAgent-Effort: xhigh
+block	assisted-by: claude-opus-5-5 via claude-code/2.1.308
+block	Assisted-by: claude-opus-5-5 via claude-code
+block	Assisted-by: claude-opus-5-5 via claude-code/2.1.308 and a note
+block	Agent-Effort: extreme
+block	Agent-Effort: low\nAgent-Model: some-model
 block	Assisted-by: any assistant at all
 block	assisted-by: lowercase
 block	Agent-Model: some-model

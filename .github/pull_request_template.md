@@ -2,6 +2,8 @@
 
 <!-- One or two sentences. What changed, and why. -->
 
+<!-- Tick every box in a section that applies. Where a section or an item does not apply, replace its boxes with a line saying "Does not apply" and why; scripts/check-pr-body fails on an empty box. -->
+
 ## Related issue or task
 
 <!-- Link the issue, or give the public TK- id (for example TK-014). Do not use private task ID formats; CONTRIBUTING.md, "Use public task IDs only", defines them. -->
@@ -19,6 +21,7 @@ Run this before opening the PR. It is the same command the `gates` job in CI run
 - [ ] Only public `TK-` task IDs appear
 - [ ] Every `.json` I touched parses
 - [ ] Markdown I touched passes `scripts/mdlint.py`
+- [ ] Every commit is signed off (`git commit -s`)
 - [ ] No `Co-Authored-By` naming an AI, session link or generated-with footer in my commits or this PR
 
 ## If this touches a skill
@@ -44,6 +47,13 @@ confirmed it yourself. An agent auditing its own work does not count. -->
 
 - [ ] Yes, and I checked the output mechanically
 - [ ] No
+
+<details>
+<summary>Provenance</summary>
+
+<!-- If you ticked Yes: copy the Assisted-by and Agent-Effort trailers from your commits, one per line. Name any agent whose model is not on record as such, in words. Delete this section if you ticked No. -->
+
+</details>
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
