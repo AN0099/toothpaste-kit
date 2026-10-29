@@ -9,7 +9,13 @@ gating decision consults, and product names are the part that changes without wa
 
 ## Files
 
-- `surface-descriptor.schema.json` validates every vendor file in this directory.
+- `surface-descriptor.schema.json` is checked on every `scripts/gates.sh` run. The "registry
+  entries are self-consistent" gate hand-checks three rules not expressible as plain schema
+  keywords (regime derivation, the vendor namespace prefix, that a `verified` confidence carries
+  sources), then calls `scripts/schema-check.py`, which validates every vendor file against this
+  schema using a standard-library-only checker. That checker implements exactly the keywords this
+  schema and the `capability_profile` definition it references use, and fails, naming the keyword,
+  on any it does not, so a keyword added here cannot pass unchecked.
 - `anthropic.json`, `openai.json`, `google.json`, `local.json`: one file per vendor namespace.
   Three of those are empty and waiting for someone who uses them.
 

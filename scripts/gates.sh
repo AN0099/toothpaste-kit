@@ -19,8 +19,11 @@
 #
 # Coverage, stated because a check that does not state its coverage is not a
 # check. These fifteen gates cover: the em dash ban, the private task ID ban,
-# JSON wellformedness, registry self-consistency, skill frontmatter (presence,
-# and each description's length and one-line YAML scalar rules), the
+# JSON wellformedness, registry self-consistency (including every vendor
+# file's shape against surface-descriptor.schema.json, checked by
+# scripts/schema-check.py, which fails loudly on any schema keyword it does
+# not implement rather than skip it), skill frontmatter (presence, and each
+# description's length and one-line YAML scalar rules), the
 # reflow script's own selftest, markdown structure via scripts/mdlint.py,
 # which states its own nineteen-rule coverage in its header, and the example
 # workspace's stubs against docs/standing-documents.md via
@@ -152,7 +155,10 @@ n = sum(len(json.load(open(p))["surfaces"]) for p in files)
 print(f"  checked {n} surface entries across {len(files)} registry files")
 sys.exit(1 if bad else 0)
 PY
-  then gate_ok "registry entries are self-consistent"
+  then
+    if python3 scripts/schema-check.py
+    then gate_ok "registry entries are self-consistent"
+    else gate_bad "registry entries are self-consistent"; fi
   else gate_bad "registry entries are self-consistent"; fi
 }
 
@@ -474,6 +480,34 @@ sys.exit(1 if bad else 0)
 PY
   plant_rejected $bad $? "registry consistency gate"
 
+  # schema-check.py validates every registry vendor file against
+  # surface-descriptor.schema.json. The plant breaks a vendor file's shape
+  # (sources as a string, not an array), not the schema.
+  for d in sc-bad sc-ok; do
+    mkdir -p "$tmp/$d/orchestration/registry" "$tmp/$d/orchestration/schemas" "$tmp/$d/scripts"
+    cp orchestration/registry/surface-descriptor.schema.json "$tmp/$d/orchestration/registry/"
+    cp orchestration/schemas/event-base.json "$tmp/$d/orchestration/schemas/"
+    cp scripts/schema-check.py "$tmp/$d/scripts/"
+  done
+  cat > "$tmp/sc-bad/orchestration/registry/acme.json" <<'JSON'
+{"vendor":"acme","surfaces":[{"id":"acme:x","display_name":"X",
+ "capability":{"interface":"programmatic","autonomy":"none","human_presence":"optional",
+ "workspace":"none","tool_execution":"none","egress":"local","audit":"unknown"},
+ "regime":"programmatic-contractual","confidence":"derived","verified_on":"2026-10-27",
+ "sources":"not-an-array"}]}
+JSON
+  cat > "$tmp/sc-ok/orchestration/registry/acme.json" <<'JSON'
+{"vendor":"acme","surfaces":[{"id":"acme:x","display_name":"X",
+ "capability":{"interface":"programmatic","autonomy":"none","human_presence":"optional",
+ "workspace":"none","tool_execution":"none","egress":"local","audit":"unknown"},
+ "regime":"programmatic-contractual","confidence":"derived","verified_on":"2026-10-27",
+ "sources":[]}]}
+JSON
+  ( cd "$tmp/sc-bad" && python3 scripts/schema-check.py ) >/dev/null 2>&1
+  bad=$?
+  ( cd "$tmp/sc-ok" && python3 scripts/schema-check.py ) >/dev/null 2>&1
+  plant_rejected $bad $? "schema-check gate"
+
   mkdir -p "$tmp/skills/nofm" "$tmp/skills/withfm"
   printf -- '---\ndescription: has no name\n---\n' > "$tmp/skills/nofm/SKILL.md"
   head -6 "$tmp/skills/nofm/SKILL.md" | grep -q '^name:'
@@ -580,7 +614,7 @@ PY
 
   printf '\n'
   [ "$plant_fail" -eq 0 ] || { echo "selftest: a gate could not be shown to fail. Do not trust a clean run."; return 1; }
-  echo "selftest: all eleven planted positives fired."
+  echo "selftest: all twelve planted positives fired."
   echo
   echo "== gate 7 plants its own positives, one per rule =="
   python3 scripts/mdlint.py --selftest >/dev/null 2>&1
