@@ -1,21 +1,12 @@
 # Toothpaste Kit: `tp-kit`
 
-A skill library, an agent relay protocol, and a set of mechanical gates for
-running multi-agent work with a person in charge of it. Judged on control
-fidelity rather than capability: legible state, cheap correction, a reliable
-halt.
+A skill library, an agent relay protocol, and a set of mechanical gates for running multi-agent work with a person in charge of it. Judged on control fidelity rather than capability: legible state, cheap correction, a reliable halt.
 
-**Status: work in progress, pre-alpha.** The skills are in daily use and the
-interfaces still change.
+**Status: work in progress, pre-alpha.** The skills are in daily use and the interfaces still change.
 
-[![gates workflow status](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml/badge.svg?branch=main)](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml) [![licence: Apache 2.0](https://img.shields.io/badge/licence-Apache%202.0-blue.svg)](LICENSE) [![concept DOI, resolves to the newest version](https://zenodo.org/badge/DOI/10.5281/zenodo.22850481.svg)](https://doi.org/10.5281/zenodo.22850481) [![latest tagged release](https://img.shields.io/github/v/release/AN0099/toothpaste-kit?label=release)](https://github.com/AN0099/toothpaste-kit/releases) [![Software Heritage archive status](https://archive.softwareheritage.org/badge/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/)](https://archive.softwareheritage.org/browse/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/) [![OpenSSF Best Practices level](https://www.bestpractices.dev/projects/14726/badge)](https://www.bestpractices.dev/projects/14726) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AN0099/toothpaste-kit)
+[![gates workflow status](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml/badge.svg?branch=main)](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml) [![licence: Apache 2.0](https://img.shields.io/badge/licence-Apache%202.0-blue.svg)](LICENSE) [![concept DOI, resolves to the newest version](https://zenodo.org/badge/DOI/10.5281/zenodo.22850481.svg)](https://doi.org/10.5281/zenodo.22850481) [![latest tagged release](https://img.shields.io/github/v/release/AN0099/toothpaste-kit?label=release)](https://github.com/AN0099/toothpaste-kit/releases) [![Software Heritage archive status](https://archive.softwareheritage.org/badge/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/)](https://archive.softwareheritage.org/browse/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/) [![OpenSSF Best Practices level](https://www.bestpractices.dev/projects/14726/badge)](https://www.bestpractices.dev/projects/14726) [![REUSE status](https://api.reuse.software/badge/github.com/AN0099/toothpaste-kit)](https://api.reuse.software/info/github.com/AN0099/toothpaste-kit)
 
-**Accessibility is a requirement here, not an afterthought.** The documents this
-repository ships are authored against
-[WCAG techniques for Markdown, with the technique IDs stated](docs/document-accessibility.md),
-and `scripts/mdlint.py` enforces the mechanically checkable half of them. The
-other side, [the accessibility of the interface this work is done through](docs/accessibility.md),
-is documented with it.
+**Accessibility is a requirement here, not an afterthought.** The documents this repository ships are authored against [WCAG techniques for Markdown, with the technique IDs stated](docs/document-accessibility.md), and `scripts/mdlint.py` enforces the mechanically checkable half of them. The other side, [the accessibility of the interface this work is done through](docs/accessibility.md), is documented with it.
 
 A Bridle Works project, maintained by Aidan Naveja.
 
@@ -25,25 +16,25 @@ Where to go, by what you came for.
 
 - [What this kit is](#what-this-kit-is), if you want the one-paragraph version
 - [What is here](#what-is-here), a directory-by-directory tour of the repository
+  - [`skills/`](#skills), the eighteen skills in three classes
+  - [`docs/`](#docs), the documents the skills assume
+  - [`examples/`](#examples), the workspace the quickstart copies
+  - [`hooks/`](#hooks), example rules for the `hookify` plugin
+  - [`scripts/`](#scripts), the gates and the tools they run
+  - [`orchestration/`](#orchestration), the relay protocol and its schemas
 - [Installing the skills](#installing-the-skills), the fastest path to using it
 - [Using the orchestration protocol](#using-the-orchestration-protocol), for relaying work between agents
-- [Packing this repo for an LLM](#packing-this-repo-for-an-llm), to paste the whole thing into a model
+- [Packing this repo for an LLM](#packing-this-repo-for-an-llm), to paste the whole thing into a model, or ask DeepWiki instead
 - [Contributing](#contributing), including the lowest-friction first contribution
-- [Project documents](#project-documents), governance, security, releases and accessibility
+- [Project documents](#project-documents), governance, security, releases, accessibility and the changelog
 - [Why this exists](#why-this-exists), the reasoning behind every choice above
 - [License and citation](#license-and-citation)
 
 ## What this kit is
 
-This is documentation for both the user and the agent. It holds an information
-corpus, a skill library, a vendor-independent capability taxonomy, a message
-schema for relaying work between agents and humans across surfaces, and a
-routing rule that gates dispatch on content sensitivity.
+This is documentation for both the user and the agent. It holds an information corpus, a skill library, a vendor-independent capability taxonomy, a message schema for relaying work between agents and humans across surfaces, and a routing rule that gates dispatch on content sensitivity.
 
-It is currently designed around a local Claude Code instance as the lead
-orchestrator. Most of it is Agent Skills compatible, plain shell and Python
-scripts, and Markdown, so it stays portable across vendors. A modular,
-vendor-agnostic framework is on the roadmap.
+It is currently designed around a local Claude Code instance as the lead orchestrator. Most of it is Agent Skills compatible, plain shell and Python scripts, and Markdown, so it stays portable across vendors. A modular, vendor-agnostic framework is on the roadmap.
 
 ## What is here
 
@@ -96,11 +87,24 @@ Three are procedures an agent may run on its own at a clean boundary. None sets 
 
 ### `hooks/`
 
-Seven rules for the `hookify` plugin, as examples rather than live configuration. They need the plugin installed, and do nothing where they sit; [the installing guide](docs/installing.md#hooks) says how to enable them.
+Eight rules for the `hookify` plugin, as examples rather than live configuration. They need the plugin installed, and do nothing where they sit; [the installing guide](docs/installing.md#hooks) says how to enable them.
 
-Two block (a forbidden character in generated content, and a packing command without an allow-list). The rest warn on reads that pull sensitive material into context, so a later publish step knows the session is derived from it. They assume a tiered directory scheme; adapt the patterns before enabling them.
+Five block: a forbidden character in generated content, a packing command without an allow-list, a packing command that turns off `.gitignore`, a push without an explicit destination branch or one that skips the git hooks, and a command naming restricted material that also carries an egress verb. The other three warn on reads that pull sensitive material into context, so a later publish step knows the session is derived from it. They assume a tiered directory scheme; adapt the patterns before enabling them.
 
 ### `scripts/`
+
+`gates.sh` is the mechanical gates, one implementation run both by CI and by hand before a push; `./scripts/gates.sh --selftest` also proves each gate can fail against a planted positive. Its header states what each gate covers. `compliance.sh` holds the checks that need an installed tool, REUSE among them, so a fresh clone can still run every gate in `gates.sh` with only `sh` and `python3`.
+
+The gates call these, and each runs on its own as well:
+
+- `mdlint.py`: Markdown structure checks under markdownlint's rule IDs, standard library only
+- `check-branch-name`: the one definition of an allowed branch or tag name, used by the pre-push hook, a gate and CI
+- `check-hooks.py`: checks the rules in `hooks/` and shows each blocking one can fire
+- `check-workspace-stubs.py`: checks `examples/workspace/` against `docs/standing-documents.md`
+- `schema-check.py`: validates `orchestration/registry/*.json` against its schema
+- `check-qblock`: checks a reply's closing question block against `working-preferences`
+
+`auto-qa-tuner.py` proposes CI job timeouts from the repository's own run history.
 
 `link-skills.sh` symlinks `skills/` into your Claude skills directory instead of copying, so `git pull` updates them in place. Targets are relative where `ln -r` exists, so the links survive the tree being moved, and absolute otherwise; the script reports which it used.
 
@@ -116,12 +120,19 @@ The protocol for passing work between agents on different surfaces.
 
 | File | Holds |
 |---|---|
+| `orchestration/README.md` | What the system is for, and where to start |
 | `orchestration/protocol.md` | The relay protocol itself |
 | `orchestration/taxonomy.md` | Role and surface definitions |
+| `orchestration/ROLES.md` | The operator, lead, aide and minion roles |
+| `orchestration/rounds.md` | Rounds: delegated work, checked and decided |
+| `orchestration/ROUTING-THRESHOLD.md` | When work goes to a local model and when to a vendor |
+| `orchestration/CHANGELOG.md` | The decision log for the protocol's own design |
 | `orchestration/schemas/request.json` | Request message schema |
 | `orchestration/schemas/response.json` | Response message schema |
 | `orchestration/schemas/event-base.json` | Shared event envelope |
 | `orchestration/ingestion/` | Specs for turning vendor data exports into machine-readable digests |
+| `orchestration/registry/` | One surface descriptor per vendor, and the schema they follow |
+| `orchestration/templates/` | Templates for a relay message and a handoff note |
 
 ## Installing the skills
 
@@ -131,7 +142,7 @@ Otherwise, [the installing guide](docs/installing.md) covers workspace-level and
 
 ## Using the orchestration protocol
 
-`orchestration/protocol.md` defines the message flow. `orchestration/schemas/request.json` and `orchestration/schemas/response.json` are the schemas a participating agent reads and writes. `taxonomy.md` maps surfaces to behavioral regimes and is the join key for the `surface-regimes` skill.
+`orchestration/protocol.md` defines the message flow. `orchestration/schemas/request.json` and `orchestration/schemas/response.json` are the schemas a participating agent reads and writes. `orchestration/taxonomy.md` maps surfaces to behavioral regimes and is the join key for the `surface-regimes` skill.
 
 ## Packing this repo for an LLM
 
@@ -150,6 +161,8 @@ grep -c '<file path=' repomix-output.xml
 
 The output is gitignored on purpose. It is a near-complete copy of the repository, so committing it roughly doubles clone size and produces a full-file diff on every change, and it goes stale silently. `repomix --remote` builds one straight from the GitHub URL without a clone.
 
+To ask questions of the repository without packing it, [DeepWiki](https://deepwiki.com/AN0099/toothpaste-kit) keeps a generated index of it.
+
 ## Contributing
 
 Read `CONTRIBUTING.md`. It covers the rules that apply to every change, the structure a skill has to follow, how a commit is signed off, and how it records which tool helped.
@@ -167,8 +180,11 @@ The lowest-friction first contribution is a surface descriptor in `orchestration
 | [Governance](GOVERNANCE.md) | Who decides, how a change lands, and what is never delegated |
 | [Contribution guide](CONTRIBUTING.md) | The rules every change passes, and the script that enforces them |
 | [Security policy](SECURITY.md) | What counts as a vulnerability here, and how to report one privately |
+| [Security for AI agents](SECURITY-AI.md) | What an AI agent may and may not do in this repository |
+| [Agent instructions](AGENTS.md) | Where a coding agent working here finds each rule |
 | [Security posture](docs/security-posture.md) | Every control, its state, and the evidence for each |
 | [Versioning and releases](docs/releasing.md) | The version scheme and the steps to cut a release |
+| [Changelog](CHANGELOG.md) | What each release changed, and what has merged since the last one |
 | [Code of conduct](CODE_OF_CONDUCT.md) | Expected conduct, and who a report reaches |
 | [Project state](docs/project-state.md) | Where the kit itself stands right now |
 | [Standing documents](docs/standing-documents.md) | The document structure the procedure skills assume |
@@ -176,28 +192,24 @@ The lowest-friction first contribution is a surface descriptor in `orchestration
 | [Concepts](docs/concepts.md) | Each idea a contributor needs, with every file that carries it |
 | [Interface accessibility](docs/accessibility.md) | Accessibility of the interface the work is done through |
 | [Document accessibility](docs/document-accessibility.md) | WCAG techniques applied to the Markdown this repository ships |
+| [Control layers](docs/control-layers.md) | How automation, gates and the human divide responsibility |
+| [Risk tiers](docs/risk-tiers.md) | Which changes need which review |
 | [Document layers](docs/document-layers.md) | How a requirement is marked, and what belongs in this repository at all |
 | [References and prior work](references.md) | Every external standard this kit depends on or borrows from |
 
 ## Why this exists
 
-The reasoning, the two images this project thinks in, and what it refuses to
-optimise for are in [the philosophy document](philosophy.md).
+The reasoning, the two images this project thinks in, and what it refuses to optimise for are in [the philosophy document](philosophy.md).
 
 ## License and citation
 
-Apache License 2.0, from release 0.5.0. See [the licence](LICENSE). Releases
-0.1.0 to 0.4.0 were published under MIT and stay under it.
+Apache License 2.0, from release 0.5.0. See [the licence](LICENSE). Releases 0.1.0 to 0.4.0 were published under MIT and stay under it.
 
-Copyright 2026 Aidan Naveja. Contributions are accepted under the same licence,
-each commit signed off under the Developer Certificate of Origin; see
-[`CONTRIBUTING.md`](CONTRIBUTING.md#licence-and-sign-off).
+Copyright 2026 Aidan Naveja. Contributions are accepted under the same licence, each commit signed off under the Developer Certificate of Origin; see [`CONTRIBUTING.md`](CONTRIBUTING.md#licence-and-sign-off).
 
-[`CITATION.cff`](CITATION.cff) carries citation metadata for anyone referencing
-this work.
+[`CITATION.cff`](CITATION.cff) carries citation metadata for anyone referencing this work.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
 
-SPDX-License-Identifier: Apache-2.0
--->
+SPDX-License-Identifier: Apache-2.0 -->
