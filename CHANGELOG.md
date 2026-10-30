@@ -30,6 +30,18 @@ skill lives in that skill's own `CHANGELOG.md`.
 - Commits (pull request #68): provenance is recorded as `Assisted-by:` and
   `Agent-Effort:` trailers, every commit needs a `Signed-off-by:` line, and
   `scripts/check-pr-body` checks a pull request body against the template.
+- The `pr-body`, `dco` and `commit-attribution` jobs (pull request #72) report
+  under those names. All three reported as `check` before, so a required
+  `check` was met by whichever ran; each can now be required on its own.
+
+### Fixed
+
+- `scripts/gates.sh --selftest` (pull request #70): counts its planted
+  positives as they run, so the "all N planted positives fired" message can
+  no longer drift from the code.
+- `scripts/schema-check.py` (pull request #71): refuses any argument with
+  exit 2. Before it, a mistyped flag such as `--selftest` ran a normal check
+  and exited 0.
 
 ### Skill revisions
 
