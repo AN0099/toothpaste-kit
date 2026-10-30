@@ -3,7 +3,7 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-10-28.
+Last updated 2026-10-30.
 
 ## Live
 
@@ -102,7 +102,9 @@ with Unreleased; `CHANGELOG.md` is the full log.
   built: `.claude/settings.json` suppressing the trailers at source, an opt-in `commit-msg` hook,
   and a `commit-attribution` workflow. The first two are bypassable by anyone who has not opted in.
   The third binds only while it is set as a required status check in a ruleset on the default
-  branch. Whether that ruleset is configured on this repository is unverified.
+  branch, and it is: ruleset `23662331`, read from the rulesets API on 2026-10-30, binds the
+  `commit-attribution` context, with `dco` and `pr-body` beside it. Pull request #72 gave the
+  three jobs those names; each had been the unnamed job `check`.
   `docs/security-posture.md` owns that row. See also `CONTRIBUTING.md`.
 - `docs/standing-documents.md` added, describing the document set `redaction-gate` and
   `session-close` assume. Structure and mechanics are shared; contents are not.
@@ -145,9 +147,12 @@ with Unreleased; `CHANGELOG.md` is the full log.
     against its own attributes, which is why it is two rather than an estimate. The badge image
     is live, so the questionnaire reaching passing updates the README with no further commit.
   - **Branch protection is in place and is stronger than the bullet assumed.** Ruleset
-    `23662331` carries six rules with five required contexts bound. A direct push to the default
-    branch cannot succeed at all, established by attempting one: the `code_scanning` rule demands
-    CodeQL results for a commit the remote has not accepted. No `pull_request` rule declares
+    `23662331` carries six rules. Its `required_status_checks` rule bound five contexts on
+    2026-09-19 and binds seven as read from the rulesets API on 2026-10-30: `gates`,
+    `markdownlint`, `Analyze (python)`, `Analyze (actions)`, `dco`, `pr-body` and
+    `commit-attribution`. A direct push to the default branch cannot succeed at all,
+    established by attempting one: the `code_scanning` rule demands CodeQL results for a commit
+    the remote has not accepted. No `pull_request` rule declares
     this, so the constraint is emergent rather than configured, and `docs/security-posture.md`
     rows 4.6 and 6.1 now say so.
   - **Still open and the maintainer's:** the education suite that would let the two `MUST`
@@ -213,6 +218,9 @@ Merged to `main` after 0.5.0, listed under Unreleased in `CHANGELOG.md`.
 - **Commit provenance (pull request #68).** Commits record tool help as `Assisted-by:` and
   `Agent-Effort:` trailers and need a sign-off; `scripts/check-pr-body` checks a pull request body
   against the template.
+- **Named check jobs (pull request #72).** The `dco`, `pr-body` and `commit-attribution` jobs carry
+  those names, so each can be bound as a required check, and the default branch ruleset binds all
+  three.
 
 ## In v0.5.0
 
