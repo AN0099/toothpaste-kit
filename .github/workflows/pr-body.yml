@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   check:
+    name: pr-body
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
