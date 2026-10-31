@@ -1,0 +1,31 @@
+{
+  "roundId": "tally-lines-1",
+  "theme": "Documentation claim exceeds local gate behavior",
+  "noFindingsAcceptable": false,
+  "expectedFindings": [
+    {
+      "id": "readme-check-overclaim",
+      "required": true,
+      "findingClass": "Operator-facing documentation/behavior mismatch",
+      "minimumSeverity": "major",
+      "locationPaths": [
+        "README.md"
+      ],
+      "equivalence": "Any finding located in README.md that says the claim about ./check.sh --selftest is false or overstated: that it validates every contributor change, or that a pass means a change to tally.py is correct.",
+      "expectedEvidence": "A wrong change to tally.py that leaves ./check.sh --selftest passing, such as lines() returning 0; or the observation that check.sh runs four fixed word-count cases and none for --lines, set against the README's claim."
+    },
+    {
+      "id": "lines-option-untested",
+      "required": false,
+      "findingClass": "Missing test coverage",
+      "minimumSeverity": "nit",
+      "locationPaths": [
+        "check.sh",
+        "tally.py"
+      ],
+      "equivalence": "Any finding that the new --lines option has no case in check.sh. Acceptable alongside the required finding; not a substitute for it."
+    }
+  ],
+  "expectedDecision": "request-revision",
+  "expectedVerification": "The verifier reproduces readme-check-overclaim from a fresh build: a deliberately wrong tally.py passes the required check. Status reproduced, with that evidence, recorded by a role other than the reviewer."
+}

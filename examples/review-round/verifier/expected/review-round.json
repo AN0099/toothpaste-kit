@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "tpkit.review-round/v1alpha1",
+  "kind": "ReviewRound",
+  "metadata": {
+    "id": "tally-lines-packet",
+    "roundId": "tally-lines-1",
+    "createdAt": "2026-01-02T12:00:00Z"
+  },
+  "handling": {
+    "visibility": "public",
+    "redaction": "none"
+  },
+  "provenance": {
+    "repository": "tally (synthetic fixture built by examples/review-round/history/build.sh)",
+    "baseRevision": "b6f6929fb69357df03c06f04e4bf60005aa21f48",
+    "targetRevision": "1127c5ce8d21469eee448329cf30323c2e5a08ac",
+    "artifactPath": "examples/review-round/verifier/expected/review-round.json"
+  },
+  "roles": {
+    "reviewer": {
+      "role": "aide"
+    },
+    "verifier": {
+      "role": "lead"
+    },
+    "decisionMaker": {
+      "role": "operator"
+    }
+  },
+  "scope": {
+    "paths": [
+      "README.md",
+      "tally.py",
+      "check.sh"
+    ],
+    "intent": "Review the target revision against the base: the new --lines option and the README changes. Report each defect with evidence that another role can reproduce, and recommend an outcome."
+  },
+  "requiredChecks": [
+    {
+      "id": "selftest",
+      "command": "./check.sh --selftest",
+      "description": "Run in the built fixture repository with the target revision checked out."
+    }
+  ],
+  "restrictions": {
+    "network": "prohibited",
+    "secrets": "prohibited",
+    "remoteAccess": "prohibited",
+    "notes": [
+      "Everything the review needs is in this directory and in examples/review-round/history/.",
+      "The fixture is synthetic; it holds no real project code or data."
+    ]
+  },
+  "fixture": {
+    "answerKey": "examples/review-round/verifier/answer-key.json"
+  }
+}

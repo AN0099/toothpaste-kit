@@ -192,6 +192,7 @@ The lowest-friction first contribution is a surface descriptor in `orchestration
 | [Concepts](docs/concepts.md) | Each idea a contributor needs, with every file that carries it |
 | [Interface accessibility](docs/accessibility.md) | Accessibility of the interface the work is done through |
 | [Document accessibility](docs/document-accessibility.md) | WCAG techniques applied to the Markdown this repository ships |
+| [Review rounds](docs/review-rounds.md) | How a change is reviewed, its findings verified by someone else, and the operator decides; [steps](docs/review-rounds-quickstart.md) |
 | [Control layers](docs/control-layers.md) | How automation, gates and the human divide responsibility |
 | [Risk tiers](docs/risk-tiers.md) | Which changes need which review |
 | [Document layers](docs/document-layers.md) | How a requirement is marked, and what belongs in this repository at all |

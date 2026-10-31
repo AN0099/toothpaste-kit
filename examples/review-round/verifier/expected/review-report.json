@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "tpkit.review-report/v1alpha1",
+  "kind": "ReviewReport",
+  "metadata": {
+    "id": "tally-lines-report",
+    "roundId": "tally-lines-1",
+    "createdAt": "2026-01-02T13:00:00Z"
+  },
+  "handling": {
+    "visibility": "public",
+    "redaction": "none"
+  },
+  "reviewer": {
+    "role": "aide"
+  },
+  "reviewedRevision": {
+    "revision": "1127c5ce8d21469eee448329cf30323c2e5a08ac",
+    "evidence": [
+      {
+        "description": "The revision checked out in the fixture repository while reviewing.",
+        "command": "git rev-parse HEAD",
+        "output": "1127c5ce8d21469eee448329cf30323c2e5a08ac"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "selftest",
+      "status": "passed",
+      "command": "./check.sh --selftest",
+      "output": "check: 4 cases passed"
+    }
+  ],
+  "findings": [
+    {
+      "id": "readme-check-overclaim",
+      "severity": "major",
+      "location": {
+        "path": "README.md",
+        "line": 21
+      },
+      "claim": "The README now says ./check.sh --selftest validates every contributor change and that a pass means a change to tally.py is correct. The check runs four fixed word-count cases only, so a wrong change passes it.",
+      "evidence": [
+        {
+          "description": "Replaced the body of lines() in tally.py with return 0, so --lines is wrong for every input. The required check still passes; tally.py --lines on a two-line file prints 0.",
+          "command": "sed -i 's/return len(text.splitlines())/return 0/' tally.py && ./check.sh --selftest && printf 'a\\nb\\n' > in.txt && python3 tally.py --lines in.txt",
+          "output": "check: 4 cases passed\n0"
+        },
+        {
+          "description": "check.sh runs four fixed word-count cases and none with --lines.",
+          "path": "check.sh",
+          "command": "grep -n '^run ' check.sh",
+          "output": "21:run 0 ''\n22:run 1 'one'\n23:run 3 'one two  three'\n24:run 2 'tab\tseparated'"
+        }
+      ],
+      "proposedRemedy": "Restore the baseline's description: the check runs its built-in cases and checks those only. Separately, add cases for --lines.",
+      "verification": {
+        "status": "unverified",
+        "verifiedBy": null,
+        "evidence": []
+      }
+    },
+    {
+      "id": "lines-option-untested",
+      "severity": "minor",
+      "location": {
+        "path": "check.sh",
+        "line": 21
+      },
+      "claim": "The new --lines option has no case in check.sh, so a regression in it is not caught.",
+      "evidence": [
+        {
+          "description": "check.sh runs four fixed word-count cases and none with --lines.",
+          "path": "check.sh",
+          "command": "grep -n '^run ' check.sh",
+          "output": "21:run 0 ''\n22:run 1 'one'\n23:run 3 'one two  three'\n24:run 2 'tab\tseparated'"
+        }
+      ],
+      "proposedRemedy": "Add --lines cases to check.sh, including an empty file and a file without a trailing newline.",
+      "verification": {
+        "status": "unverified",
+        "verifiedBy": null,
+        "evidence": []
+      }
+    }
+  ],
+  "recommendation": {
+    "status": "request-revision",
+    "rationale": "The README makes an operator-facing claim the check does not support. Passing the required check is not evidence for that claim."
+  },
+  "limitations": [
+    "Did not review tally.py's handling of non-UTF-8 input; out of the stated scope."
+  ],
+  "provenance": {
+    "artifactPath": "examples/review-round/verifier/expected/review-report.json",
+    "commit": "0000000000000000000000000000000000000a02"
+  }
+}

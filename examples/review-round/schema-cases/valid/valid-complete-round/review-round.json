@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "tpkit.review-round/v1alpha1",
+  "kind": "ReviewRound",
+  "metadata": {
+    "id": "example-round-1-packet",
+    "roundId": "example-round-1",
+    "createdAt": "2026-10-01T09:00:00Z"
+  },
+  "handling": {
+    "visibility": "public",
+    "redaction": "none"
+  },
+  "provenance": {
+    "repository": "example-kit",
+    "baseRevision": "1111111111111111111111111111111111111111",
+    "targetRevision": "2222222222222222222222222222222222222222",
+    "artifactPath": "examples/review-round/schema-cases/valid/valid-complete-round/review-round.json"
+  },
+  "roles": {
+    "reviewer": {
+      "role": "aide"
+    },
+    "verifier": {
+      "role": "lead"
+    },
+    "decisionMaker": {
+      "role": "operator"
+    }
+  },
+  "scope": {
+    "paths": [
+      "docs/checks.md",
+      "scripts/check.sh"
+    ],
+    "intent": "Review the synthetic change that documents the check script's self-test."
+  },
+  "requiredChecks": [
+    {
+      "id": "check-selftest",
+      "command": "./scripts/check.sh --selftest",
+      "description": "The script's built-in self-test."
+    }
+  ],
+  "restrictions": {
+    "network": "prohibited",
+    "secrets": "prohibited",
+    "remoteAccess": "prohibited"
+  }
+}

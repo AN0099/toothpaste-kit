@@ -1,0 +1,90 @@
+SPDX-FileCopyrightText: 2026 Aidan Naveja
+
+SPDX-License-Identifier: Apache-2.0
+
+Fixture history, commit 1 of 2: the baseline. Synthetic material, applied by build.sh.
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..94a2357
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,21 @@
++# tally
++
++A small word counter, used as synthetic review material. Nothing here is real
++project code.
++
++## Use
++
++```sh
++python3 tally.py FILE
++```
++
++prints the number of words in `FILE`.
++
++## Before a push
++
++```sh
++./check.sh --selftest
++```
++
++runs the built-in cases in `check.sh` against `tally.py` and exits 0 when each
++one gives its expected count. It checks those cases only.
+diff --git a/check.sh b/check.sh
+new file mode 100755
+index 0000000..ec083a7
+--- /dev/null
++++ b/check.sh
+@@ -0,0 +1,26 @@
++#!/usr/bin/env sh
++# Runs the built-in cases below against tally.py. Synthetic review material.
++set -u
++if [ "${1:-}" != "--selftest" ]; then
++    echo "usage: check.sh --selftest" >&2
++    exit 2
++fi
++dir=$(dirname "$0")
++tmp=$(mktemp)
++trap 'rm -f "$tmp"' EXIT
++failed=0
++run() {
++    expected=$1; shift
++    printf '%s' "$1" > "$tmp"; shift
++    got=$(python3 "$dir/tally.py" "$@" "$tmp")
++    if [ "$got" != "$expected" ]; then
++        echo "case failed: expected $expected, got $got"
++        failed=1
++    fi
++}
++run 0 ''
++run 1 'one'
++run 3 'one two  three'
++run 2 'tab	separated'
++[ "$failed" -eq 0 ] && echo "check: 4 cases passed"
++exit "$failed"
+diff --git a/tally.py b/tally.py
+new file mode 100644
+index 0000000..afd996f
+--- /dev/null
++++ b/tally.py
+@@ -0,0 +1,19 @@
++"""Count the words in a file. Synthetic review material."""
++import sys
++
++
++def words(text):
++    return len(text.split())
++
++
++def main(argv):
++    if len(argv) != 1:
++        print("usage: tally.py FILE", file=sys.stderr)
++        return 2
++    with open(argv[0], encoding="utf-8") as f:
++        print(words(f.read()))
++    return 0
++
++
++if __name__ == "__main__":
++    sys.exit(main(sys.argv[1:]))

@@ -44,6 +44,10 @@ sweepable by a staleness checker rather than only readable. `unknown` is a legit
 
 **`ingestion/CLAUDE-EXPORT-DIGEST-SPEC.md` merged into `ingestion/VENDOR-AGNOSTIC-DIGEST-SPEC.md` (0.6.0).** The vendor-agnostic spec pointed at the Claude spec for its Steps 1 to 9 and failure list, so it could not stand alone. Both now live in one file, with Claude's export shapes kept as a worked mapping example.
 
+**A review round is three records, and the verifier is a different role from the reviewer.** A round's packet, the reviewer's report and the operator's decision are separate files with separate schemas, so each is written by the role that owns it and none can be edited to agree with another after the fact. The reviewer's findings stay unverified in the report; a role other than the reviewer reproduces them in the decision, and the operator cites only reproduced findings. Rejected: one combined record, which lets the reviewer fill in their own verification, and checks within each schema alone, which cannot compare a value across records; those comparisons are in `scripts/round-check.py`.
+
+**Round records allow all four roles of `ROLES.md`, `minion` included.** The TK-081 handoff's `actorModel.vocabulary` lists three roles, `operator`, `lead` and `aide`, and names `ROLES.md` as its source; `ROLES.md` defines four. The round schemas and `scripts/round-check.py` follow the source, so a round that a minion takes part in can be recorded, and a role `ROLES.md` defines is never rejected. The cost is that `minion` can be named as a round's reviewer or verifier, which the handoff's list does not foresee; the independence rule (verifier role differs from reviewer role) applies to it as to any other role.
+
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
 

@@ -1,0 +1,8 @@
+{
+  "roundId": "example-round-3",
+  "theme": "Synthetic: a change with no defect",
+  "noFindingsAcceptable": true,
+  "expectedFindings": [],
+  "expectedDecision": "accept",
+  "expectedVerification": "Nothing to reproduce: the report has no findings and the key allows none."
+}

@@ -1,0 +1,108 @@
+{
+  "description": "Schema-level cases: each document checked against one schema. Cross-artifact rows of the validation matrix are the validator's. Revisions and commits are synthetic placeholders.",
+  "cases": [
+    {
+      "file": "valid/valid-complete-round/review-round.json",
+      "schema": "review-round",
+      "expect": "pass",
+      "matrixRow": "valid-complete-round"
+    },
+    {
+      "file": "valid/valid-complete-round/review-report.json",
+      "schema": "review-report",
+      "expect": "pass",
+      "matrixRow": "valid-complete-round"
+    },
+    {
+      "file": "valid/valid-complete-round/operator-decision.json",
+      "schema": "operator-decision",
+      "expect": "pass",
+      "matrixRow": "valid-complete-round"
+    },
+    {
+      "file": "valid/valid-verification-rejects-finding/review-round.json",
+      "schema": "review-round",
+      "expect": "pass",
+      "matrixRow": "valid-verification-rejects-finding"
+    },
+    {
+      "file": "valid/valid-verification-rejects-finding/review-report.json",
+      "schema": "review-report",
+      "expect": "pass",
+      "matrixRow": "valid-verification-rejects-finding"
+    },
+    {
+      "file": "valid/valid-verification-rejects-finding/operator-decision.json",
+      "schema": "operator-decision",
+      "expect": "pass",
+      "matrixRow": "valid-verification-rejects-finding"
+    },
+    {
+      "file": "valid/valid-no-findings-when-answer-key-allows/review-round.json",
+      "schema": "review-round",
+      "expect": "pass",
+      "matrixRow": "valid-no-findings-when-answer-key-allows"
+    },
+    {
+      "file": "valid/valid-no-findings-when-answer-key-allows/review-report.json",
+      "schema": "review-report",
+      "expect": "pass",
+      "matrixRow": "valid-no-findings-when-answer-key-allows"
+    },
+    {
+      "file": "valid/valid-no-findings-when-answer-key-allows/operator-decision.json",
+      "schema": "operator-decision",
+      "expect": "pass",
+      "matrixRow": "valid-no-findings-when-answer-key-allows"
+    },
+    {
+      "file": "invalid/missing-check-status/review-report-status-absent.json",
+      "schema": "review-report",
+      "expect": "fail",
+      "matrixRow": "missing-check-status",
+      "reason": "checks[0] has no status."
+    },
+    {
+      "file": "invalid/missing-check-status/review-report-status-unlisted.json",
+      "schema": "review-report",
+      "expect": "fail",
+      "matrixRow": "missing-check-status",
+      "reason": "checks[0].status is not one of passed, failed, not-run, blocked."
+    },
+    {
+      "file": "invalid/self-verification/review-report-self-reproduced.json",
+      "schema": "review-report",
+      "expect": "fail",
+      "matrixRow": "self-verification",
+      "reason": "The report marks its own finding reproduced by its own reviewer role. A report can hold only the initial unverified state; the cross-document half (decision verifier equal to report reviewer) is the validator's."
+    },
+    {
+      "file": "invalid/missing-verification-evidence/operator-decision-reproduced-without-evidence.json",
+      "schema": "operator-decision",
+      "expect": "fail",
+      "matrixRow": "missing-verification-evidence",
+      "reason": "f1 is reproduced with an empty evidence list."
+    },
+    {
+      "file": "invalid/reviewed-wrong-revision/operator-decision-mismatch-normal-decision.json",
+      "schema": "operator-decision",
+      "expect": "fail",
+      "matrixRow": "reviewed-wrong-revision",
+      "reason": "Alignment is mismatched but the decision is request-revision; only abstain or rerun are open."
+    },
+    {
+      "file": "invalid/reviewed-wrong-revision/operator-decision-unresolved-called-matched.json",
+      "schema": "operator-decision",
+      "expect": "fail",
+      "matrixRow": "reviewed-wrong-revision",
+      "reason": "The reviewed revision is unresolved (null) but alignment says matched."
+    },
+    {
+      "file": "invalid/decision-not-by-operator/operator-decision-made-by-lead.json",
+      "schema": "operator-decision",
+      "expect": "fail",
+      "matrixRow": null,
+      "reason": "Semantic rule, not a matrix row: decision.madeBy.role must be operator."
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "orchestration/schemas/round/review-round.json",
+  "title": "ReviewRound",
+  "description": "The round packet: what is asked to be reviewed, at which revisions, by which roles, under which restrictions. It records intent. targetRevision is the revision requested for review and proves nothing about what a reviewer actually inspected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "metadata", "handling", "provenance", "roles", "scope", "requiredChecks", "restrictions"],
+  "properties": {
+    "schemaVersion": { "const": "tpkit.review-round/v1alpha1" },
+    "kind": { "const": "ReviewRound" },
+    "metadata": { "$ref": "#/definitions/metadata" },
+    "handling": { "$ref": "#/definitions/handling" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "baseRevision", "targetRevision", "artifactPath"],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The repository the round reviews, as its maintainers name it. A label, not a URL to fetch."
+        },
+        "baseRevision": { "$ref": "#/definitions/revision" },
+        "targetRevision": { "$ref": "#/definitions/revision" },
+        "artifactPath": { "$ref": "#/definitions/repoPath" }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Roles from orchestration/ROLES.md. A role records authority and responsibility, not a routable agent.",
+      "required": ["reviewer", "verifier", "decisionMaker"],
+      "properties": {
+        "reviewer": { "$ref": "#/definitions/roleRef" },
+        "verifier": { "$ref": "#/definitions/roleRef" },
+        "decisionMaker": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["role"],
+          "properties": { "role": { "const": "operator" } }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paths", "intent"],
+      "properties": {
+        "paths": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/repoPath" } },
+        "intent": { "type": "string", "minLength": 1 }
+      }
+    },
+    "requiredChecks": {
+      "type": "array",
+      "description": "Mechanical checks the reviewer must run. Their passing is evidence, not acceptance.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "command"],
+        "properties": {
+          "id": { "$ref": "#/definitions/identifier" },
+          "command": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "restrictions": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The intended posture for the round. At least network, secrets and remote access are stated.",
+      "required": ["network", "secrets", "remoteAccess"],
+      "properties": {
+        "network": { "$ref": "#/definitions/posture" },
+        "secrets": { "$ref": "#/definitions/posture" },
+        "remoteAccess": { "$ref": "#/definitions/posture" },
+        "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "answerKey": {
+          "$ref": "#/definitions/repoPath",
+          "description": "Where verifier material lives. Instructional separation only, not access control."
+        }
+      }
+    },
+    "transport": { "$ref": "#/definitions/transport" }
+  },
+  "definitions": {
+    "identifier": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$" },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "roundId", "createdAt"],
+      "properties": {
+        "id": { "$ref": "#/definitions/identifier" },
+        "roundId": { "$ref": "#/definitions/identifier" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Workflow labels, not legal classification, compliance certification or access control.",
+      "required": ["visibility", "redaction"],
+      "properties": {
+        "visibility": { "enum": ["public", "private", "restricted"] },
+        "redaction": { "enum": ["none", "sanitized", "pending-review"] }
+      }
+    },
+    "revision": {
+      "type": "string",
+      "description": "A full Git object name, so that revisions compare exactly.",
+      "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "repoPath": {
+      "type": "string",
+      "description": "A repository-relative path: no leading slash, no backslash, no .. segment.",
+      "pattern": "^(?!/)(?!(.*/)?\\.\\.(/|$))[^\\\\]+$"
+    },
+    "role": {
+      "description": "Kept in step with the four roles in orchestration/ROLES.md.",
+      "enum": ["operator", "lead", "aide", "minion"]
+    },
+    "roleRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role"],
+      "properties": { "role": { "$ref": "#/definitions/role" } }
+    },
+    "posture": { "enum": ["prohibited", "permitted"] },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional future relay bridge fields. Never required for a valid round.",
+      "properties": {
+        "relayEventId": { "type": ["string", "null"] },
+        "relayThreadId": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

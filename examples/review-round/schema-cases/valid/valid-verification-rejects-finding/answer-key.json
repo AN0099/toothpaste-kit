@@ -1,0 +1,20 @@
+{
+  "roundId": "example-round-2",
+  "theme": "Synthetic: documentation claim exceeds the self-test's behavior; the report adds a finding verification rejects",
+  "noFindingsAcceptable": false,
+  "expectedFindings": [
+    {
+      "id": "checks-doc-overclaim",
+      "required": true,
+      "findingClass": "Operator-facing documentation/behavior mismatch",
+      "minimumSeverity": "major",
+      "locationPaths": [
+        "docs/checks.md"
+      ],
+      "equivalence": "Any finding located in docs/checks.md that says its claim about ./scripts/check.sh --selftest is false or overstated.",
+      "expectedEvidence": "A wrong change that leaves ./scripts/check.sh --selftest passing, set against the claim in docs/checks.md."
+    }
+  ],
+  "expectedDecision": "request-revision",
+  "expectedVerification": "The verifier reproduces checks-doc-overclaim and does not reproduce the extra finding."
+}

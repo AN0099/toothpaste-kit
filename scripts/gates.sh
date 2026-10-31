@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These seventeen gates cover: the em dash ban, the private task ID ban,
+# check. These eighteen gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency (including every vendor
 # file's shape against surface-descriptor.schema.json, checked by
 # scripts/schema-check.py, which fails loudly on any schema keyword it does
@@ -44,7 +44,9 @@
 # request body checker's selftest in scripts/check-pr-body, which plants each
 # finding it reports, and the SPDX fragment builder's selftest in
 # scripts/spdx-fragment.py, which builds fragments from commits in a scratch
-# repository and checks each models file rule. They
+# repository and checks each models file rule, and the review-round records under
+# examples/ via scripts/round-check.py, which states its own keyword coverage
+# and runs its own selftest first. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -381,6 +383,64 @@ gate_spdx() {
   fi
 }
 
+# ---------------------------------------------------------------- 18
+# Review rounds (docs/review-rounds.md). Runs scripts/round-check.py's own
+# selftest, then --cases on every schema-cases directory under examples/ (one
+# holding a cases.json), so each case, invalid ones included, still gets the
+# expect it records. Then the validator over every round directory under
+# examples/: a directory holding a review-round.json, except under an invalid/
+# directory, whose cases are expected to fail and are not a success path. A tree with
+# none of the review-round files has nothing to check, and says so; a tree
+# with some of them and no validator fails, because records nobody checks are
+# what the gate exists to stop.
+gate_review_rounds() {
+  gate_start "review-round records"
+  if [ ! -f scripts/round-check.py ]; then
+    if [ -d orchestration/schemas/round ] || [ -d examples/review-round ]; then
+      echo "review-round files are present but scripts/round-check.py is not"
+      gate_bad "review-round records"
+    else
+      echo "no review-round files in this tree"
+      gate_ok "review-round records"
+    fi
+    return
+  fi
+  # Quiet on success, whole on failure: the selftest's own lines name the
+  # case that did not behave.
+  if ! out=$(python3 scripts/round-check.py --selftest 2>&1); then
+    printf '%s\n' "$out"
+    gate_bad "review-round records: round-check selftest"
+    return
+  fi
+  # Each schema-cases directory must still match the expect its cases.json
+  # records, invalid cases included; the round directories below are only
+  # the valid ones.
+  cases_bad=0
+  for c in $(find examples -name cases.json 2>/dev/null | sort); do
+    if ! out=$(python3 scripts/round-check.py --cases "$(dirname "$c")" 2>&1); then
+      printf '%s\n' "$out"
+      cases_bad=1
+    fi
+  done
+  if [ "$cases_bad" -ne 0 ]; then
+    gate_bad "review-round records: schema cases differ from cases.json"
+    return
+  fi
+  dirs=$(find examples -name review-round.json ! -path '*/invalid/*' 2>/dev/null | sed 's|/review-round.json$||' | sort)
+  if [ -z "$dirs" ]; then
+    gate_ok "review-round records (selftest only, no round directory under examples/)"
+    return
+  fi
+  # Word splitting on $dirs is intended: kit paths hold no spaces, and
+  # mdlint's file-name rules keep it that way.
+  # shellcheck disable=SC2086
+  if python3 scripts/round-check.py $dirs; then
+    gate_ok "review-round records"
+  else
+    gate_bad "review-round records"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -399,7 +459,8 @@ run_all() {
   gate_qblock
   gate_pr_body
   gate_spdx
-  printf '\n%s of 17 gates passed\n' "$pass_n"
+  gate_review_rounds
+  printf '\n%s of 18 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -407,7 +468,7 @@ run_all() {
 
 # A gate that has never returned a hit has not been shown capable of
 # returning one, so each of the first five, and the eighth, is run against a
-# planted positive in a scratch tree, as are 12, 13, 14, 15, 16 and 17. Gates 6, 9, 10 and
+# planted positive in a scratch tree, as are 12, 13, 14, 15, 16, 17 and 18. Gates 6, 9, 10 and
 # 11 run their tools' own selftests, which carry their own planted cases, and
 # gate 7 plants one positive per rule below.
 run_selftest() {
@@ -447,7 +508,16 @@ run_selftest() {
       printf 'PLANT FAIL  %s accepted a planted positive\n' "$3"; plant_fail=1
     else
       printf 'PLANT FAIL  %s rejected its own clean fixture, so the non-zero on the plant proves nothing\n' "$3"; plant_fail=1
+      # The cause is often not the plant: a gate that fails on everything,
+      # such as a validator whose own selftest broke, fails the clean copy
+      # too. Show what the gate said about the clean copy, so the line above
+      # is not the only clue.
+      if [ -s "$tmp/gate.out" ]; then
+        printf '            the gate said, on the clean fixture:\n'
+        grep -v '^[[:space:]]*$' "$tmp/gate.out" | head -n 8 | sed 's/^/              /'
+      fi
     fi
+    rm -f "$tmp/gate.out"
   }
 
   # The two search gates run as installed, by calling their own functions in
@@ -455,7 +525,8 @@ run_selftest() {
   # the gate is blind, which is what happened before this selftest called
   # them. The clean fixture holds the same plant inside .git, so it also
   # proves the .git exclusion works.
-  run_gate() { ( cd "$1" && fail=0 && "$2" >/dev/null 2>&1; exit "$fail" ) }
+  # The output of the last run is kept in $tmp/gate.out for plant_rejected.
+  run_gate() { ( cd "$1" && fail=0 && "$2" >"$tmp/gate.out" 2>&1; exit "$fail" ) }
   mkdir -p "$tmp/g-bad/.git" "$tmp/g-ok/.git"
   printf 'text %s text\n' "$EM" > "$tmp/g-bad/a.md"
   printf 'text %s text\n' "$EM" > "$tmp/g-ok/.git/a.md"
@@ -673,6 +744,73 @@ JSON
   bad=$?
   python3 scripts/spdx-fragment.py --selftest >/dev/null 2>&1
   plant_rejected $bad $? "spdx-fragment gate, releaseTime pattern loosened"
+
+  # Gate 18: a round directory whose verifier has the reviewer's role must
+  # fail the gate, and the same directory with the roles apart must pass. Both
+  # trees get the validator and schemas as installed. Without the validator
+  # there is nothing to plant against, and the gate itself fails if any
+  # review-round file is present without it.
+  # The other half: review-round files without the validator must fail, and
+  # a tree with none of them must pass. This one needs nothing installed, so
+  # it runs in every tree.
+  mkdir -p "$tmp/rr-novalidator/examples/review-round" "$tmp/rr-none/examples"
+  run_gate "$tmp/rr-novalidator" gate_review_rounds; bad=$?
+  run_gate "$tmp/rr-none" gate_review_rounds
+  plant_rejected $bad $? "review-round gate, records without a validator"
+  if [ -f scripts/round-check.py ] && [ -d examples/review-round/schema-cases/valid/valid-complete-round ]; then
+    for t in rr-bad rr-ok; do
+      mkdir -p "$tmp/$t/scripts" "$tmp/$t/orchestration/schemas" "$tmp/$t/examples"
+      cp scripts/round-check.py "$tmp/$t/scripts/"
+      cp -R orchestration/schemas/round "$tmp/$t/orchestration/schemas/"
+      cp -R examples/review-round/schema-cases/valid/valid-complete-round "$tmp/$t/examples/r"
+    done
+    # The plant is about independence only, so both copies drop the packet's
+    # answer key, which names a file outside the copy.
+    python3 - "$tmp/rr-bad/examples/r" "$tmp/rr-ok/examples/r" <<'PY'
+import json, sys
+for d in sys.argv[1:]:
+    rnd = json.load(open(d + "/review-round.json"))
+    rnd.pop("fixture", None)
+    json.dump(rnd, open(d + "/review-round.json", "w"), indent=2)
+d = sys.argv[1]
+rep = json.load(open(d + "/review-report.json"))
+dec = json.load(open(d + "/operator-decision.json"))
+dec["verification"]["performedBy"]["role"] = rep["reviewer"]["role"]
+json.dump(dec, open(d + "/operator-decision.json", "w"), indent=2)
+PY
+    run_gate "$tmp/rr-bad" gate_review_rounds; bad=$?
+    run_gate "$tmp/rr-ok" gate_review_rounds
+    plant_rejected $bad $? "review-round gate, self-verified finding"
+
+    # A schema case that drifts from its recorded expect must fail the gate:
+    # both trees get the kit's schema cases, and the bad one records an
+    # invalid case as expected to pass.
+    for t in rc-bad rc-ok; do
+      mkdir -p "$tmp/$t/scripts" "$tmp/$t/orchestration/schemas" "$tmp/$t/examples"
+      cp scripts/round-check.py "$tmp/$t/scripts/"
+      cp -R orchestration/schemas/round "$tmp/$t/orchestration/schemas/"
+      cp -R examples/review-round/schema-cases "$tmp/$t/examples/cases"
+    done
+    # The valid rounds' answer keys name files outside the copy, so both
+    # copies drop them, as above.
+    python3 - "$tmp/rc-bad/examples/cases/cases.json" "$tmp/rc-ok" "$tmp/rc-bad" <<'PY'
+import glob, json, sys
+for root in sys.argv[2:]:
+    for f in glob.glob(root + "/examples/cases/**/review-round.json", recursive=True):
+        rnd = json.load(open(f))
+        if rnd.pop("fixture", None) is not None:
+            json.dump(rnd, open(f, "w"), indent=2)
+p = sys.argv[1]
+d = json.load(open(p))
+next(c for c in d["cases"] if c["expect"] == "fail")["expect"] = "pass"
+json.dump(d, open(p, "w"), indent=2)
+PY
+    run_gate "$tmp/rc-bad" gate_review_rounds; bad=$?
+    run_gate "$tmp/rc-ok" gate_review_rounds
+    plant_rejected $bad $? "review-round gate, schema case drifted from its expect"
+  else
+    echo "PLANT skip  review-round gate: no round-check.py or valid-complete-round in this tree"
+  fi
 
   printf '\n'
   [ "$plant_fail" -eq 0 ] || { echo "selftest: a gate could not be shown to fail. Do not trust a clean run."; return 1; }

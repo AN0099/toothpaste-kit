@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "tpkit.operator-decision/v1alpha1",
+  "kind": "OperatorDecision",
+  "metadata": {
+    "id": "REPLACE-decision-id",
+    "roundId": "tally-lines-1",
+    "createdAt": "REPLACE with the decision time"
+  },
+  "handling": {
+    "visibility": "public",
+    "redaction": "none"
+  },
+  "references": {
+    "reviewRound": {
+      "artifactPath": "REPLACE with the packet's path",
+      "commit": "REPLACE with the 40-hex commit that holds the packet"
+    },
+    "reviewReport": {
+      "artifactPath": "REPLACE with the report's path",
+      "commit": "REPLACE with the 40-hex commit that holds the report (the commit that added it, which the report itself cannot name)"
+    }
+  },
+  "alignment": {
+    "packetTargetRevision": "REPLACE with the packet's provenance.targetRevision",
+    "reportReviewedRevision": "REPLACE with the report's reviewedRevision.revision, or null if it cannot be resolved",
+    "status": "REPLACE with matched, mismatched or unresolved"
+  },
+  "verification": {
+    "performedBy": {
+      "role": "REPLACE with a role other than the reviewer's"
+    },
+    "performedAt": "REPLACE",
+    "findings": [
+      {
+        "findingId": "REPLACE with a finding id from the report",
+        "status": "REPLACE with reproduced, not-reproduced, not-applicable or blocked",
+        "evidence": [
+          {
+            "description": "REPLACE: what you did and what it showed.",
+            "command": "REPLACE, or remove this field",
+            "output": "REPLACE, or remove this field"
+          }
+        ]
+      }
+    ]
+  },
+  "decision": {
+    "madeBy": {
+      "role": "operator"
+    },
+    "status": "REPLACE with accept, reject or request-revision; abstain or rerun when alignment is not matched",
+    "basedOnFindings": [
+      "REPLACE with reproduced finding ids only"
+    ],
+    "rationale": "REPLACE"
+  },
+  "provenance": {
+    "artifactPath": "REPLACE with this decision's path",
+    "commit": "REPLACE with the 40-hex commit you wrote the decision against: git rev-parse HEAD in the repository that holds the round, before you commit the decision. A file cannot name the commit that adds it"
+  }
+}

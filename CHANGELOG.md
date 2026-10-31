@@ -30,6 +30,17 @@ skill lives in that skill's own `CHANGELOG.md`.
   kit's security arrangements in a form tools read. `docs/security-posture.md`
   row 2.9 records where each value comes from.
 
+- Review rounds (TK-081): three JSON schemas in `orchestration/schemas/round/`
+  for a round's packet, the reviewer's report and the operator's decision;
+  `scripts/round-check.py`, which validates a round directory against them and
+  checks the invariants that span the records (a reviewer never verifies their
+  own finding, the operator cites only reproduced findings, the reviewed
+  revision matches the packet's), with `--repo` to check recorded commits and
+  `--selftest`; a practice fixture in `examples/review-round/` with reviewer and
+  verifier paths, an answer key and schema cases; and `docs/review-rounds.md`
+  and `docs/review-rounds-quickstart.md`. `scripts/gates.sh` runs the selftest
+  and the schema cases as gate 18.
+
 ### Changed
 
 - `orchestration/ingestion/VENDOR-AGNOSTIC-DIGEST-SPEC.md` (pull request #60):

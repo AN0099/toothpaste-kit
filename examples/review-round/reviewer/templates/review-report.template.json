@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "tpkit.review-report/v1alpha1",
+  "kind": "ReviewReport",
+  "metadata": {
+    "id": "REPLACE-report-id",
+    "roundId": "tally-lines-1",
+    "createdAt": "REPLACE with the time you finish, such as 2026-01-02T13:00:00Z"
+  },
+  "handling": {
+    "visibility": "public",
+    "redaction": "none"
+  },
+  "reviewer": { "role": "aide" },
+  "reviewedRevision": {
+    "revision": "REPLACE with the 40-hex output of git rev-parse HEAD in the fixture repository",
+    "evidence": [
+      {
+        "description": "The revision checked out while reviewing.",
+        "command": "git rev-parse HEAD",
+        "output": "REPLACE"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "selftest",
+      "status": "REPLACE with passed, failed, not-run or blocked",
+      "command": "./check.sh --selftest",
+      "output": "REPLACE"
+    }
+  ],
+  "findings": [
+    {
+      "id": "REPLACE-finding-id",
+      "severity": "REPLACE with major, minor or nit",
+      "location": { "path": "REPLACE with a repository-relative path", "line": 1 },
+      "claim": "REPLACE: what is wrong, in one or two sentences.",
+      "evidence": [
+        {
+          "description": "REPLACE: what you did and what it showed.",
+          "command": "REPLACE, or remove this field",
+          "output": "REPLACE, or remove this field"
+        }
+      ],
+      "proposedRemedy": "REPLACE",
+      "verification": { "status": "unverified", "verifiedBy": null, "evidence": [] }
+    }
+  ],
+  "recommendation": {
+    "status": "REPLACE with accept, reject, request-revision or no-recommendation",
+    "rationale": "REPLACE"
+  },
+  "limitations": [],
+  "provenance": {
+    "artifactPath": "REPLACE with the report's path, such as rounds/tally-lines-1/review-report.json",
+    "commit": "REPLACE with the 40-hex commit you wrote the report against: git rev-parse HEAD in the repository that holds the round, before you commit the report. The commit that adds the report goes in the decision's references.reviewReport"
+  }
+}
