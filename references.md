@@ -1,7 +1,9 @@
 # References and prior work
 
-Every external standard, specification and published practice this repository
-depends on or borrows from, and what in here depends on it.
+External standards, specifications and published practices this repository
+depends on or borrows from, and what in here depends on each; REUSE, SPDX and
+OpenSSF Security Insights are used (`REUSE.toml`, `security-insights.yml`) and
+not yet listed.
 
 Split into normative and informative per
 [RFC 7322](https://www.rfc-editor.org/info/rfc7322) section 4.8.6, where
@@ -111,9 +113,9 @@ depends on them yet, and listing them here is not a claim that it does.
 - **[RDF12-PRIMER]** "RDF 1.2 Primer", W3C.
 - **[SKOS-PRIMER]** "SKOS Simple Knowledge Organization System Primer", W3C.
 - **[SKOS-REF]** "SKOS Simple Knowledge Organization System Reference", W3C.
-  The likely nearest fit for `orchestration/registry/`, which is a controlled
-  vocabulary with broader and narrower relations rather than a logic requiring
-  inference.
+  The likely nearest fit for `orchestration/registry/`, a controlled
+  vocabulary of fixed capability values (`orchestration/schemas/event-base.json`)
+  rather than a logic requiring inference.
 - **[JSON-LD]** "JSON-LD", W3C. The interoperability path for services that
   consume JSON rather than RDF, which is what `orchestration/registry/` and
   `orchestration/schemas/` currently are.

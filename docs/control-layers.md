@@ -41,7 +41,7 @@ config. Nobody is notified when these succeed, which is the point.
 
 **Failure mode: silence that is indistinguishable from success.** A check that is broken and a check
 that found nothing look identical. This is why a search returning nothing gets confirmed rather than
-believed, and why `--selftest` exists on every tool here.
+believed, and why `scripts/gates.sh --selftest` shows each gate able to fire before its clean run.
 
 ### 3. Alarms: the machine notices, the human decides
 

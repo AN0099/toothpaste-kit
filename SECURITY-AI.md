@@ -47,7 +47,7 @@ Keywords are BCP 14, per `docs/document-layers.md`.
 
 ## What the controls here are not
 
-The gates and hook rules are pattern-based. A hook rule states its own limits so that it is not
+The gates and hook rules are pattern-based. A hook rule is meant to state its own limits so that it is not
 mistaken for a boundary. Source: `CONTRIBUTING.md`, "Hook rules". The gates do not cover en
 dashes, prose quality, internal link validity, or whether any document's claims are true. Source:
 `CONTRIBUTING.md`, "What these gates do not cover".

@@ -26,7 +26,7 @@ This is the missing piece under `document-standards`' Three-Tier Threshold Frame
 
 # Locating an Existing Skill
 
-Given the family's current size, nine skills, discovery works by reading frontmatter `description` fields directly rather than through a dedicated routing file. Each skill's `description` already states what it covers and what it explicitly doesn't, with a pointer to whichever sibling does instead. The descriptions collectively function as the index.
+Given the family's current size (the `skills/` tables in `README.md`), discovery works by reading frontmatter `description` fields directly rather than through a dedicated routing file. Each skill's `description` already states what it covers and what it explicitly doesn't, with a pointer to whichever sibling does instead. The descriptions collectively function as the index.
 
 Two failure modes worth checking for before concluding no skill covers something:
 
@@ -35,7 +35,7 @@ Two failure modes worth checking for before concluding no skill covers something
 
 # When Description-Matching Stops Being Enough
 
-Reading six descriptions to find the right one doesn't need a dedicated gateway file. That overhead only starts paying for itself once there are enough skills in one category that scanning descriptions individually gets slow. One source project in this project's own research used four `discover-*` gateway files for eight downstream skills, roughly two skills per category. If this system's meta-skill category (this file, `skill-creation`, and whatever ends up adjacent to them) grows to three or more, revisit whether a dedicated `discover-skill-standards` gateway earns its place, rather than assuming the current description-matching approach scales indefinitely.
+Reading each skill's description to find the right one doesn't need a dedicated gateway file. That overhead only starts paying for itself once there are enough skills in one category that scanning descriptions individually gets slow. One source project in this project's own research used four `discover-*` gateway files for eight downstream skills, roughly two skills per category. If this system's meta-skill category (this file, `skill-creation`, and whatever ends up adjacent to them) grows to three or more, revisit whether a dedicated `discover-skill-standards` gateway earns its place, rather than assuming the current description-matching approach scales indefinitely.
 
 # Scope Pointer
 

@@ -102,14 +102,14 @@ change to the skill and gets its own revision. The exemption ends when
 ## What a release is
 
 A tag, release notes, and nothing else. There is no build artifact, no package
-and no installer, because the kit is documents and two scripts. `scripts/link-skills.sh`
+and no installer, because the kit is documents and the scripts in `scripts/`. `scripts/link-skills.sh`
 is how it gets used, and it reads the tree it sits in.
 
 ## Cadence
 
 **A release review every two weeks, on a Tuesday, and a release only when the
-review admits one.** Counted from 0.3.0 on Tuesday 2026-09-29, so the next
-review is Tuesday 2026-10-13.
+review admits one.** Counted from 0.3.0 on Tuesday 2026-09-29, so a review
+falls on every second Tuesday from that date.
 
 - **The Friday before is the cutoff.** No new scope enters the release. The
   release notes, citation fields and redaction result are assembled, and the

@@ -11,7 +11,7 @@ Regime is a property of what a session can do. Product names are a label on top 
 
 # Regime Detection
 
-1. If a `capability` profile is present in context, for example on an agent reference in a relay message or handoff note from the multi-agent orchestration protocol, derive the regime from it using the rule below. Authoritative, skip inference.
+1. If a `capability` profile is present in context, for example on an agent reference in a relay message from the multi-agent orchestration protocol, derive the regime from it using the rule below. Authoritative, skip inference.
 2. If a stated `regime` is present without a capability profile, use it. If both are present and disagree, the capability profile governs and the mismatch is worth surfacing rather than silently resolving.
 3. If only a `surface` identifier is present, resolve it against `orchestration/registry/` to get its capability profile, then derive.
 4. Otherwise infer from session context: which interface is described in the system prompt or surrounding tooling (a chat window, a desktop agent app, a terminal or IDE coding agent, or an API call with no chat UI), whether a human can plausibly respond before the next step executes, whether the output is consumed by a program as a data contract rather than read by a person.
@@ -72,7 +72,7 @@ Making a new skill is covered by `skill-creation`, and deciding whether a need j
 
 # Multi-Agent Relay Use
 
-Inside the orchestration protocol's relay and handoff templates, an agent reference carries a required `capability` profile and the `regime` derived from it. The `regime` field is stated explicitly on the wire so a receiving agent without this skill loaded still sees it, and it is derived rather than typed freely so it cannot drift from the derivation rule above.
+Inside the orchestration protocol's relay message template, an agent reference carries a required `capability` profile and the `regime` derived from it. The handoff note template names only an `agent_id` and its `surface`, which step 3 above resolves. The `regime` field is stated explicitly on the wire so a receiving agent without this skill loaded still sees it, and it is derived rather than typed freely so it cannot drift from the derivation rule above.
 
 `active_skills` is operator-side configuration. It names whatever behavioral configuration a given agent has loaded, in whatever form its vendor provides. An empty array is valid and expected for a vendor with no skill mechanism, and an empty array is not evidence that an agent is unconfigured.
 

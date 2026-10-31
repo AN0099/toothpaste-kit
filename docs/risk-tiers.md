@@ -83,7 +83,7 @@ This tier covers skills under `skills/`, hook rules under `hooks/` and agent con
   header comment.
 - A workflow uses no third party action and pins versions exactly. Source:
   `docs/security-posture.md`, section 7. As current practice rather than a rule, each workflow
-  declares its own `permissions`, `contents: read` throughout, and `labeler.yml` adds
+  declares its own `permissions`, `contents: read` except in `ai-fix.yml`, and `labeler.yml` adds
   `pull-requests: write` to label pull requests; row 4.4 records the practice.
 - A workflow binds only once it is a required status check in the ruleset on the default branch.
   Source: `docs/security-posture.md`, row 4.6.

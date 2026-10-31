@@ -30,7 +30,7 @@ project and no document described them, so every session rediscovered them by in
 | Twenty-seven ALLCAPS commands | **Live** | `working-preferences`, `commands` |
 | Brevity code, 27 codes in three tiers | **Live** | `working-preferences` |
 | Input syntax, 10 rules | **Live** | `working-preferences` |
-| Reply-cost rules, 4 | **Live** | `working-preferences` |
+| Reply-cost rule, with the Questions and Answers form | **Live** | `working-preferences` |
 | `commands` index updated with codes | **Done** | `commands` |
 | `CHANGELOG.md` entry for the above | **Done** | both skills' `CHANGELOG.md` |
 | Q1-3 format compliance | **Open, see 5-2** | `working-preferences` `# Format` |
@@ -90,8 +90,8 @@ commands, not an extension of this code.
 built.**
 
 *What breaks.* The current code's organising constraint is hand alternation, and for a one-handed
-user that is not a neutral property, it is a hard failure. All ten two-key codes require both hands
-and none of them can be typed. Four of the seven single keys sit on the wrong side. The feature and
+user that is not a neutral property, it is a hard failure. Every two-key code requires both hands
+and none of them can be typed. The singles are three per hand, so half sit on the wrong side. The feature and
 the defect are the same design decision, which is the useful part of this flag: an accessibility
 choice made for one body can exclude another, and hand balance looked unambiguously correct until
 this question was asked.
@@ -139,7 +139,7 @@ in the restricted tier. That split is asserted here and has not been reviewed.
 ## Cross-references
 
 - `skills/working-preferences/SKILL.md`: normative. The contract itself.
-- `skills/commands/SKILL.md`: the index, pending the update at 5-1.
+- `skills/commands/SKILL.md`: the index, carrying each code since 5-1 closed.
 - `interaction-manual.md`: the human-facing half, explaining why these rules exist.
 - `accessibility.md`: the wider input-strain effort this code is one part of.
 

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v5
+
+Step 5 orders Next as Do first, then Decide, in the board's order. It also said "within each
+serves group", which the lane board does not sort by, so an agent following it proposed an order
+the board would not show.
+
 ## v4
 
 Step 5 names the Most Important Task by the lane board's rule: the person's first task in Next,

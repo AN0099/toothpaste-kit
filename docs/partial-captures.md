@@ -18,8 +18,8 @@ ran. So:
   lost what `session-log` would have kept. A day with twenty touches and no `session-close` was
   never closed.
 - **The count is visible.** An orient tool counts partials written since the last close, so the
-  debt shows at every orientation instead of accumulating silently. `session-close` writes a
-  heading containing `session-close run`, and that heading resets the count.
+  debt shows at every orientation instead of accumulating silently. `scripts/reorient` resets the
+  count at a close heading, such as one containing `session-close run`.
 
 ## Where they go
 
@@ -36,7 +36,7 @@ dated trace in one place.
 ```
 
 `HH:MM` comes from `date` at the moment of writing. Never write a placeholder minute or a time
-ahead of the clock; a tree can gate both mechanically, and this one does.
+ahead of the clock; a tree can gate both mechanically, though no gate in `scripts/gates.sh` does.
 
 ## When the agent calls them
 

@@ -2,7 +2,7 @@
 
 ## What counts as a vulnerability here
 
-This repository ships documents, JSON schemas, two scripts, and example hook rules. It runs no
+This repository ships documents, JSON schemas, the scripts in `scripts/`, and example hook rules. It runs no
 service and holds no user data, so the usual web-application categories mostly do not apply.
 
 What does apply:
@@ -10,7 +10,7 @@ What does apply:
 - **A gate that fails open.** `redaction-gate` and the hook rules exist to stop content from
   crossing a boundary. A pattern that silently misses a case it claims to catch is the highest
   severity defect this project can have, because the failure is invisible to the person relying on
-  it. The v2.1 fix to `redaction-gate` is the worked example: the published skill was weaker than
+  it. The v3 fix to `redaction-gate` is the worked example: the published skill was weaker than
   its own documentation for a period, and anyone running it had less protection than they believed.
 - **A skill or hook that leaks.** A rule whose body, error text, or example quotes material it was
   meant to keep out.
@@ -61,7 +61,7 @@ is, because the answer to "is this still present" depends on it.
 ## What this project does not promise
 
 The hook rules and the gates are pattern-based. Every pattern-based control has ways around it, and
-each rule's own body says so. They raise the cost of a mistake and they do not constitute a
+`branch-name-guard` and `restricted-egress-guard` name theirs. They raise the cost of a mistake and they do not constitute a
 boundary. Treat them as instrumentation rather than as enforcement.
 
 <!--

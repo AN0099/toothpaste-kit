@@ -21,7 +21,7 @@ Three are procedures an agent may run on its own at a clean boundary: `orient`, 
 None sets `disable-model-invocation`, because each reads or records and none decides anything, and
 none satisfies `session-log` or `session-close`.
 
-`hooks/` carries seven `hookify` rule examples, inert where they sit. `scripts/` carries
+`hooks/` carries `hookify` rule examples, inert where they sit. `scripts/` carries
 `link-skills.sh`, `reflow-md.py` with a fixture and `--selftest`, and `remote-level.sh`, the remote
 classifier `merge-proxy` runs, with its own `--selftest`, and `reorient`, the observing half of
 `orient`, whose `--selftest` runs it on `examples/workspace/`. `link-skills.sh`
@@ -127,13 +127,13 @@ with Unreleased; `CHANGELOG.md` is the full log.
 - No eval suite for the skills in this repo (TK-069). An eval harness covering
   `document-standards` exists and is not ready to ship here. Skills are otherwise
   validated by use and review. The CI half of this gap is closed: `gates.yml` is
-  installed and runs eleven mechanical gates plus a second-party markdown lint, so
+  installed and runs the gates in `scripts/gates.sh` plus a second-party markdown lint, so
   the checks `CONTRIBUTING.md` documents are now enforced rather than merely
   documented.
 - No drift detection for this repo's own documents (TK-070). A checker exists that records a source path
   and a content hash next to a claim and rehashes on demand, reporting whether
   a claim's source is current, moved, changed, or gone. It is deterministic, costs no tokens, and is
-  not ready to ship here. The full-repo audit that found six inaccuracies below is the kind of pass
+  not ready to ship here. The full-repo audit that found six inaccuracies above is the kind of pass
   it is meant to make unnecessary.
 - **Closed 2026-09-19: 0.1.0 is released.** Tag `v0.1.0`, six badges on the README, and the
   `identifiers` block in `CITATION.cff` filled with the Zenodo concept DOI rather than left
@@ -168,10 +168,10 @@ with Unreleased; `CHANGELOG.md` is the full log.
 
 ## Security posture, and what is actually in place
 
-**Nothing here is claimed as achieved.** Each row states what exists in the tree today, checked
-rather than recalled.
+**Nothing here is claimed as achieved.** Each row states what was in the tree when the security work
+started, checked rather than recalled; the License row has since been updated for release 0.5.0.
 
-| Expected by a reviewer | In this repository today |
+| Expected by a reviewer | In this repository when the work started |
 |---|---|
 | License | `LICENSE`, present, Apache 2.0 from release 0.5.0; `CITATION.cff` and `README.md` name the individual copyright holder |
 | Security policy | `SECURITY.md`, present. No coordinated-disclosure timeline stated |
@@ -191,7 +191,7 @@ rather than recalled.
 row; `docs/releasing.md` holds the versioning scheme. The shorter table here is kept because it is
 the record of what was true when the work started.
 
-Since that record, governance, versioning and branch protection have closed; see
+Since that record, governance, versioning, branch protection and most other rows have changed; see
 `docs/security-posture.md` for each row's current state. The ordering above is not a plan.
 The plan, once the target tier is fixed, belongs in its own document with one row per criterion and
 a pointer to the evidence, because a posture claim without per-criterion evidence is the same

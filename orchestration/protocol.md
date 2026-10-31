@@ -26,7 +26,7 @@ Exactly one agent holds the token, meaning it is expected to produce the next me
 
 An LLM agent that cannot itself format the header-plus-JSON block, for example a chat instance replying only in prose mid-conversation, delegates formatting to whichever human is acting as relay for that hop. The relay human's job in that case still excludes editing the LLM's actual content; only the wrapping is theirs to produce.
 
-A `broadcast` intent has no single `to`. It is addressed to all agents in the thread, and each replies independently, referencing `in_reply_to`.
+A `broadcast` intent is addressed to all agents in the thread, and each replies independently, referencing `in_reply_to`. Its event still carries the one `to` that `schemas/event-base.json` requires.
 
 ## Timing
 

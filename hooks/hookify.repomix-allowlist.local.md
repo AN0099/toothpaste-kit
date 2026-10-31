@@ -28,8 +28,9 @@ directories that are actually publishable in your tree:
 repomix --include "*.md,<dir-a>/**,<dir-b>/**" --output repomix-output.xml
 ```
 
-Quote the `--include` value. Unquoted, the shell expands `*.md` against the
-working directory before repomix sees it.
+Quote the `--include` value. Unquoted, the shell reads it as a glob: a value
+that matches files, such as a bare `*.md`, is replaced by the matching names
+before repomix sees it.
 
 **Verify every run, do not assume:**
 

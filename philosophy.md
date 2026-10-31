@@ -26,7 +26,7 @@ the constraints, and checks the result. Everything here is built to make that pe
 
 That principle shows up in concrete design choices:
 
-- Each skill states what it does not cover and names the skill that does, so an agent reaching past
+- Most skills state what they do not cover and name the skill that does, so an agent reaching past
   its scope is visible in the description rather than discovered in the output.
 - The command vocabulary is short and fixed, because ambiguous instructions produce plausible work
   on the wrong problem.
@@ -75,7 +75,7 @@ one input method, one output channel, or one kind of attention is not finished.
 ### Forkable by construction
 
 The core stays self-hostable and forkable. The skills are plain Markdown. The tools are
-standard-library Python against SQLite and BibTeX, both of which outlive any particular vendor.
+standard-library Python and shell scripts in `scripts/`, neither tied to any particular vendor.
 Interoperability is treated as a permanent constraint on the design, checked when new dependencies
 are considered.
 

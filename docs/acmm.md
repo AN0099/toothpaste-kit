@@ -21,7 +21,7 @@ reach. The issues name three levels, and the files for a fourth have begun:
 | L0 | None given; the issues say "Prerequisites not met" | Guardrails an agent needs first: tests, a pull request template, a code style configuration |
 | L2 | Advisory | Instructions an agent reads, and records it learns from |
 | L3 | Quality-Gated | Measures of change quality, and a record of each session |
-| L4 | No issue opened | Not stated in an issue; two L4 changes are below, and more may follow |
+| L4 | No issue opened | Not stated in an issue; the L4 changes are below, one section each |
 
 No issue was opened at L1, so no file was added for it.
 
@@ -169,7 +169,7 @@ the entry names none.
   whether any ended at the timeout. It writes the proposals to the job summary and never edits a
   workflow: a person accepts one in a pull request. The rules the gates enforce are not thresholds and
   are never tuned; the gates jobs get timeouts like any other job.
-- **`timeout-minutes: 5` on both jobs in [`gates.yml`](../.github/workflows/gates.yml).** The
+- **`timeout-minutes: 5` on the `gates` and `markdownlint` jobs in [`gates.yml`](../.github/workflows/gates.yml).** The
   tuner's first proposals: neither job had a timeout, so each ran under GitHub's 360 minute default,
   and no run has taken a minute.
 - **`timeout-minutes: 5` on `check` in
