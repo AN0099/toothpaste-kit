@@ -121,7 +121,7 @@ Three layers enforce this, and only the third binds:
    ```
 
    Git does not transmit hooks on clone, so this is opt-in, and `--no-verify` walks past it. Treat it as a fast local failure rather than a guarantee. The same hook refuses a commit with no `Signed-off-by:` line for its author, so a missing `-s` fails on your machine rather than in the `dco` workflow.
-3. The `commit-attribution` workflow runs the same `commit-msg` hook on every commit in a pull request, with its sign-off check off since the `dco` workflow holds that, so the two cannot disagree. It is the layer that binds, provided the maintainer has set it as a required status check in the ruleset on `main`. Without that setting it reports a failure and blocks nothing. Where it is required, a branch that reaches review with a trailer in its history needs those messages rewritten and the branch force-pushed.
+3. The `commit-attribution` workflow runs the same `commit-msg` hook on every commit in a pull request, with its sign-off check off since the `dco` workflow holds that, so the two cannot disagree. It is the layer that binds: it is set as a required status check in the ruleset on `main`, as read from the rulesets API on 2026-10-30. On a fork, it binds only once that fork's maintainer sets the same; without that setting it reports a failure and blocks nothing. Where it is required, a branch that reaches review with a trailer in its history needs those messages rewritten and the branch force-pushed.
 
 Human co-author trailers are fine and expected. The rule is about tools.
 
