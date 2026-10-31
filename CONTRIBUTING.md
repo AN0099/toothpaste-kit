@@ -26,7 +26,7 @@ That check must return nothing. The two formats cannot collide, so a single grep
 
 **Raise findings instead of quietly resolving them.** If something looks wrong or inconsistent, say so in the issue or the pull request. A unilateral fix hides the disagreement that prompted it.
 
-Three more rules, all mechanical and all enforced by the checks below:
+More rules, all mechanical and all enforced by the checks below:
 
 **Every `.json` in the repo must parse.**
 
@@ -42,7 +42,7 @@ scripts/mdlint.py path/to/file.md
 
 It states its own coverage in its header, including the thirty-four markdownlint rules it does not implement and why.
 
-**markdownlint itself runs in CI, and it is not the same check.** `scripts/mdlint.py` is this project's own reimplementation, so a clean result from it is a self-audit, and the standing rule here is that a completion claim is not fact until a party other than the one making it verifies it. The `markdownlint` job in `.github/workflows/gates.yml` runs the real tool against the same rule IDs for exactly that reason. Nothing is installed at your desk to make this work, and you are not expected to run it locally. If the two ever disagree, the defect is in `scripts/mdlint.py`: report the disagreement rather than editing the document to satisfy whichever one complained. Configuration, and the two rules the CI copy cannot check, are in `.markdownlint-cli2.jsonc`.
+**markdownlint itself runs in CI, and it is not the same check.** `scripts/mdlint.py` is this project's own reimplementation, so a clean result from it is a self-audit, and the standing rule here is that a completion claim is not fact until a party other than the one making it verifies it. The `markdownlint` job in `.github/workflows/gates.yml` runs the real tool against the same rule IDs for exactly that reason. Nothing is installed at your desk to make this work, and you are not expected to run it locally. If the two ever disagree, the defect is in `scripts/mdlint.py`: report the disagreement rather than editing the document to satisfy whichever one complained. Its configuration is in `.markdownlint-cli2.jsonc`.
 
 ## Run the checks the way CI runs them
 
@@ -52,7 +52,7 @@ You need a POSIX shell, `bash`, `git`, `python3`, `find`, and a `grep` with `-r`
 ./scripts/gates.sh --selftest
 ```
 
-That is the same script `.github/workflows/gates.yml` runs, which is the point: a check whose local copy and CI copy are separate texts can drift apart, and you find out when a clean local run is rejected by CI. It covers the seven mechanical rules above, including the two greps quoted earlier in this document, and an eighth: the stubs in `examples/workspace/` must match the files `docs/standing-documents.md` describes, checked by `scripts/check-workspace-stubs.py`. A ninth runs `scripts/remote-level.sh --selftest`, so the classifier `merge-proxy` relies on still gives all three answers. A tenth runs `scripts/reorient --selftest`, on `examples/workspace/` as a second tree and against planted positives. An eleventh runs `scripts/link-skills.sh --selftest`, which links the skills into a temporary directory and checks each link. A twelfth runs `scripts/check-hooks.py`, which checks the structure and patterns of the rules in `hooks/` and that the blocking ones fire on planted commands, the branch name guard's from `tests/branch-guard-cases.tsv`. A thirteenth runs `scripts/check-branch-name --selftest`, the branch and tag name rule below. A fourteenth runs `.githooks/commit-msg` against the trailers in `tests/attribution-cases.tsv`.
+That is the same script `.github/workflows/gates.yml` runs, which is the point: a check whose local copy and CI copy are separate texts can drift apart, and you find out when a clean local run is rejected by CI. It covers the mechanical rules above, including the two greps quoted earlier in this document, and these besides. It runs `scripts/reflow-md.py --selftest`. The stubs in `examples/workspace/` must match the files `docs/standing-documents.md` describes, checked by `scripts/check-workspace-stubs.py`. It runs `scripts/remote-level.sh --selftest`, so the classifier `merge-proxy` relies on still gives all three answers; `scripts/reorient --selftest`, on `examples/workspace/` as a second tree and against planted positives; and `scripts/link-skills.sh --selftest`, which links the skills into a temporary directory and checks each link. It runs `scripts/check-hooks.py`, which checks the structure and patterns of the rules in `hooks/` and that the blocking ones fire on planted commands, the branch name guard's from `tests/branch-guard-cases.tsv`; `scripts/check-branch-name --selftest`, the branch and tag name rule below; and `.githooks/commit-msg` against the trailers in `tests/attribution-cases.tsv`. It runs the selftests of `scripts/check-qblock` against `tests/qblock-cases/`, of `scripts/check-pr-body`, and of `scripts/spdx-fragment.py`. The header of `scripts/gates.sh` lists what every gate covers.
 
 `--selftest` first shows that each gate can fire, by planting a positive and confirming the gate catches it or by running the gate tool's own selftest, then runs the real pass. A gate that has never returned a hit has not been shown capable of returning one, so a clean result on its own is weak evidence.
 
@@ -76,7 +76,7 @@ The description decides when the skill loads, so it should state what the skill 
 
 ## Orchestration
 
-`orchestration/protocol.md` and the two JSON schemas define the message contract between agents. Changing a field means changing the schema, the protocol document, and `taxonomy.md` together, since they are read by separate agents that will not notice a partial update.
+`orchestration/protocol.md` and the JSON schemas in `orchestration/schemas/` define the message contract between agents. Changing a field means changing the schema, the protocol document, and `taxonomy.md` together, since they are read by separate agents that will not notice a partial update.
 
 ## Branch and tag names
 
@@ -156,10 +156,10 @@ A rule is one `.local.md` file: YAML frontmatter defining the match, then a Mark
 
 Adding one:
 
-- `action: block` stops the tool call. `action: warn` lets it through and adds a notice. Reach for `warn` unless the thing being prevented is unrecoverable. Most of the rules here warn, because reading sensitive material is normal work and the thing worth catching is what happens afterward.
+- `action: block` stops the tool call. `action: warn` lets it through and adds a notice. Reach for `warn` unless the thing being prevented is unrecoverable. The read notices here warn, because reading sensitive material is normal work and the thing worth catching is what happens afterward.
 - Match on command position, not bare substrings, for anything matching shell commands. A rule that fires on a tool name inside a quoted heredoc makes writing documentation about that tool impossible.
 - Give the rule a false-positive escape and say what it is. If a contributor cannot get legitimate work past a rule, they will disable it, and a disabled rule protects nothing.
-- Exempt by filename, not by weakening the pattern. Two rules here exempt files that must quote the thing they forbid.
+- Exempt by filename, not by weakening the pattern. One rule here, `hookify.em-dash-gate.local.md`, exempts files that must quote the thing it forbids.
 - State the rule's limits in its own body. Every pattern-based rule has ways around it. Saying so is what keeps it from being mistaken for a boundary.
 
 Test a rule against three cases before adding it: something that must trip it, something legitimate that must not, and the rule's own documentation.
