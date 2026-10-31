@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "tpkit.operator-decision/v1alpha1",
+  "kind": "OperatorDecision",
+  "metadata": {
+    "id": "tally-lines-decision",
+    "roundId": "tally-lines-1",
+    "createdAt": "2026-01-02T14:00:00Z"
+  },
+  "handling": {
+    "visibility": "public",
+    "redaction": "none"
+  },
+  "references": {
+    "reviewRound": {
+      "artifactPath": "examples/review-round/verifier/expected/review-round.json",
+      "commit": "0000000000000000000000000000000000000a01"
+    },
+    "reviewReport": {
+      "artifactPath": "examples/review-round/verifier/expected/review-report.json",
+      "commit": "0000000000000000000000000000000000000a02"
+    }
+  },
+  "alignment": {
+    "packetTargetRevision": "1127c5ce8d21469eee448329cf30323c2e5a08ac",
+    "reportReviewedRevision": "1127c5ce8d21469eee448329cf30323c2e5a08ac",
+    "status": "matched"
+  },
+  "verification": {
+    "performedBy": {
+      "role": "lead"
+    },
+    "performedAt": "2026-01-02T13:30:00Z",
+    "findings": [
+      {
+        "findingId": "readme-check-overclaim",
+        "status": "reproduced",
+        "evidence": [
+          {
+            "description": "In a fresh build of the fixture, made lines() return 0; the required check still passed and --lines printed 0 for a two-line file.",
+            "command": "build.sh DIR; cd DIR; sed -i 's/return len(text.splitlines())/return 0/' tally.py; ./check.sh --selftest; python3 tally.py --lines in.txt",
+            "output": "check: 4 cases passed\n0"
+          }
+        ]
+      },
+      {
+        "findingId": "lines-option-untested",
+        "status": "reproduced",
+        "evidence": [
+          {
+            "description": "No run line in check.sh passes --lines.",
+            "path": "check.sh",
+            "command": "grep -c -- '--lines' check.sh",
+            "output": "0"
+          }
+        ]
+      }
+    ]
+  },
+  "decision": {
+    "madeBy": {
+      "role": "operator"
+    },
+    "status": "request-revision",
+    "basedOnFindings": [
+      "readme-check-overclaim",
+      "lines-option-untested"
+    ],
+    "rationale": "Both findings were reproduced by the lead. The README's claim about the pre-push check is false, and the new option is untested. Revise the README and add --lines cases before merging."
+  },
+  "provenance": {
+    "artifactPath": "examples/review-round/verifier/expected/operator-decision.json",
+    "commit": "0000000000000000000000000000000000000a03"
+  }
+}

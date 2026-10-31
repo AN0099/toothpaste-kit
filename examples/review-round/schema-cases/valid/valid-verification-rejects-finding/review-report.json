@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "tpkit.review-report/v1alpha1",
+  "kind": "ReviewReport",
+  "metadata": {
+    "id": "example-round-2-report",
+    "roundId": "example-round-2",
+    "createdAt": "2026-10-01T10:00:00Z"
+  },
+  "handling": {
+    "visibility": "public",
+    "redaction": "none"
+  },
+  "reviewer": {
+    "role": "aide"
+  },
+  "reviewedRevision": {
+    "revision": "2222222222222222222222222222222222222222",
+    "evidence": [
+      {
+        "description": "HEAD at review time.",
+        "command": "git rev-parse HEAD",
+        "output": "2222222222222222222222222222222222222222"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "check-selftest",
+      "status": "passed",
+      "command": "./scripts/check.sh --selftest",
+      "output": "selftest: 3 planted cases, 3 caught"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f1",
+      "severity": "major",
+      "location": {
+        "path": "docs/checks.md",
+        "line": 12
+      },
+      "claim": "The doc says the self-test validates any contributor change; it runs only its own planted cases.",
+      "evidence": [
+        {
+          "description": "The doc line claiming more than the script does.",
+          "path": "docs/checks.md",
+          "output": "The self-test validates any contributor change."
+        },
+        {
+          "description": "The self-test runs only its own planted cases.",
+          "command": "./scripts/check.sh --selftest",
+          "output": "selftest: 3 planted cases, 3 caught"
+        }
+      ],
+      "proposedRemedy": "Say the self-test checks the script's own planted cases, not contributor changes.",
+      "verification": {
+        "status": "unverified",
+        "verifiedBy": null,
+        "evidence": []
+      }
+    },
+    {
+      "id": "f2",
+      "severity": "minor",
+      "location": {
+        "path": "scripts/check.sh",
+        "line": 30
+      },
+      "claim": "The script exits 0 when the self-test fails.",
+      "evidence": [
+        {
+          "description": "Reviewer read the exit path.",
+          "path": "scripts/check.sh"
+        }
+      ],
+      "proposedRemedy": "Exit non-zero on a failed self-test.",
+      "verification": {
+        "status": "unverified",
+        "verifiedBy": null,
+        "evidence": []
+      }
+    }
+  ],
+  "recommendation": {
+    "status": "request-revision",
+    "rationale": "f1 is an operator-facing claim the script does not meet."
+  },
+  "limitations": [
+    "Only the paths in scope were read."
+  ],
+  "provenance": {
+    "artifactPath": "examples/review-round/schema-cases/valid/valid-verification-rejects-finding/review-report.json",
+    "commit": "3333333333333333333333333333333333333333"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "tpkit.review-report/v1alpha1",
+  "kind": "ReviewReport",
+  "metadata": {
+    "id": "example-round-3-report",
+    "roundId": "example-round-3",
+    "createdAt": "2026-10-01T10:00:00Z"
+  },
+  "handling": {
+    "visibility": "public",
+    "redaction": "none"
+  },
+  "reviewer": {
+    "role": "aide"
+  },
+  "reviewedRevision": {
+    "revision": "2222222222222222222222222222222222222222",
+    "evidence": [
+      {
+        "description": "HEAD at review time.",
+        "command": "git rev-parse HEAD",
+        "output": "2222222222222222222222222222222222222222"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "check-selftest",
+      "status": "passed",
+      "command": "./scripts/check.sh --selftest",
+      "output": "selftest: 3 planted cases, 3 caught"
+    }
+  ],
+  "findings": [],
+  "recommendation": {
+    "status": "accept",
+    "rationale": "No finding; the required check passed."
+  },
+  "limitations": [
+    "Only the paths in scope were read."
+  ],
+  "provenance": {
+    "artifactPath": "examples/review-round/schema-cases/valid/valid-no-findings-when-answer-key-allows/review-report.json",
+    "commit": "3333333333333333333333333333333333333333"
+  }
+}

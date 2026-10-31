@@ -19,6 +19,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 - **Aide**: the role that verifies and assists. A second party with its own working copy and context and no stake in the lead's work being right. Its verdict is evidence for the operator's decision, never the decision. See [roles](../orchestration/ROLES.md#aide).
 - **Alarm**: a control layer that notices a condition outside normal and hands the judgment to a person without blocking anything. Alarms share a budget: each one added lowers the value of the rest. See [control layers](control-layers.md#3-alarms-the-machine-notices-the-human-decides).
 - **Answer grammar**: how a reply to a question block is written. Segments separated by `;`, each `<code> qN`, as in `f q1; 2 q2; d q3`. Prose in a segment, or after `pr:`, outranks a conflicting code, and `(c: ...)` attaches a comment. See [`working-preferences`](../skills/working-preferences/SKILL.md#questions-and-answers).
+- **Answer key**: in a review round's teaching fixture, the file that says which findings a report must contain, where, at what severity, and the expected decision. `scripts/round-check.py` checks a report against it when the packet names it. See [review rounds](review-rounds.md#the-fixture-and-its-answer-key).
 - **Anti-slop**: the lists of words, phrases and structures that mark text as generated, removed from anything written. A distilled list in [`working-preferences`](../skills/working-preferences/SKILL.md#distilled-anti-slop-reference) applies everywhere; the full reference in [`document-standards`](../skills/document-standards/SKILL.md#references) applies to any document.
 - **Autonomous-asynchronous**: the regime in which no person is present while the work runs, and output is reviewed afterwards if at all. Question blocks are suppressed and decisions are logged rather than gated. See [the three regimes](../skills/surface-regimes/SKILL.md#three-regimes) and [the mechanics by regime](../skills/surface-regimes/SKILL.md#mechanic-adjustments-by-regime).
 
@@ -62,7 +63,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 ## F
 
 - **Faculty**: a model a Claude-tier agent may route part of a task to, local or vendor-hosted, under the routing threshold. See [the routing threshold](../orchestration/ROUTING-THRESHOLD.md).
-- **Finding**: one claim in a report that something is wrong or missing, numbered within its report (`r12.2.3` is report 2's third finding) and graded major, minor or nit. See [rounds](../orchestration/rounds.md#reports-and-findings).
+- **Finding**: one claim in a report that something is wrong or missing, numbered within its report (`r12.2.3` is report 2's third finding) and graded major, minor or nit. See [rounds](../orchestration/rounds.md#reports-and-findings). Separately, a review round's finding is one entry in the reviewer's report, which stays Reported until someone other than the reviewer reproduces it; see [review rounds](review-rounds.md#reported-and-verified).
 
 ## G
 
@@ -99,7 +100,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 
 ## M
 
-- **Major**: the severity grade for a wrong result or a broken rule on input that ordinary use produces. It blocks a round's close. See [rounds](../orchestration/rounds.md#severity).
+- **Major**: the severity grade for a wrong result or a broken rule on input that ordinary use produces. It blocks a round's close. See [rounds](../orchestration/rounds.md#severity). A review round uses the same three grades for its findings, without the rule about closing; see [review rounds](review-rounds.md).
 - **Manifest**: the file, `index.md` by default, that says what is authoritative, what is stale and what was added when, and names which documents must stay current. Read first in any session. See [the document set](standing-documents.md#the-document-set) and [how the documents work together](standing-documents.md#how-they-work-together).
 - **Merge-proxy**: a skill a person invokes to let the agent type a trunk merge they have decided, for one session, on a repository whose level is `internal` or `none`, and only after the agent explains the exact plan in full and halts for explicit approval of it. It never applies to an external remote. See [`merge-proxy`](../skills/merge-proxy/SKILL.md).
 - **Minion**: the role that executes one atomic task cold, from a brief, and reports. It does not interpret. See [roles](../orchestration/ROLES.md#minions).
@@ -141,10 +142,12 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 - **Relay**: the passive human role: copies a message between surfaces without changing it. Its failure mode is transcription drift. See [the taxonomy](../orchestration/taxonomy.md#human) and [the relay protocol](../orchestration/protocol.md#relay-fidelity).
 - **Relief**: a control layer designed to fail on purpose in a known direction, such as a forced push that writes a record naming who forced it and why. See [control layers](control-layers.md#5-relief-designed-to-fail-on-purpose-in-a-known-direction).
 - **Report**: a seat's reply to a round's dispatch, numbered within the round (`r12.2`): what was done, how it was checked, and what the check does not cover. A re-check after fixes is the next report, never a new round. See [rounds](../orchestration/rounds.md#reports-and-findings).
+- **Reproduced**: a review-round finding's status once a role other than the reviewer has repeated its evidence and recorded their own. Only a reproduced finding can be cited in the operator's decision. See [review rounds](review-rounds.md#reported-and-verified).
+- **Review round**: one change, one review of it, the verification of that review and one decision, kept as three records (the packet, the reviewer's report and the operator's decision) and checked by `scripts/round-check.py`. Not a [round](#r), which is one task with its dispatches and replies. See [review rounds](review-rounds.md) and [the quickstart](review-rounds-quickstart.md).
 - **Role**: authority over a decision: operator, lead, aide or minion. One identity may hold several. Role is independent of clearance, seat and reach. See [roles](../orchestration/ROLES.md).
 - **Role name**: a filename that says what a file does for the system, such as a manifest or a thread log. Published freely, unlike a subject name, which says what a file is about and is treated as content. See [standing documents](standing-documents.md#why-these-filenames-are-here-at-all).
 - **Roster**: the part of the handoff document where each agent's clearance is set. See [the document set](standing-documents.md#the-document-set) and [roles](../orchestration/ROLES.md#what-this-axis-is-and-the-three-it-is-not).
-- **Round**: one task: the lead's dispatches for it and the replies, numbered `r1` upward, checked by a seat other than the author and decided by the operator. See [rounds](../orchestration/rounds.md).
+- **Round**: one task: the lead's dispatches for it and the replies, numbered `r1` upward, checked by a seat other than the author and decided by the operator. See [rounds](../orchestration/rounds.md). Not a [review round](#r), which records one change's review.
 - **Routing threshold**: four ordered gates (sensitivity, capability, cost, trust label) that decide whether part of a task goes to a local model, a vendor faculty or the agent itself. See [the routing threshold](../orchestration/ROUTING-THRESHOLD.md).
 
 ## S
@@ -176,7 +179,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 ## V
 
 - **Verified**: a claim known with certainty from provided or trained information. One of three knowledge labels, with derived and unknown. Separately, a completion claim counts as fact only once a party other than the claimant has checked it. See [`working-preferences`](../skills/working-preferences/SKILL.md#tripartite-knowledge-labeling) and [control layers](control-layers.md#where-the-human-sits).
-- **Verifier**: the seat that checks a round's work, never its author. It proposes each finding's grade; the lead's grade stands. See [rounds](../orchestration/rounds.md#severity).
+- **Verifier**: the seat that checks a round's work, never its author. It proposes each finding's grade; the lead's grade stands. See [rounds](../orchestration/rounds.md#severity). Separately, in a [review round](#r), the verifier is the role that reproduces the reviewer's findings, which must differ from the reviewer's role; see [review rounds](review-rounds.md#reported-and-verified).
 - **Verify lane**: the lane for work whose deliverable exists and has been checked by a second party. It leaves for Done only on the person's word. See [`daily-review`](../skills/daily-review/SKILL.md#the-lanes).
 
 ## W

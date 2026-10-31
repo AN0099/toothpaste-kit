@@ -17,6 +17,7 @@ Do not use this system for tasks a single session already handles well. The rela
 - `rounds.md`: the round, one task with its dispatches and replies: its steps and who runs each, report and finding notation, the severity scale, the verification rule, and closing a round.
 - `protocol.md`: the relay mechanism (human-readable header wrapping a JSON payload), turn-taking rules, and state handoff rules.
 - `schemas/`: JSON Schema definitions for events exchanged between agents (`event-base.json`, `request.json`, `response.json`).
+- `schemas/round/`: JSON Schema definitions for the three review-round records (`review-round.json`, `review-report.json`, `operator-decision.json`), checked by `scripts/round-check.py`. See `docs/review-rounds.md`.
 - `templates/relay-message.md`: the literal template a human copies, fills, and pastes to move a message from one agent's surface to another.
 - `templates/handoff-note.md`: the template for closing out one agent's turn and briefing whichever agent picks up next.
 - `ROUTING-THRESHOLD.md`: the rule for deciding whether a task runs locally, on a Claude-tier agent, or through a vendor faculty.

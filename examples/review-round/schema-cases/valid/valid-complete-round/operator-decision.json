@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "tpkit.operator-decision/v1alpha1",
+  "kind": "OperatorDecision",
+  "metadata": {
+    "id": "example-round-1-decision",
+    "roundId": "example-round-1",
+    "createdAt": "2026-10-01T12:00:00Z"
+  },
+  "handling": {
+    "visibility": "public",
+    "redaction": "none"
+  },
+  "references": {
+    "reviewRound": {
+      "artifactPath": "examples/review-round/schema-cases/valid/valid-complete-round/review-round.json",
+      "commit": "4444444444444444444444444444444444444444"
+    },
+    "reviewReport": {
+      "artifactPath": "examples/review-round/schema-cases/valid/valid-complete-round/review-report.json",
+      "commit": "3333333333333333333333333333333333333333"
+    }
+  },
+  "alignment": {
+    "packetTargetRevision": "2222222222222222222222222222222222222222",
+    "reportReviewedRevision": "2222222222222222222222222222222222222222",
+    "status": "matched"
+  },
+  "verification": {
+    "performedBy": {
+      "role": "lead"
+    },
+    "performedAt": "2026-10-01T11:00:00Z",
+    "findings": [
+      {
+        "findingId": "f1",
+        "status": "reproduced",
+        "evidence": [
+          {
+            "description": "Read the doc line and ran the self-test at the target revision; the self-test takes no input path.",
+            "command": "./scripts/check.sh --selftest docs/checks.md",
+            "output": "usage: check.sh --selftest (takes no arguments)"
+          }
+        ]
+      }
+    ]
+  },
+  "decision": {
+    "madeBy": {
+      "role": "operator"
+    },
+    "status": "request-revision",
+    "basedOnFindings": [
+      "f1"
+    ],
+    "rationale": "f1 is reproduced by the lead: the doc overstates the self-test."
+  },
+  "provenance": {
+    "artifactPath": "examples/review-round/schema-cases/valid/valid-complete-round/operator-decision.json",
+    "commit": "5555555555555555555555555555555555555555"
+  }
+}

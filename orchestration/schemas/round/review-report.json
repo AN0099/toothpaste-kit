@@ -1,0 +1,354 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "orchestration/schemas/round/review-report.json",
+  "title": "ReviewReport",
+  "description": "What a reviewer observed: the revision actually reviewed and the evidence identifying it, check results, findings as unverified claims, limitations and a recommendation. A recommendation is evidence for the operator, not a decision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "metadata",
+    "handling",
+    "reviewer",
+    "reviewedRevision",
+    "checks",
+    "findings",
+    "recommendation",
+    "limitations",
+    "provenance"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "tpkit.review-report/v1alpha1"
+    },
+    "kind": {
+      "const": "ReviewReport"
+    },
+    "metadata": {
+      "$ref": "#/definitions/metadata"
+    },
+    "handling": {
+      "$ref": "#/definitions/handling"
+    },
+    "reviewer": {
+      "$ref": "#/definitions/roleRef"
+    },
+    "reviewedRevision": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The revision the reviewer actually inspected, which may differ from the round's targetRevision.",
+      "required": [
+        "revision",
+        "evidence"
+      ],
+      "properties": {
+        "revision": {
+          "$ref": "#/definitions/revision"
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/evidence"
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/definitions/identifier"
+          },
+          "status": {
+            "description": "Stated explicitly for every check. passed is evidence, not acceptance.",
+            "enum": [
+              "passed",
+              "failed",
+              "not-run",
+              "blocked"
+            ]
+          },
+          "command": {
+            "type": "string",
+            "minLength": 1
+          },
+          "output": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/finding"
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "rationale"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "accept",
+            "reject",
+            "request-revision",
+            "no-recommendation"
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "description": "Always present. An empty array is the documented convention for: the reviewer states no limitation.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactPath",
+        "commit"
+      ],
+      "properties": {
+        "artifactPath": {
+          "$ref": "#/definitions/repoPath"
+        },
+        "commit": {
+          "$ref": "#/definitions/revision"
+        }
+      }
+    },
+    "transport": {
+      "$ref": "#/definitions/transport"
+    }
+  },
+  "definitions": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9.-]*$"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "roundId",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/identifier"
+        },
+        "roundId": {
+          "$ref": "#/definitions/identifier"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Workflow labels, not legal classification, compliance certification or access control.",
+      "required": [
+        "visibility",
+        "redaction"
+      ],
+      "properties": {
+        "visibility": {
+          "enum": [
+            "public",
+            "private",
+            "restricted"
+          ]
+        },
+        "redaction": {
+          "enum": [
+            "none",
+            "sanitized",
+            "pending-review"
+          ]
+        }
+      }
+    },
+    "revision": {
+      "type": "string",
+      "description": "A full Git object name, so that revisions compare exactly.",
+      "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "repoPath": {
+      "type": "string",
+      "description": "A repository-relative path: no leading slash, no backslash, no .. segment.",
+      "pattern": "^(?!/)(?!(.*/)?\\.\\.(/|$))[^\\\\]+$"
+    },
+    "role": {
+      "description": "Kept in step with the four roles in orchestration/ROLES.md.",
+      "enum": [
+        "operator",
+        "lead",
+        "aide",
+        "minion"
+      ]
+    },
+    "roleRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/role"
+        }
+      }
+    },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional future relay bridge fields. Never required for a valid round.",
+      "properties": {
+        "relayEventId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relayThreadId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One piece of evidence. A path is repository-relative; output is captured text, synthetic in public fixtures.",
+      "required": [
+        "description"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "$ref": "#/definitions/repoPath"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "output": {
+          "type": "string"
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A finding is a claim. The report records it as unverified; only a party other than the reviewer can reproduce it, and that is recorded in an OperatorDecision, not here.",
+      "required": [
+        "id",
+        "severity",
+        "location",
+        "claim",
+        "evidence",
+        "proposedRemedy",
+        "verification"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/identifier"
+        },
+        "severity": {
+          "description": "The grades in orchestration/rounds.md.",
+          "enum": [
+            "major",
+            "minor",
+            "nit"
+          ]
+        },
+        "location": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path"
+          ],
+          "properties": {
+            "path": {
+              "$ref": "#/definitions/repoPath"
+            },
+            "line": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "claim": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/evidence"
+          }
+        },
+        "proposedRemedy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Always the initial state in a report: a reviewer cannot verify its own finding.",
+          "required": [
+            "status",
+            "verifiedBy",
+            "evidence"
+          ],
+          "properties": {
+            "status": {
+              "const": "unverified"
+            },
+            "verifiedBy": {
+              "const": null
+            },
+            "evidence": {
+              "const": []
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,427 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "orchestration/schemas/round/operator-decision.json",
+  "title": "OperatorDecision",
+  "description": "The operator's decision on a round: revision alignment between packet and report, the independent verification of each reported finding, and the decision, which may cite only reproduced findings. Mechanical validation of this record is evidence, not a substitute for operator accountability.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "metadata",
+    "handling",
+    "references",
+    "alignment",
+    "verification",
+    "decision",
+    "provenance"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "tpkit.operator-decision/v1alpha1"
+    },
+    "kind": {
+      "const": "OperatorDecision"
+    },
+    "metadata": {
+      "$ref": "#/definitions/metadata"
+    },
+    "handling": {
+      "$ref": "#/definitions/handling"
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewRound",
+        "reviewReport"
+      ],
+      "properties": {
+        "reviewRound": {
+          "$ref": "#/definitions/artifactRef"
+        },
+        "reviewReport": {
+          "$ref": "#/definitions/artifactRef"
+        }
+      }
+    },
+    "alignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "matched requires the two revisions to be equal exactly; the validator compares them and the documents they came from.",
+      "required": [
+        "packetTargetRevision",
+        "reportReviewedRevision",
+        "status"
+      ],
+      "properties": {
+        "packetTargetRevision": {
+          "$ref": "#/definitions/revision"
+        },
+        "reportReviewedRevision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$",
+          "description": "null when the reviewed revision cannot be resolved."
+        },
+        "status": {
+          "enum": [
+            "matched",
+            "mismatched",
+            "unresolved"
+          ]
+        }
+      },
+      "if": {
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "const": "matched"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reportReviewedRevision": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "performedBy",
+        "performedAt",
+        "findings"
+      ],
+      "properties": {
+        "performedBy": {
+          "$ref": "#/definitions/roleRef"
+        },
+        "performedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/findingVerification"
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "madeBy",
+        "status",
+        "basedOnFindings",
+        "rationale"
+      ],
+      "properties": {
+        "madeBy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role"
+          ],
+          "properties": {
+            "role": {
+              "const": "operator"
+            }
+          }
+        },
+        "status": {
+          "description": "abstain and rerun are the outcomes open when alignment is not matched.",
+          "enum": [
+            "accept",
+            "reject",
+            "request-revision",
+            "abstain",
+            "rerun"
+          ]
+        },
+        "basedOnFindings": {
+          "type": "array",
+          "description": "Finding IDs, each reproduced in verification.findings with evidence.",
+          "items": {
+            "$ref": "#/definitions/identifier"
+          }
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exceptions": {
+          "type": "array",
+          "description": "Explicit operator exceptions, such as accepting despite a reproduced finding. An exception never relabels a finding's verification status.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "findingId",
+              "reason"
+            ],
+            "properties": {
+              "findingId": {
+                "$ref": "#/definitions/identifier"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "provenance": {
+      "$ref": "#/definitions/artifactRef"
+    },
+    "transport": {
+      "$ref": "#/definitions/transport"
+    }
+  },
+  "if": {
+    "required": [
+      "alignment"
+    ],
+    "properties": {
+      "alignment": {
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "mismatched",
+              "unresolved"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "decision": {
+        "properties": {
+          "status": {
+            "enum": [
+              "abstain",
+              "rerun"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9.-]*$"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "roundId",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/identifier"
+        },
+        "roundId": {
+          "$ref": "#/definitions/identifier"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Workflow labels, not legal classification, compliance certification or access control.",
+      "required": [
+        "visibility",
+        "redaction"
+      ],
+      "properties": {
+        "visibility": {
+          "enum": [
+            "public",
+            "private",
+            "restricted"
+          ]
+        },
+        "redaction": {
+          "enum": [
+            "none",
+            "sanitized",
+            "pending-review"
+          ]
+        }
+      }
+    },
+    "revision": {
+      "type": "string",
+      "description": "A full Git object name, so that revisions compare exactly.",
+      "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "repoPath": {
+      "type": "string",
+      "description": "A repository-relative path: no leading slash, no backslash, no .. segment.",
+      "pattern": "^(?!/)(?!(.*/)?\\.\\.(/|$))[^\\\\]+$"
+    },
+    "role": {
+      "description": "Kept in step with the four roles in orchestration/ROLES.md.",
+      "enum": [
+        "operator",
+        "lead",
+        "aide",
+        "minion"
+      ]
+    },
+    "roleRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/role"
+        }
+      }
+    },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional future relay bridge fields. Never required for a valid round.",
+      "properties": {
+        "relayEventId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relayThreadId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One piece of evidence. A path is repository-relative; output is captured text, synthetic in public fixtures.",
+      "required": [
+        "description"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "$ref": "#/definitions/repoPath"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "output": {
+          "type": "string"
+        }
+      }
+    },
+    "artifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactPath",
+        "commit"
+      ],
+      "properties": {
+        "artifactPath": {
+          "$ref": "#/definitions/repoPath"
+        },
+        "commit": {
+          "$ref": "#/definitions/revision"
+        }
+      }
+    },
+    "findingVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The independent check of one reported finding. Recorded by the verification role, never by the report's reviewer.",
+      "required": [
+        "findingId",
+        "status",
+        "evidence"
+      ],
+      "properties": {
+        "findingId": {
+          "$ref": "#/definitions/identifier"
+        },
+        "status": {
+          "enum": [
+            "reproduced",
+            "not-reproduced",
+            "not-applicable",
+            "blocked"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/evidence"
+          }
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "if": {
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "reproduced",
+              "not-reproduced"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  }
+}

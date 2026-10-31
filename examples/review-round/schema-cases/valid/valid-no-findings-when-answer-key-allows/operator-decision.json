@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "tpkit.operator-decision/v1alpha1",
+  "kind": "OperatorDecision",
+  "metadata": {
+    "id": "example-round-3-decision",
+    "roundId": "example-round-3",
+    "createdAt": "2026-10-01T12:00:00Z"
+  },
+  "handling": {
+    "visibility": "public",
+    "redaction": "none"
+  },
+  "references": {
+    "reviewRound": {
+      "artifactPath": "examples/review-round/schema-cases/valid/valid-no-findings-when-answer-key-allows/review-round.json",
+      "commit": "4444444444444444444444444444444444444444"
+    },
+    "reviewReport": {
+      "artifactPath": "examples/review-round/schema-cases/valid/valid-no-findings-when-answer-key-allows/review-report.json",
+      "commit": "3333333333333333333333333333333333333333"
+    }
+  },
+  "alignment": {
+    "packetTargetRevision": "2222222222222222222222222222222222222222",
+    "reportReviewedRevision": "2222222222222222222222222222222222222222",
+    "status": "matched"
+  },
+  "verification": {
+    "performedBy": {
+      "role": "lead"
+    },
+    "performedAt": "2026-10-01T11:00:00Z",
+    "findings": []
+  },
+  "decision": {
+    "madeBy": {
+      "role": "operator"
+    },
+    "status": "accept",
+    "basedOnFindings": [],
+    "rationale": "No finding was reported; the answer key for this round expects none.",
+    "limitations": [
+      "A passing check is evidence, not proof of a complete review."
+    ]
+  },
+  "provenance": {
+    "artifactPath": "examples/review-round/schema-cases/valid/valid-no-findings-when-answer-key-allows/operator-decision.json",
+    "commit": "5555555555555555555555555555555555555555"
+  }
+}
