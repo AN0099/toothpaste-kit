@@ -77,7 +77,7 @@ notes; this document is updated when there is an acceptance to record.
 | Needed | State today |
 |---|---|
 | Commit access to the repository | Held by one account |
-| Ability to publish a release | Same account, and no signing key is configured yet |
+| Ability to publish a release | Same account, which signs release tags with an SSH signing key |
 | The private vulnerability reporting inbox | Reaches one person, per `SECURITY.md` |
 | The conduct reporting address | Reaches the same person, per `CODE_OF_CONDUCT.md` |
 | Knowledge of why the design is shaped this way | In `philosophy.md` and in a `CHANGELOG.md` beside each file |
