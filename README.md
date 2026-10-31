@@ -18,7 +18,7 @@ Where to go, by what you came for.
 - [What is here](#what-is-here), a directory-by-directory tour of the repository
   - [`skills/`](#skills), the eighteen skills in three classes
   - [`docs/`](#docs), the documents the skills assume
-  - [`examples/`](#examples), the workspace the quickstart copies
+  - [`examples/`](#examples), the workspace the quickstart copies and a practice review round
   - [`hooks/`](#hooks), example rules for the `hookify` plugin
   - [`scripts/`](#scripts), the gates and the tools they run
   - [`orchestration/`](#orchestration), the relay protocol and its schemas
@@ -84,6 +84,8 @@ Three are procedures an agent may run on its own at a clean boundary. None sets 
 ### `examples/`
 
 `examples/workspace/` is the workspace the quickstart copies: a `CLAUDE.md` naming where the other files are, the manifest `index.md`, and stubs of the standing files under `.agents/`. The stubs hold comments saying what goes in each, and point at `docs/standing-documents.md` rather than restating it. A gate checks that each stub matches a file that document describes.
+
+`examples/review-round/` is a practice [review round](docs/review-rounds.md): a small synthetic project with a proposed change that carries a known defect, the material for the reviewer and the verifier in separate directories, an answer key, and the schema test cases that gate 18 runs. [`examples/README.md`](examples/README.md) indexes both examples, and each directory in the review round has its own README.
 
 ### `hooks/`
 
