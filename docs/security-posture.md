@@ -33,6 +33,7 @@ that a reader can go and form one.
 | 2.6 Citation metadata | Present, incomplete by design | `CITATION.cff`, with `version` and `date-released` commented out until a release exists. See `docs/releasing.md` step 3 |
 | 2.7 Issue templates | Present | Four files under `.github/ISSUE_TEMPLATE/` |
 | 2.8 Project state, current | Present | `docs/project-state.md`, which carries its own last-updated date so a reader can judge staleness |
+| 2.9 Security Insights file | Present, fields checked by hand | `security-insights.yml` at the repository root, following OpenSSF Security Insights schema version 2.2.0. Every value is taken from a file in this tree or is a link to a file in it, except the header dates and schema version, which describe the file, and `bug-bounty-available: false`, which the maintainer states; an optional field with nothing behind it is left out. No tool validates it against the schema, and no gate reads it |
 
 ## 3. Build, release and provenance
 

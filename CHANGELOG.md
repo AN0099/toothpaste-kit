@@ -25,6 +25,10 @@ skill lives in that skill's own `CHANGELOG.md`.
   `noAssertion`, the file's other values left out and a warning on stderr; an
   entry missing a required key exits 2. The pull request template now points
   to the script, and `scripts/gates.sh` runs its selftest as gate 17.
+- `security-insights.yml` (pull request #76): an OpenSSF Security Insights
+  file at the kit root, following schema version 2.2.0, that describes the
+  kit's security arrangements in a form tools read. `docs/security-posture.md`
+  row 2.9 records where each value comes from.
 
 ### Changed
 
