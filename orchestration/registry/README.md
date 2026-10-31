@@ -3,8 +3,8 @@
 A surface descriptor answers one question: what can this vendor's product actually do. The
 orchestration protocol reads the answer, never the product name.
 
-`schemas/event-base.json` requires `capability` and `regime` on every agent reference. `surface` is
-a label that resolves here. That ordering is deliberate: capability is what every routing and
+`../schemas/event-base.json` requires `capability` and `regime` on every agent reference. `surface`
+is a label that resolves here. That ordering is deliberate: capability is what every routing and
 gating decision consults, and product names are the part that changes without warning.
 
 ## Files

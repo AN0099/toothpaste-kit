@@ -37,10 +37,10 @@ than as prose, and the register tell that accompanies this character is the
 actual problem, not the glyph alone.
 
 **Two filename patterns are deliberately exempt**: any file whose name contains
-`em-dash`, and the `banned-words` reference. Both have to quote the character in
-order to document it. The exemption exists because a gate whose own rule file
-trips it gets ignored within a week. Add your own exemptions the same way, by
-filename rather than by weakening the pattern.
+`em-dash`, and the `banned-words` reference, so that either can quote the
+character where it documents the rule. The exemption exists because a gate
+whose own rule file trips it gets ignored within a week. Add your own
+exemptions the same way, by filename rather than by weakening the pattern.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

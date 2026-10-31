@@ -90,7 +90,7 @@ conventions everyone working in the workspace follows in `CLAUDE.md`.
 
 ## Hooks
 
-`hooks/` in the kit holds seven rule files for the `hookify` plugin. They are
+`hooks/` in the kit holds rule files for the `hookify` plugin. They are
 examples: they do nothing until the plugin is installed and the files are
 copied into the workspace.
 
@@ -110,7 +110,7 @@ copied into the workspace.
 3. Start a new Claude Code session in the workspace.
 
 `hookify.em-dash-gate.local.md` works anywhere: it blocks a write containing
-an em dash. The other six assume a tiered directory scheme and name its
+an em dash. The `restricted-*` rules assume a tiered scheme and name its
 paths; edit their patterns to your own paths before enabling them, or they
 match nothing and report clean.
 

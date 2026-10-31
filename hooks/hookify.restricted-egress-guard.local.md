@@ -39,9 +39,10 @@ is explicit that confirmation authority for anything sensitive is shared. Run
 
 **Scope of the match.** The egress verb must appear in command position: at the
 start of the command, after a `;`, `|`, or `&&`, inside a substitution, or at
-the start of a line. Merely naming one of these tools inside a quoted heredoc or
-a comment does not trip the rule, which is what makes it possible to write
-documentation about these paths without fighting the gate.
+the start of a line. Naming one of these tools mid-line, in a comment or inside
+a quoted heredoc, does not trip the rule, which is what makes it possible to
+write documentation about these paths without fighting the gate. A heredoc line
+that starts with one does trip it, since a line start is a command position.
 
 Command-position matching is a deliberate tradeoff and it has limits, as any
 pattern-based rule does. Treat this as a third layer behind physical isolation

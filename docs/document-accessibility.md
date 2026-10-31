@@ -113,7 +113,7 @@ discovered by a reader:
 - **An automated check exists.** `scripts/mdlint.py` is the seventh gate, run
   by `scripts/gates.sh` and by CI. It enforces nineteen
   markdownlint rules, using markdownlint's own rule IDs so the real tool is a
-  drop-in later. Four of them exist for accessibility rather than tidiness:
+  drop-in later. Seven of them exist for accessibility rather than tidiness:
   MD001, MD025 and MD041 for heading structure and title (G141, H42, G88, F25);
   MD045 for image alt text (G100, G82); MD059 and MD034 for link purpose (G91,
   H30, F84); MD056 for table structure (H51, F91). It states its own coverage,

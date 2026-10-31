@@ -163,7 +163,7 @@ Twenty-seven commands, twenty-seven codes, in three tiers. **Tier is assigned by
 
 **Hand balance is the organizing constraint, not mnemonics.** Singles alternate hands down the frequency list, so no run of frequent commands lands on one side. Every two-key code uses one key per hand, which halves per-hand load and is faster than a same-hand digraph. Three-key codes take two keys on one hand and one on the other. No code repeats a finger.
 
-`j`, `k`, `kd`, `lf`, `sdj` and `sdk` take an argument on the same line exactly as their ALLCAPS forms do.
+`j`, `k`, `dl`, `kd`, `lf`, `sdj` and `sdk` take an argument on the same line exactly as their ALLCAPS forms do.
 
 A single key and a longer code sharing a first letter is not ambiguous, because a code is only a code in one of those two places. `f` is CONFIRM, `fk` is PROCEED.
 

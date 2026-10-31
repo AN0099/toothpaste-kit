@@ -15,10 +15,11 @@ conditions:
 
 **Notice: tier-restricted material is entering session context via a shell command.**
 
-This is the companion to `restricted-read-notice`, which only sees the `Read`
-tool. Shell reads are the more common path in practice, and without this rule
-the notice would almost never fire in a session that works through `cat`, `sed`,
-and `grep`.
+This is the companion to `restricted-read-notice`, which sees only the file
+tools (`Read`, `Write`, `Edit`, `MultiEdit`, `NotebookEdit`), not `Bash`. Shell
+reads are the more common path in practice, and without this rule the notice
+would almost never fire in a session that works through `cat`, `sed`, and
+`grep`.
 
 Not a block. Reading this material is normal work. What matters is what becomes
 true immediately afterward.

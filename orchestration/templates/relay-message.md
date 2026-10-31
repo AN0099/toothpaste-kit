@@ -29,12 +29,12 @@ intent: request | response | handoff | broadcast
     "agent_id": "<...>",
     "kind": "human",
     "role": "relay | participant",
-    "comment": "human agents carry kind and role, and no surface, capability, or regime"
+    "comment": "human agents carry kind and role, and no surface"
   },
   "type": "request | response",
 
   "action": "<only for type=request: what the target is being asked to do>",
-  "request_id": "<only for type=request>",
+  "request_id": "<the request's id; a response repeats it>",
   "params": {},
   "human_summary": "<one to three lines, redundant with the header summary above, so this block stays self-contained if separated from its header>",
 
