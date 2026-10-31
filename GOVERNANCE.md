@@ -24,7 +24,7 @@ contributor to say so.
 **Bus factor is one, and the succession plan below is explicit rather than
 assumed.** See [Succession](#succession) below. Until a second maintainer
 accepts, the fallback remains a fork: the licence permits it, every design
-decision is recorded in a `CHANGELOG.md` beside the file it concerns, and
+decision on a skill or the protocol is in a `CHANGELOG.md` beside it, and
 nothing here depends on infrastructure only the maintainer can reach.
 
 ## How a change lands
@@ -54,7 +54,9 @@ passes, the reviewer runs it.
   other people pin to.
 - **Anything that publishes**, including a push to this repository's remote.
   Automated agents contribute by editing and staging; a person commits and
-  pushes.
+  pushes. The one automated party that pushes is Dependabot, which pushes its
+  own update branches under `.github/dependabot.yml` and opens a pull request
+  for each; a person merges each of those pull requests.
 
 That last one is not a style preference. This project is developed with AI
 agents doing a large share of the editing, and the boundary between an agent
@@ -80,7 +82,7 @@ notes; this document is updated when there is an acceptance to record.
 | Ability to publish a release | Same account, which signs release tags with an SSH signing key |
 | The private vulnerability reporting inbox | Reaches one person, per `SECURITY.md` |
 | The conduct reporting address | Reaches the same person, per `CODE_OF_CONDUCT.md` |
-| Knowledge of why the design is shaped this way | In `philosophy.md` and in a `CHANGELOG.md` beside each file |
+| Knowledge of why the design is shaped this way | In `philosophy.md`, and in a `CHANGELOG.md` beside each skill and in `orchestration/` |
 | Knowledge of what is unfinished | In `docs/project-state.md` and `docs/security-posture.md` |
 
 The last two rows are the reason this project writes reasoning down beside the
