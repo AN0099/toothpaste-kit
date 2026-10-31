@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These fifteen gates cover: the em dash ban, the private task ID ban,
+# check. These seventeen gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency (including every vendor
 # file's shape against surface-descriptor.schema.json, checked by
 # scripts/schema-check.py, which fails loudly on any schema keyword it does
@@ -42,7 +42,9 @@
 # question block checker's selftest in scripts/check-qblock against
 # tests/qblock-cases/, which states its own eight-rule coverage, and the pull
 # request body checker's selftest in scripts/check-pr-body, which plants each
-# finding it reports. They
+# finding it reports, and the SPDX fragment builder's selftest in
+# scripts/spdx-fragment.py, which builds fragments from commits in a scratch
+# repository and checks each models file rule. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -369,6 +371,16 @@ gate_pr_body() {
   fi
 }
 
+# ---------------------------------------------------------------- 17
+gate_spdx() {
+  gate_start "spdx-fragment selftest"
+  if python3 scripts/spdx-fragment.py --selftest; then
+    gate_ok "spdx-fragment selftest"
+  else
+    gate_bad "spdx-fragment selftest"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -386,7 +398,8 @@ run_all() {
   gate_attribution
   gate_qblock
   gate_pr_body
-  printf '\n%s of 16 gates passed\n' "$pass_n"
+  gate_spdx
+  printf '\n%s of 17 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -394,7 +407,7 @@ run_all() {
 
 # A gate that has never returned a hit has not been shown capable of
 # returning one, so each of the first five, and the eighth, is run against a
-# planted positive in a scratch tree, as are 12, 13, 14, 15 and 16. Gates 6, 9, 10 and
+# planted positive in a scratch tree, as are 12, 13, 14, 15, 16 and 17. Gates 6, 9, 10 and
 # 11 run their tools' own selftests, which carry their own planted cases, and
 # gate 7 plants one positive per rule below.
 run_selftest() {
@@ -652,6 +665,14 @@ JSON
   bad=$?
   python3 scripts/check-pr-body --selftest >/dev/null 2>&1
   plant_rejected $bad $? "pull request body gate, rule removed"
+
+  # Gate 17: a copy of the builder whose releaseTime pattern ends in $ rather
+  # than \Z, so it accepts a trailing newline, must fail its own selftest.
+  mkdir -p "$tmp/sp/scripts" && sed '/^RELEASE_TIME_RE/s/\\Z"/$"/' scripts/spdx-fragment.py > "$tmp/sp/scripts/spdx-fragment.py"
+  python3 "$tmp/sp/scripts/spdx-fragment.py" --selftest >/dev/null 2>&1
+  bad=$?
+  python3 scripts/spdx-fragment.py --selftest >/dev/null 2>&1
+  plant_rejected $bad $? "spdx-fragment gate, releaseTime pattern loosened"
 
   printf '\n'
   [ "$plant_fail" -eq 0 ] || { echo "selftest: a gate could not be shown to fail. Do not trust a clean run."; return 1; }
