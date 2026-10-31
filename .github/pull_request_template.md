@@ -53,6 +53,8 @@ confirmed it yourself. An agent auditing its own work does not count. -->
 
 <!-- If you ticked Yes: copy the Assisted-by and Agent-Effort trailers from your commits, one per line. Name any agent whose model is not on record as such, in words. Delete this section if you ticked No. -->
 
+<!-- Then, from the repository root, run `python3 scripts/spdx-fragment.py origin/main..HEAD` (two dots; use the base your branch starts from if it is not origin/main). It prints an SPDX 3.0.1 JSON document built from those same trailers. Paste the output below them in a json code block. Values for each model come from scripts/spdx-models.json, which ships empty; for a model with no entry the script marks the package noAssertion and prints a warning, so say so here instead of guessing the values. -->
+
 </details>
 
 <!--

@@ -31,13 +31,16 @@ packageVersion that is not a string, a releaseTime that is not a string
 matching DateTime.html's pattern, or an autonomyType that is not "yes" or "no"
 each exit 2, as does a file that is not UTF-8, not JSON, or past the JSON
 parser's limits (an integer over 4300 digits, nesting too deep). A model
-this run names but the file lacks exits 2 the same way, naming the model and
-the file.
+this run names but the file lacks still gets its ai_AIPackage, with
+ai_autonomyType "noAssertion" and none of the values the file would give, and
+no supplier Agent; each such model prints one warning line to stderr, naming
+the model and the file, and the run exits 0.
 
 A range with no Assisted-by trailer prints the CreationInfo, the kit package
 and the author Agent only, and exits 0. The range must be exactly
 <base>..<head>, two dots; a three-dot range or any other form exits 2 with the
-usage line. An Assisted-by value not of the form "<model> via <tool>/<version>"
+usage line. --help or -h anywhere in the arguments prints the usage line to
+stdout and exits 0. An Assisted-by value not of the form "<model> via <tool>/<version>"
 exits 2, naming the commit and the value.
 
 Standard library only.
@@ -75,11 +78,6 @@ DOT_RUN_RE = re.compile(r"\.\.+")
 
 class BadRange(Exception):
     pass
-
-
-class NoModelEntry(Exception):
-    def __init__(self, model, models_path):
-        super().__init__(f"spdx-fragment: no entry for {model} in {models_path}")
 
 
 class ModelsValidationError(Exception):
@@ -171,6 +169,7 @@ def is_valid_range(s):
 
 
 def build_graph(cwd, range_arg, models_path):
+    """Return (graph, warnings): the JSON-LD @graph list and stderr lines."""
     base, sep, head_ref = range_arg.partition("..")
     if not sep or not base or not head_ref:
         raise BadRange(range_arg)
@@ -225,17 +224,20 @@ def build_graph(cwd, range_arg, models_path):
     })
 
     if not model_order:
-        return graph
+        return graph, []
 
     models = load_models(models_path)
     validate_models(models, models_path)
 
-    for model in model_order:
-        if model not in models:
-            raise NoModelEntry(model, models_path)
+    warnings = [
+        f"spdx-fragment: warning: no entry for {model} in {models_path}; values left out"
+        for model in model_order if model not in models
+    ]
 
     supplier_agent_id = {}
     for model in model_order:
+        if model not in models:
+            continue
         supplier = models[model]["suppliedBy"]
         if supplier not in supplier_agent_id:
             aid = f"urn:toothpaste-kit:{head_hash}:agent-{agent_n}"
@@ -250,20 +252,20 @@ def build_graph(cwd, range_arg, models_path):
 
     aipackage_ids = []
     for i, model in enumerate(model_order, start=1):
-        entry = models[model]
-        supplier = entry["suppliedBy"]
+        entry = models.get(model)
         node = {
             "type": "ai_AIPackage",
             "spdxId": f"urn:toothpaste-kit:{head_hash}:aipackage-{i}",
             "creationInfo": CREATION_INFO_ID,
             "name": model,
-            "ai_autonomyType": entry["autonomyType"],
+            "ai_autonomyType": entry["autonomyType"] if entry else "noAssertion",
             "software_primaryPurpose": "model",
-            "suppliedBy": supplier_agent_id[supplier],
-            "software_downloadLocation": entry["downloadLocation"],
-            "releaseTime": entry["releaseTime"],
-            "software_packageVersion": entry["packageVersion"],
         }
+        if entry:
+            node["suppliedBy"] = supplier_agent_id[entry["suppliedBy"]]
+            node["software_downloadLocation"] = entry["downloadLocation"]
+            node["releaseTime"] = entry["releaseTime"]
+            node["software_packageVersion"] = entry["packageVersion"]
         if model in effort_by_model:
             node["ai_hyperparameter"] = [
                 {"key": "agent-effort", "value": effort_by_model[model]}
@@ -291,7 +293,7 @@ def build_graph(cwd, range_arg, models_path):
         "to": aipackage_ids + tool_ids,
     })
 
-    return graph
+    return graph, warnings
 
 
 def parse_args(argv):
@@ -315,20 +317,22 @@ def parse_args(argv):
 
 def run(argv, cwd):
     """Execute the command; return (exit_code, stdout_text, stderr_lines)."""
+    if "--help" in argv or "-h" in argv:
+        return 0, USAGE + "\n", []
     parsed = parse_args(argv)
     if parsed is None:
         return 2, "", [USAGE]
     models_path, range_arg = parsed
     try:
-        graph = build_graph(cwd, range_arg, models_path)
-    except (NoModelEntry, ModelsValidationError, MalformedAssistedBy) as e:
+        graph, warnings = build_graph(cwd, range_arg, models_path)
+    except (ModelsValidationError, MalformedAssistedBy) as e:
         return 2, "", [str(e)]
     except BadRange:
         return 2, "", [USAGE]
     except GitError as e:
         return 2, "", [f"spdx-fragment: {e}"]
     doc = {"@context": CONTEXT_URL, "@graph": graph}
-    return 0, json.dumps(doc, indent=2) + "\n", []
+    return 0, json.dumps(doc, indent=2) + "\n", warnings
 
 
 def selftest():
@@ -538,7 +542,7 @@ def selftest():
               f"FAIL  ai_autonomyType: code={code} errs={errs} aipkgs={yes_aipkgs}")
         ok = ok and autonomy_from_file_ok
 
-        # --- missing model entry: exits 2, names the model and the file ---
+        # --- missing model entry: exits 0, warns, and leaves the file's values out ---
         bad_models = os.path.join(d, "bad-models.json")
         with open(bad_models, "w") as f:
             json.dump({"model-a": {
@@ -549,12 +553,35 @@ def selftest():
                 "autonomyType": "no",
             }}, f)
         code, out, errs = run(["--models", bad_models, range_full], d)
-        missing_ok = (code == 2 and not out
-                      and errs == [f"spdx-fragment: no entry for model-b in {bad_models}"])
+        doc_missing = json.loads(out) if code == 0 else None
+        missing_pkg = [x for x in doc_missing["@graph"]
+                       if x["type"] == "ai_AIPackage" and x["name"] == "model-b"] if doc_missing else []
+        missing_agents = [x["name"] for x in doc_missing["@graph"] if x["type"] == "Agent"] if doc_missing else []
+        left_out = ("suppliedBy", "software_downloadLocation", "releaseTime", "software_packageVersion")
+        missing_ok = bool(
+            code == 0
+            and errs == [f"spdx-fragment: warning: no entry for model-b in {bad_models}; values left out"]
+            and len(missing_pkg) == 1
+            and missing_pkg[0]["ai_autonomyType"] == "noAssertion"
+            and not any(k in missing_pkg[0] for k in left_out)
+            and "vendor-b" not in missing_agents
+        )
         n += 1
-        print(f"{'ok  ' if missing_ok else 'FAIL'}  missing model entry: got code={code} errs={errs}"
-              if not missing_ok else "ok    missing model entry exits 2 and names it")
+        print(f"{'ok  ' if missing_ok else 'FAIL'}  missing model entry: got code={code} errs={errs} pkg={missing_pkg}"
+              if not missing_ok else "ok    missing model entry exits 0, warns, and leaves the file's values out")
         ok = ok and missing_ok
+
+        # --- empty models file over one Assisted-by trailer: exits 0, one warning ---
+        empty_models = os.path.join(d, "empty-models.json")
+        with open(empty_models, "w") as f:
+            json.dump({}, f)
+        code, out, errs = run(["--models", empty_models, f"{c0}..{c1}"], d)
+        empty_ok = (code == 0 and bool(out)
+                    and errs == [f"spdx-fragment: warning: no entry for model-a in {empty_models}; values left out"])
+        n += 1
+        print(f"{'ok  ' if empty_ok else 'FAIL'}  empty models file: got code={code} errs={errs}"
+              if not empty_ok else "ok    empty models file exits 0 with one warning")
+        ok = ok and empty_ok
 
         # --- a models entry lacking a required key ---
         lacking_key = os.path.join(d, "lacking-key-models.json")
@@ -610,7 +637,7 @@ def selftest():
         ok = ok and bad_release_ok
 
         # A valid model-b beside each bad model-a below, so a case that stops catching
-        # its fault exits 0 or raises, never 2 by falling through to "no entry for model-b".
+        # its fault exits 0 or raises, never 2 because a model-b entry is missing.
         valid_b = {
             "suppliedBy": "vendor-b",
             "downloadLocation": "https://example.com/model-b",
@@ -817,6 +844,18 @@ def selftest():
             n += 1
             print(f"{'ok  ' if case_ok else 'FAIL'}  bad argument ({name}): code={code} errs={errs}"
                   if not case_ok else f"ok    bad argument ({name}) exits 2 with usage")
+            ok = ok and case_ok
+
+        # --- help: exit 0 with the usage on stdout ---
+        for name, argv in [
+            ("--help", ["--help"]),
+            ("-h", ["-h"]),
+        ]:
+            code, out, errs = run(argv, d)
+            case_ok = (code == 0 and out == USAGE + "\n" and errs == [])
+            n += 1
+            print(f"{'ok  ' if case_ok else 'FAIL'}  help ({name}): code={code} out={out!r} errs={errs}"
+                  if not case_ok else f"ok    help ({name}) exits 0 with usage on stdout")
             ok = ok and case_ok
 
     print(f"selftest: {n} cases passed" if ok else "selftest: FAILED")

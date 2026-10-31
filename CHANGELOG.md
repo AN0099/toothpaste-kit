@@ -20,9 +20,11 @@ skill lives in that skill's own `CHANGELOG.md`.
   `Assisted-by:` and `Agent-Effort:` trailers as one SPDX 3.0.1 JSON-LD
   document, with a CreationInfo, the kit package, one AIPackage per model, one
   Tool per tool version, their Agents and a `usesTool` relationship. Values the
-  trailers cannot give come from `scripts/spdx-models.json`, shipped empty; a
-  model with no entry, or an entry missing a required key, exits 2 rather than
-  guessing. `scripts/gates.sh` runs its selftest as gate 17.
+  trailers cannot give come from `scripts/spdx-models.json`, shipped empty. A
+  model with no entry still gets its AIPackage, with `ai_autonomyType` set to
+  `noAssertion`, the file's other values left out and a warning on stderr; an
+  entry missing a required key exits 2. The pull request template now points
+  to the script, and `scripts/gates.sh` runs its selftest as gate 17.
 
 ### Changed
 
