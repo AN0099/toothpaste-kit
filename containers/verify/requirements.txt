@@ -6,9 +6,10 @@
 # depend on, each at an exact version with its sha256, so pip's
 # --require-hashes refuses anything else. reuse is the version
 # .github/workflows/compliance.yml installs. Resolved for python 3.13 on
-# linux/amd64 from files uploaded before 2026-10-17. reuse 6.2.0 has no
-# python 3.13 wheel, so it is built from its sdist with the backend pinned
-# in build-requirements.txt.
+# linux/amd64 and linux/arm64 from files uploaded before 2026-10-17; a
+# package with compiled code carries one hash per architecture. reuse 6.2.0
+# has no python 3.13 wheel, so it is built from its sdist with the backend
+# pinned in build-requirements.txt.
 attrs==26.1.0 \
     --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309
 boolean-py==5.0 \
@@ -16,7 +17,8 @@ boolean-py==5.0 \
 certifi==2026.7.22 \
     --hash=sha256:62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775
 charset-normalizer==3.5.2 \
-    --hash=sha256:7218e8f32b0956cfcd048fd42d9d5779809745ca1d86113ca56f66e7ae1549c4
+    --hash=sha256:7218e8f32b0956cfcd048fd42d9d5779809745ca1d86113ca56f66e7ae1549c4 \
+    --hash=sha256:849df64e889b2e17230d58410a03dba311a65b163508fd33679b2b737d4b7858
 check-jsonschema==0.38.2 \
     --hash=sha256:8edefe154b7117962f2e88318f315fc4bb9615827f932b37cb676a8d42a3a286
 click==8.5.0 \
@@ -32,7 +34,8 @@ jsonschema-specifications==2025.9.1 \
 license-expression==30.4.4 \
     --hash=sha256:421788fdcadb41f049d2dc934ce666626265aeccefddd25e162a26f23bcbf8a4
 markupsafe==3.0.4 \
-    --hash=sha256:434139499bb20b502ed3baa1f169e618f924a97e7a777fea1a49446d80106cf6
+    --hash=sha256:434139499bb20b502ed3baa1f169e618f924a97e7a777fea1a49446d80106cf6 \
+    --hash=sha256:7018d4af1cd272e847aa5917983ab5e83e4f6579f9dbfecd4a79c0ca80b144c2
 pathspec==1.1.1 \
     --hash=sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189
 python-debian==1.1.1 \
@@ -40,17 +43,20 @@ python-debian==1.1.1 \
 python-magic==0.4.27 \
     --hash=sha256:c212960ad306f700aa0d01e5d7a325d20548ff97eb9920dcd29513174f0294d3
 pyyaml==6.0.3 \
-    --hash=sha256:0f29edc409a6392443abf94b9cf89ce99889a1dd5376d94316ae5145dfedd5d6
+    --hash=sha256:0f29edc409a6392443abf94b9cf89ce99889a1dd5376d94316ae5145dfedd5d6 \
+    --hash=sha256:ee2922902c45ae8ccada2c5b501ab86c36525b883eff4255313a253a3160861c
 referencing==0.37.0 \
     --hash=sha256:381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231
 regress==2026.9.1 \
-    --hash=sha256:c6c38738d973ee4680da9884c11bbd473841be6d660dbd00142192c279b01789
+    --hash=sha256:c6c38738d973ee4680da9884c11bbd473841be6d660dbd00142192c279b01789 \
+    --hash=sha256:f3ffa280c0ca9bc3946922e86ffc0c61038e9bd849f0f928d3ef32f42d6e40f1
 requests==2.34.2 \
     --hash=sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0
 reuse==6.2.0 \
     --hash=sha256:4feae057a2334c9a513e6933cdb9be819d8b822f3b5b435a36138bd218897d23
 rpds-py==2026.9.1 \
-    --hash=sha256:7868b85224291c6cb6759f9b5adb9745f486d226f62b16a614dd5a2a5ab2b35b
+    --hash=sha256:7868b85224291c6cb6759f9b5adb9745f486d226f62b16a614dd5a2a5ab2b35b \
+    --hash=sha256:457866b85daf5034296666168b84a69e0b2e89dc4f1af102b46f6448a60b9063
 ruamel-yaml==0.19.1 \
     --hash=sha256:27592957fedf6e0b62f281e96effd28043345e0e66001f97683aa9a40c667c93
 tomlkit==0.15.2 \

@@ -9,21 +9,35 @@
 #
 # Pins: the base image by digest, the same as the verification container's v0.
 # Each download carries its exact version and its sha256, and the build fails
-# on a file whose hash does not match.
-FROM docker.io/library/python@sha256:2d44738ebf4ce5f63b9d9ea871e9c7cfdc0426f7b0c97cac915fd88ded1d86bb
+# on a file whose hash does not match. Built for linux/amd64 and linux/arm64.
 
+# Downloads: one stage per architecture, each at an exact version and checked
+# by digest. The build uses the stage named by TARGETARCH, which podman and
+# docker set to the platform being built, and skips the other.
 # Node.js, for Claude Code (docs/quickstart.md steps 1 and 5 run `claude`).
-ADD --checksum=sha256:e05a4d65232ae2b27b3d77da2e368522fb46b923335b8e0d5f77624c32484044 https://nodejs.org/dist/v22.12.0/node-v22.12.0-linux-x64.tar.gz /tmp/node.tar.gz
-# Claude Code, as the npm package tarball, and its linux-x64 platform
-# package, which the main package names as an optional dependency. Both are
-# installed from these files with --offline, so a fetch from the registry
-# fails the build rather than pulling a file with no hash here.
+# Claude Code, as the npm package tarball, and its platform package, which the
+# main package names as an optional dependency. Both are installed from these
+# files with --offline, so a fetch from the registry fails the build rather
+# than pulling a file with no hash here.
+ARG TARGETARCH
+FROM scratch AS dl-amd64
+ADD --checksum=sha256:e05a4d65232ae2b27b3d77da2e368522fb46b923335b8e0d5f77624c32484044 https://nodejs.org/dist/v22.12.0/node-v22.12.0-linux-x64.tar.gz /tmp/dl/node.tar.gz
+ADD --checksum=sha256:1eda4ee54631c2e313df7bd9c2b7d3ca22815e09c6145774309214f06a8acd15 https://registry.npmjs.org/@anthropic-ai/claude-code-linux-x64/-/claude-code-linux-x64-2.1.304.tgz /tmp/dl/claude-code-platform.tgz
+
+FROM scratch AS dl-arm64
+ADD --checksum=sha256:9e7905fdee722f9650a03ae644b51c4c6effd3b98ac93c588700072ab35c9ddb https://nodejs.org/dist/v22.12.0/node-v22.12.0-linux-arm64.tar.gz /tmp/dl/node.tar.gz
+ADD --checksum=sha256:8982cb48232af63394a36332304db8767aeb83e7ae16ecd122a686b58fa5811e https://registry.npmjs.org/@anthropic-ai/claude-code-linux-arm64/-/claude-code-linux-arm64-2.1.304.tgz /tmp/dl/claude-code-platform.tgz
+
+FROM dl-${TARGETARCH} AS dl
+
+FROM docker.io/library/python@sha256:2d44738ebf4ce5f63b9d9ea871e9c7cfdc0426f7b0c97cac915fd88ded1d86bb
+COPY --from=dl /tmp/dl /tmp/dl
+# The main package is the same file on every architecture.
+ADD --checksum=sha256:94dcc84341b99d0b5f76d6c6ca24feb4109250a2bdba728fa2163aeb7fba00ac https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.304.tgz /tmp/dl/claude-code.tgz
 # The platform package goes in FIRST: the main package's postinstall copies
 # the native binary out of it, and with it missing leaves a stub that only
 # prints "native binary not installed". --no-update-notifier because npm's
 # check for a newer npm reaches the registry even with --offline.
-ADD --checksum=sha256:94dcc84341b99d0b5f76d6c6ca24feb4109250a2bdba728fa2163aeb7fba00ac https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.304.tgz /tmp/claude-code.tgz
-ADD --checksum=sha256:1eda4ee54631c2e313df7bd9c2b7d3ca22815e09c6145774309214f06a8acd15 https://registry.npmjs.org/@anthropic-ai/claude-code-linux-x64/-/claude-code-linux-x64-2.1.304.tgz /tmp/claude-code-linux-x64.tgz
 
 # git: quickstart step 1 (`git --version`) and every script that reads a
 # repository. The rest (sh, bash, GNU grep, find, sed, awk, sort, mktemp, ln
@@ -31,11 +45,11 @@ ADD --checksum=sha256:1eda4ee54631c2e313df7bd9c2b7d3ca22815e09c6145774309214f06a
 RUN apt-get update -qq \
  && apt-get install -y -qq --no-install-recommends git \
  && rm -rf /var/lib/apt/lists/* \
- && tar -xzf /tmp/node.tar.gz -C /usr/local --strip-components=1 \
+ && tar -xzf /tmp/dl/node.tar.gz -C /usr/local --strip-components=1 \
       --exclude='*/CHANGELOG.md' --exclude='*/README.md' --exclude='*/LICENSE' \
- && npm install -g --offline --no-update-notifier /tmp/claude-code-linux-x64.tgz \
- && npm install -g --offline --no-update-notifier --omit=optional /tmp/claude-code.tgz \
- && rm -f /tmp/node.tar.gz /tmp/claude-code.tgz /tmp/claude-code-linux-x64.tgz \
+ && npm install -g --offline --no-update-notifier /tmp/dl/claude-code-platform.tgz \
+ && npm install -g --offline --no-update-notifier --omit=optional /tmp/dl/claude-code.tgz \
+ && rm -rf /tmp/dl \
  && mkdir -m 1777 /home/kit /workspace
 
 # run passes --userns=keep-id, so the container runs as the calling user's

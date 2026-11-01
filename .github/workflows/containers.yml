@@ -1,0 +1,79 @@
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: containers
+
+# Builds each image in containers/ for linux/amd64 and linux/arm64 and runs
+# the gates selftest inside it. A container exists to run the same on any
+# host, so an image that builds on one architecture only is a failure here,
+# not a README note.
+#
+# Each architecture builds on a native runner, never under emulation: an
+# emulated pass is not a native one, and CodeQL under emulation runs many
+# times slower. Docker builds here because both runner images ship it; the
+# Containerfile in each directory is the one podman builds locally.
+#
+# The verification image also runs compliance and a CodeQL scan. The scan
+# exits 1 when it finds any alert, and main carries dismissed alerts, so the
+# step passes on 0 or 1 with both per-language counts printed, and fails on
+# 2, an analysis that did not finish. Comparing alerts is CodeQL's own job
+# in CI, not this one's.
+#
+# Run the same thing yourself, one architecture:
+#   containers/verify/verify . ./scripts/gates.sh --selftest
+#   containers/starter/run "$(mktemp -d)" sh -c 'cp -a /kit /tmp/work && cd /tmp/work && ./scripts/gates.sh --selftest'
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    timeout-minutes: 45
+    strategy:
+      # Let both architectures finish. A failure on one is information about
+      # the other only if the other has run to the end.
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      # Pinned by tag, not by digest, as in gates.yml. See
+      # docs/security-posture.md, row 3.7.
+      - uses: actions/checkout@v7
+
+      - name: Build the starter image
+        run: docker build -t kit-starter -f containers/starter/Containerfile containers/starter
+
+      # As containers/starter/run does: the calling user's uid, no network.
+      - name: Gates selftest in the starter image
+        run: |
+          docker run --rm --network=none --user "$(id -u):$(id -g)" -v "$PWD:/kit:ro" kit-starter \
+            sh -c 'uname -m && node --version && claude --version \
+              && cp -a /kit /tmp/work && cd /tmp/work && ./scripts/gates.sh --selftest'
+
+      - name: Build the verification image
+        run: docker build -t kit-verify -f containers/verify/Containerfile containers/verify
+
+      - name: Gates and compliance selftests in the verification image
+        run: |
+          docker run --rm --network=none -v "$PWD:/src:ro" kit-verify \
+            sh -c 'uname -m && codeql version --format=terse \
+              && cp -a /src /tmp/work && cd /tmp/work \
+              && ./scripts/gates.sh --selftest && ./scripts/compliance.sh --require --selftest'
+
+      - name: CodeQL scan in the verification image
+        run: |
+          set +e
+          docker run --rm --network=none -v "$PWD:/src:ro" kit-verify \
+            sh -c 'cp -a /src /tmp/work && cd /tmp/work && codeql-scan' > scan.txt 2>&1
+          code=$?
+          set -e
+          grep '^codeql: ' scan.txt || true
+          [ "$code" -le 1 ] || { tail -20 scan.txt; echo "codeql-scan exit $code"; exit 1; }
+          grep -q '^codeql: python: ' scan.txt && grep -q '^codeql: actions: ' scan.txt

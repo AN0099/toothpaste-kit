@@ -78,6 +78,17 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `containers/verify/` and `containers/starter/` build for linux/amd64 and
+  linux/arm64. Each download that differs by architecture has one pinned
+  stage per architecture, chosen by `TARGETARCH`, and `requirements.txt`
+  carries an aarch64 wheel hash beside each x86-64 one. A new workflow,
+  `.github/workflows/containers.yml`, builds both images on a native runner
+  for each architecture and runs the gates selftest inside each, plus
+  compliance and a CodeQL scan in the verification image.
+- `containers/verify/` moves to the CodeQL 2.27.3 bundle, the version GitHub's
+  default setup runs. 2.27.2 missed a `py/xml-bomb` alert that 2.27.3 reports
+  on the same tree. The image is now `localhost/kit-verify:v2`, so a host that
+  built v1 builds the new one on its next run instead of reusing the old.
 - `scripts/compliance.sh`: a check whose tool is not
   installed now fails the script, exit 1, and names the tool; `--allow-missing`
   reports it as not checked instead. `--require` is still accepted. The
