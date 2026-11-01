@@ -71,6 +71,11 @@ skill lives in that skill's own `CHANGELOG.md`.
 - `scripts/schema-check.py` (pull request #71): refuses any argument with
   exit 2. Before it, a mistyped flag such as `--selftest` ran a normal check
   and exited 0.
+- `scripts/round-check.py --selftest`: counts its extra checks as they run, so
+  the total reads 134 of 134 and can no longer drift from the code, as 133
+  did. The `finding-id-unique` plant now differs from the finding it
+  duplicates, and the report's ids are kept as a set, which removes a mutant
+  the selftest could not tell apart.
 
 ### Skill revisions
 
