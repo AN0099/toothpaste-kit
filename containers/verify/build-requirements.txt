@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# The build backend for reuse's sdist (see requirements.txt), pinned by
+# hash and installed first, so the build needs no unpinned download.
+poetry-core==2.5.0 \
+    --hash=sha256:98ee465b66f7e14bb9fbe68fb5e00d0cff184f036993ec94610ae4b5612f3add

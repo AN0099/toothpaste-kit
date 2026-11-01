@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Run CodeQL's python and actions analyses on a tree, in the verification
+# container, with each pack's default query suite: the two languages the
+# repository's CodeQL default setup analyses (docs/security-posture.md, 4.5).
+# usage: containers/verify/codeql TREE
+# Prints each alert as `file:line rule`, then a count per language. Exits 1 if
+# there is any alert, 2 on a usage or analysis error, 0 when clean. The work is
+# containers/verify/codeql-scan, which the image holds.
+set -eu
+[ $# -eq 1 ] || { echo "usage: codeql TREE" >&2; exit 2; }
+here=$(dirname "$(readlink -f "$0")")
+exec "$here/verify" "$1" codeql-scan 2>&1

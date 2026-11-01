@@ -95,7 +95,7 @@ Five block: a forbidden character in generated content, a packing command withou
 
 ### `scripts/`
 
-`gates.sh` is the mechanical gates, one implementation run both by CI and by hand before a push; `./scripts/gates.sh --selftest` also proves each gate can fail against a planted positive. Its header states what each gate covers. `compliance.sh` holds the checks that need an installed tool, REUSE among them, so a fresh clone can still run every gate in `gates.sh` with only the tools [`CONTRIBUTING.md` lists](CONTRIBUTING.md#run-the-checks-the-way-ci-runs-them), and nothing installed.
+`gates.sh` is the mechanical gates, one implementation run both by CI and by hand before a push; `./scripts/gates.sh --selftest` also proves each gate can fail against a planted positive. Its header states what each gate covers. `compliance.sh` holds the checks that need an installed tool, REUSE among them, so a fresh clone can still run every gate in `gates.sh` with only the tools [`CONTRIBUTING.md` lists](CONTRIBUTING.md#run-the-checks-the-way-ci-runs-them), and nothing installed. A check whose tool is missing fails `compliance.sh` unless `--allow-missing` is given. [`containers/`](containers/README.md) holds an image with every such tool, so the checks run without installing anything on the host.
 
 The gates call these, and each runs on its own as well:
 
