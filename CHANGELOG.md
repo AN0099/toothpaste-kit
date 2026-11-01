@@ -25,6 +25,13 @@ skill lives in that skill's own `CHANGELOG.md`.
   `noAssertion`, the file's other values left out and a warning on stderr; an
   entry missing a required key exits 2. The pull request template now points
   to the script, and `scripts/gates.sh` runs its selftest as gate 17.
+- `scripts/sbom.py`: prints an SPDX 3.0.1 JSON-LD bill of materials for the
+  tree, with every REUSE-covered file's copyright and licence and every
+  workflow action by its pinned ref. It exits 1 on a file with no licence or
+  copyright, a licence with no text under `LICENSES/`, or an action not pinned
+  by commit SHA, except `actions/checkout@v7`, recorded in
+  `docs/security-posture.md` row 3.7. `scripts/gates.sh` runs its selftest
+  and then the script on the tree as gate 19.
 - `security-insights.yml` (pull request #76): an OpenSSF Security Insights
   file at the kit root, following schema version 2.2.0, that describes the
   kit's security arrangements in a form tools read. `docs/security-posture.md`
