@@ -12,6 +12,14 @@ skill lives in that skill's own `CHANGELOG.md`.
   `feed.xml`; `--selftest` runs the planted cases for both. Three posts, one
   per release from 0.3.0 to 0.5.0. `blog/README.md` indexes the directory and
   [The kit blog](docs/blog.md) is the guide. Nothing is published.
+- `scripts/cli_path.py`: one function, `under(root, arg)`, that keeps a
+  command-line path argument inside a root directory, using `realpath` and a
+  `startswith` on the root plus the separator. A path outside, through `..`,
+  an absolute path or a symbolic link, exits 2 naming the argument and the
+  root. `scripts/spdx-fragment.py` routes `--models` through it, taken from
+  the repository root, so a `--models` path outside the repository now exits
+  2. `scripts/gates.sh --selftest` runs the helper's selftest against a copy
+  with the separator dropped.
 - `scripts/check-qblock` (pull request #62): checks a reply's closing question
   block against `skills/working-preferences/SKILL.md`, "Questions and
   Answers", with 30 planted cases in `tests/qblock-cases/` run from
