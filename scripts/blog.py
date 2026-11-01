@@ -95,11 +95,13 @@ def parse_front(path, lines):
         if line.strip() == '---':
             end = i
             break
-        m = re.match(r'^([a-z]+):\s*(.*?)\s*$', line)
+        # One quantifier per span, so a long line cannot backtrack; strip()
+        # drops the spaces that \s*(.*?)\s*$ used to.
+        m = re.match(r'^([a-z]+):(.*)$', line)
         if not m:
             errs.append(f'{path}:{i + 1}: front block line is not "field: value"')
             continue
-        key, val = m.group(1), m.group(2)
+        key, val = m.group(1), m.group(2).strip()
         if len(val) >= 2 and val[0] == val[-1] and val[0] in '"\'':
             val = val[1:-1]
         if key not in FRONT_FIELDS:
@@ -182,8 +184,25 @@ BLOCK_REFUSED = [
     (re.compile(r'^#{1,6}[^#\s]'), 'heading without a space after #'),
     (re.compile(r'^\s*<(?!!--)'), 'raw HTML block'),
 ]
-HEADING_RE = re.compile(r'^(#{1,6}) +(.+?)\s*#*\s*$')
-ITEM_RE = re.compile(r'^( *)([-*]|\d+\.) +(.*)$')
+# Neither pattern has two quantifiers that can match the same characters
+# side by side ([^ ] and the literal space end each run of spaces), so
+# neither can backtrack on a long line. The spaces after a
+# marker and a heading's closing #s are cut in code instead: heading_text and
+# the lstrip on an item's text.
+HEADING_RE = re.compile(r'^(#{1,6})( +)([^ ].*)?$')
+ITEM_RE = re.compile(r'^( *)([-*]|\d+\.) (.*)$')
+
+
+def heading_text(m):
+    """A HEADING_RE match's text without the closing run of # and the
+    spaces around it, as (.+?)\\s*#*\\s*$ read it, or None when there is no
+    text. The text is the shortest non-empty start of the rest whose tail is
+    spaces, #s, spaces; with nothing after the spaces, one space is the text."""
+    rest = m.group(3)
+    if not rest:
+        return ' ' if len(m.group(2)) > 1 else None
+    cut = len(rest.rstrip().rstrip('#').rstrip())
+    return rest[:max(cut, 1)]
 
 
 def convert(path, lines, first_ln=1):
@@ -254,14 +273,15 @@ def convert(path, lines, first_ln=1):
             errs.append(refuse(path, ln, refused))
             continue
         m = HEADING_RE.match(line)
-        if m:
+        text = heading_text(m) if m else None
+        if text is not None:
             close_para()
             close_lists()
             level = len(m.group(1))
             if level == 1:
                 errs.append(refuse(path, ln, 'level-1 heading; the title comes from the front block'))
                 continue
-            out.append(f'<h{level}>{inline(path, ln, m.group(2), errs)}</h{level}>')
+            out.append(f'<h{level}>{inline(path, ln, text, errs)}</h{level}>')
             continue
         m = ITEM_RE.match(line)
         if m and not para:
@@ -283,7 +303,7 @@ def convert(path, lines, first_ln=1):
                     out.append('</li>')
                 if lists and lists[-1][1] != tag:
                     errs.append(refuse(path, ln, 'list changes between - and 1. at one level'))
-            lists[-1][2].append((ln, m.group(3)))
+            lists[-1][2].append((ln, m.group(3).lstrip(' ')))
             continue
         if lists:
             if line.startswith(' ') and lists[-1][2]:
@@ -391,6 +411,7 @@ def build(out_dir, posts_dir=POSTS_DIR):
 
 # ------------------------------------------------------------------- selftest
 
+# REUSE-IgnoreStart
 GOOD = """---
 title: A good post
 date: 2026-10-13
@@ -421,6 +442,7 @@ SPDX-FileCopyrightText: 2026 Aidan Naveja
 SPDX-License-Identifier: Apache-2.0
 -->
 """
+# REUSE-IgnoreEnd
 
 GOOD_HTML = """<h2>What changed</h2>
 <p>A paragraph with <code>inline &lt;code&gt;</code> and a <a href="https://example.org/a?b=1&amp;c=2">link</a> that wraps onto a second line.</p>
@@ -533,6 +555,50 @@ def selftest():
             except BlogError as e:
                 msg = '\n'.join(e.args[0])
             check(want in msg, f'planted {name} is refused' + ('' if want in msg else f' (got: {msg or "no error"})'))
+    # Each rewritten pattern on a long line built to make the old one
+    # backtrack: each must finish well under a second and read as before.
+    import time
+
+    def quick(label, run):
+        t0 = time.perf_counter()
+        got = run()
+        took = time.perf_counter() - t0
+        check(took < 1.0, f'{label}, in {took:.3f} s')
+        return got
+
+    # pad T pad T, not pad T pad: the old \s*(.*?)\s*$ was linear on the
+    # second and took 4 s on this one.
+    pad = ' \t' * 20000
+    fields, _ = quick('a front line of 40000 spaces and tabs, T, 40000 more and T',
+                      lambda: parse_front('p', ['---', 'title: ' + pad + 'T' + pad + 'T', 'date: 2026-10-14',
+                                                'summary: S', '---']))
+    check(fields.get('title') == 'T' + pad + 'T', 'the padding around a front value is dropped')
+    html_out = quick('a heading of 20000 " # " runs before its last word',
+                     lambda: convert('p', ['## a' + ' # ' * 20000 + 'b']))
+    check(html_out.startswith('<h2>a #') and html_out.endswith(' b</h2>\n'), 'that heading keeps its #s inside the text')
+    html_out = quick('a heading of 100000 spaces before its last letter',
+                     lambda: convert('p', ['## a' + ' ' * 100000 + 'b']))
+    check(html_out == '<h2>a' + ' ' * 100000 + 'b</h2>\n', 'that heading keeps its spaces')
+    # convert's lines never hold a newline; this times the pattern on one anyway.
+    quick('HEADING_RE on 100000 spaces then a newline', lambda: HEADING_RE.match('# ' + ' ' * 100000 + '\nx'))
+    check(convert('p', ['## Title ## ']) == '<h2>Title</h2>\n', 'a heading drops its closing #s')
+    html_out = quick('a list item with 100000 spaces after its marker',
+                     lambda: convert('p', ['- ' + ' ' * 100000 + 'x']))
+    check(html_out == '<ul>\n<li>x\n</li>\n</ul>\n', 'the spaces after an item marker are dropped')
+    # As with HEADING_RE: the old ' +(.*)$' took 6 s here, though convert never passes a newline.
+    quick('ITEM_RE on 50000 spaces then a newline', lambda: ITEM_RE.match('- ' + ' ' * 50000 + '\nx'))
+    with tempfile.TemporaryDirectory() as tmp:
+        cl = os.path.join(tmp, 'CHANGELOG.md')
+        with open(cl, 'w', encoding='utf-8') as f:
+            # REUSE-IgnoreStart
+            f.write('<!--\nSPDX-FileCopyrightText: x\n' * 20000 + '<!--' + ' \n' * 50000)
+            # REUSE-IgnoreEnd
+        check(quick('20000 unclosed SPDX comment starts', lambda: spdx_comment(cl)) == '',
+              'an SPDX comment that is never closed is not taken')
+        with open(cl, 'w', encoding='utf-8') as f:
+            f.write('<!--x' * 200000)
+        check(quick('200000 comment starts that are not an SPDX comment', lambda: spdx_comment(cl)) == '',
+              'a file with no SPDX comment gives none')
     print(f'blog selftest: {len(fails)} failure(s)')
     return 1 if fails else 0
 
@@ -554,7 +620,7 @@ CONTENT_NS = 'http://purl.org/rss/1.0/modules/content/'
 # hosts, and changed only by renaming the post's file.
 GUID_PREFIX = 'tp-kit-blog:'
 # Characters XML 1.0 cannot carry at all, even escaped.
-XML_BAD_CHAR = re.compile('[\x00-\x08\x0b\x0c\x0e-\x1f￾￿]')
+XML_BAD_CHAR = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\ufffe\uffff]')
 RFC822_RE = re.compile(r'^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} '
                        r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} '
                        r'\d{2}:\d{2}:\d{2} (GMT|[+-]\d{4})$')
@@ -604,7 +670,11 @@ def feed_problems(text, posts):
     required elements (rss version, channel title, link and description; an
     item's title or description), and this blog's own promises (one item
     per post in order, a unique guid, an RFC 822 pubDate on the post's
-    date, the whole body in content:encoded). Empty when nothing is."""
+    date, the whole body in content:encoded). Empty when nothing is.
+    A feed with a DOCTYPE is refused before parsing, so no entity it
+    declares is ever expanded; this blog's feed never carries one."""
+    if '<!DOCTYPE' in text:
+        return ['a DOCTYPE is refused, so no entity can be expanded']
     try:
         root = ET.fromstring(text)
     except ET.ParseError as e:
@@ -675,8 +745,25 @@ def spdx_comment(changelog):
     """The CHANGELOG's closing SPDX comment, so the draft carries the same header."""
     with open(changelog, encoding='utf-8') as f:
         text = f.read()
-    m = re.search(r'<!--\s*\nSPDX-FileCopyrightText:.*?-->', text, re.S)
-    return m.group(0) if m else ''
+    # The first <!-- followed by whitespace that ends in a newline, then the
+    # tag at the start of that line, up to the next -->, found in one pass: the
+    # regex this replaces, <!--\s*\n...:.*?-->, could take quadratic time on
+    # many unclosed starts. Each whitespace run is walked once, since the next
+    # <!-- is searched for from where the walk began and cannot be whitespace.
+    # REUSE-IgnoreStart
+    tag = 'SPDX-FileCopyrightText:'
+    # REUSE-IgnoreEnd
+    start = text.find('<!--')
+    while start != -1:
+        after = start + 4
+        at = after
+        while at < len(text) and text[at].isspace():
+            at += 1
+        if at > after and text[at - 1] == '\n' and text.startswith(tag, at):
+            end = text.find('-->', at + len(tag))
+            return text[start:end + 3] if end != -1 else ''
+        start = text.find('<!--', after)
+    return ''
 
 
 def draft_text(version, date, section, spdx):
@@ -755,6 +842,7 @@ FEED_REQUIRED = ('not well-formed', 'wrong rss version', 'no channel title', 'no
                  'no channel description', 'pubDate not RFC 822', 'pubDate on another day', 'no guid',
                  'duplicate guid', 'body cut short', 'item without title or description')
 
+# REUSE-IgnoreStart
 CHANGELOG_SAMPLE = """# Changelog
 
 ## Unreleased
@@ -787,6 +875,7 @@ SPDX-FileCopyrightText: 2026 Someone
 SPDX-License-Identifier: Apache-2.0
 -->
 """
+# REUSE-IgnoreEnd
 
 
 def feed_selftest():
@@ -847,7 +936,9 @@ def feed_selftest():
         check('## Added' in draft and '## Fixed' in draft and '### ' not in draft,
               'the section headings are raised one level')
         check('Older.' not in draft and 'Not yet.' not in draft, 'only the version asked for is drafted')
+        # REUSE-IgnoreStart
         check('SPDX-License-Identifier: Apache-2.0' in draft, 'the draft carries the SPDX header')
+        # REUSE-IgnoreEnd
         drafted = load_posts(drafts)
         check(len(drafted) == 1 and drafted[0]['title'].startswith('DRAFT'), 'the draft loads as a post marked DRAFT')
         for label, version, want in (('the existing draft is not overwritten', '1.2.0', 'already exists'),
@@ -860,6 +951,20 @@ def feed_selftest():
             except BlogError as e:
                 msg = '\n'.join(e.args[0])
             check(want in msg, label + ('' if want in msg else f' (got: {msg or "no error"})'))
+    bomb = ('<?xml version="1.0"?><!DOCTYPE rss [<!ENTITY a "' + 'a' * 1000 + '">'
+            + ''.join(f'<!ENTITY a{i} "' + '&a;' * 10 + '">' for i in range(5))
+            + ']><rss version="2.0"><channel>&a4;</channel></rss>')
+    check(feed_problems(bomb, []) == ['a DOCTYPE is refused, so no entity can be expanded'],
+          'a feed with a DOCTYPE is refused before it is parsed')
+    bad = [chr(c) for c in list(range(0x00, 0x09)) + [0x0b, 0x0c] + list(range(0x0e, 0x20))] + ['\ufffe', '\uffff']
+    good_chars = ['\t', '\n', '\r', ' ', '~', '\ud7ff', '\ue000', '\ufffd']
+    check(all(XML_BAD_CHAR.search(c) for c in bad) and not any(XML_BAD_CHAR.search(c) for c in good_chars),
+          'XML_BAD_CHAR holds exactly the characters XML 1.0 cannot carry, U+FFFE and U+FFFF included')
+    import time
+    t0 = time.perf_counter()
+    XML_BAD_CHAR.search('a' * 1000000)
+    took = time.perf_counter() - t0
+    check(took < 1.0, f'XML_BAD_CHAR on a clean 1000000-character text, in {took:.3f} s')
     return fails
 
 
