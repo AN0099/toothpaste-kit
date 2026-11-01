@@ -60,6 +60,12 @@
 
 set -u
 
+# Every gate reads paths from the kit root, so start there whatever the
+# current directory. dirname, not git, so it works in a tree whose .git is
+# missing, such as a container's copy. Run from elsewhere without this, the
+# selftest's plants failed with messages about the gates, not the directory.
+cd "$(dirname "$0")/.." || exit 2
+
 # Most gates run python3. Without it they fail with a message about the gate,
 # not about python3, so say so once, before any gate runs.
 if ! command -v python3 >/dev/null 2>&1; then
@@ -955,6 +961,29 @@ PY
   bad=$?
   python3 scripts/sbom.py --selftest >/dev/null 2>&1
   plant_rejected $bad $? "sbom gate, action pin check removed"
+  # gates.sh from another directory: two copies of the kit, each in a fresh
+  # repository of one commit (the sbom gate reads the index and HEAD), run
+  # from a third directory. The one whose cd to the kit root is removed must
+  # fail, and the one as installed must pass every gate.
+  mkdir -p "$tmp/cwd-elsewhere"
+  for t in cwd-bad cwd-ok; do
+    mkdir -p "$tmp/$t"
+    cp -R . "$tmp/$t/"
+    rm -rf "$tmp/$t/.git"
+    ( cd "$tmp/$t" && export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null &&
+      git init -q && git add -A &&
+      git -c user.name=plant -c user.email=plant@invalid commit -qm plant ) \
+      || { echo "PLANT FAIL  gates.sh from another directory: scratch repository failed"; plant_fail=1; }
+  done
+  sed '/^cd "$(dirname "$0")\/\.\." || exit 2$/d' scripts/gates.sh > "$tmp/cwd-bad/scripts/gates.sh"
+  if cmp -s scripts/gates.sh "$tmp/cwd-bad/scripts/gates.sh"; then
+    echo "PLANT FAIL  gates.sh from another directory, cd removed: the plant did not apply"; plant_fail=1
+  else
+    ( cd "$tmp/cwd-elsewhere" && sh "$tmp/cwd-bad/scripts/gates.sh" ) >"$tmp/gate.out" 2>&1
+    bad=$?
+    ( cd "$tmp/cwd-elsewhere" && sh "$tmp/cwd-ok/scripts/gates.sh" ) >"$tmp/gate.out" 2>&1
+    plant_rejected $bad $? "gates.sh from another directory, cd removed"
+  fi
 
   printf '\n'
   [ "$plant_fail" -eq 0 ] || { echo "selftest: a gate could not be shown to fail. Do not trust a clean run."; return 1; }
