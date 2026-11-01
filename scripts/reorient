@@ -241,9 +241,9 @@ repo() { # $1 label, $2 path
   lvl=$(bash "$HERE/remote-level.sh" "$dir" 2>/dev/null || printf 'external')
   br=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null || printf '?')
   [ "$br" = HEAD ] && br="detached@$(git -C "$dir" rev-parse --short HEAD 2>/dev/null)"
-  staged=$(git -C "$dir" diff --cached --name-only 2>/dev/null | wc -l)
-  dirty=$(git -C "$dir" diff --name-only 2>/dev/null | wc -l)
-  untr=$(git -C "$dir" ls-files --others --exclude-standard 2>/dev/null | wc -l)
+  staged=$(git -C "$dir" diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
+  dirty=$(git -C "$dir" diff --name-only 2>/dev/null | wc -l | tr -d ' ')
+  untr=$(git -C "$dir" ls-files --others --exclude-standard 2>/dev/null | wc -l | tr -d ' ')
   st=$(git -C "$dir" rev-list --left-right --count "@{u}...HEAD" 2>/dev/null || true)
   if [ -n "$st" ]; then behind=${st%%[!0-9]*}; ahead=${st##*[!0-9]}; else behind=-; ahead=-; fi
   printf 'GIT  %-14s %-9s %-10s staged %-3s dirty %-3s untracked %-3s ahead %s behind %s\n' \
