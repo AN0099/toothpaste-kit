@@ -369,15 +369,15 @@ def cross_check(docs):
         for i, value in enumerate(get(rnd, "scope.paths") if isinstance(get(rnd, "scope.paths"), list) else []):
             if repo_relative(value):
                 bad("review-round", "repository-relative-path", f"scope.paths[{i}] {value!r} {repo_relative(value)}")
-    report_findings = {}
+    report_ids = set()
     if rep is not None:
         for i, f in enumerate(get(rep, "findings") if isinstance(get(rep, "findings"), list) else []):
             if not isinstance(f, dict):
                 continue
-            if f.get("id") in report_findings:
+            if f.get("id") in report_ids:
                 bad("review-report", "finding-id-unique",
                     f"findings[{i}].id {f.get('id')!r} is already used by an earlier finding; ids are unique in the report")
-            report_findings.setdefault(f.get("id"), f)
+            report_ids.add(f.get("id"))
             loc = get(f, "location.path")
             if loc is not MISSING and repo_relative(loc):
                 bad("review-report", "repository-relative-path", f"findings[{i}].location.path {loc!r} {repo_relative(loc)}")
@@ -453,7 +453,7 @@ def cross_check(docs):
             continue
         fid = v.get("findingId")
         verified[fid] = v
-        if rep is not None and fid not in report_findings:
+        if rep is not None and fid not in report_ids:
             bad("operator-decision", "finding-exists",
                 f"verification.findings[{i}] names {fid!r}, which the report does not contain")
         if v.get("status") == "reproduced":
@@ -1260,7 +1260,7 @@ def selftest_cross():
              if k != "proposedRemedy"} | {"id": "f2"})),
         # Two findings with one id: a verification entry could name only one of them.
         ("finding-id-unique", lambda d: d["review-report"]["findings"].append(
-            copy.deepcopy(d["review-report"]["findings"][0]))),
+            copy.deepcopy(d["review-report"]["findings"][0]) | {"severity": "minor"})),
         ("spec-required-field", delp("operator-decision", "references.reviewReport.commit")),
         ("spec-required-field", setp("operator-decision", "schemaVersion", "tpkit.operator-decision/v1")),
         ("spec-required-field", setp("review-report", "kind", "Report")),
@@ -1318,10 +1318,20 @@ def selftest_cross():
     ]
     key_failed, key_cases = selftest_answer_key(plant)
     failed = key_failed
+    # Each check beside the planted cases goes through extra(), which counts
+    # it, so the total below is the number of checks that ran.
+    extras = 0
+
+    def extra(problem, message):
+        nonlocal failed, extras
+        extras += 1
+        if problem:
+            print(f"selftest FAIL: {message}")
+            failed += 1
+        return not problem
+
     clean = cross_check(valid_trio())
-    if clean:
-        print(f"selftest FAIL: the valid round raised {clean}")
-        failed += 1
+    extra(clean, f"the valid round raised {clean}")
 
     def rejects(d):
         # A second finding, checked by the verifier and not reproduced; not cited.
@@ -1333,9 +1343,7 @@ def selftest_cross():
              "evidence": [{"description": "followed the reviewer's steps; the behaviour did not occur"}]})
     excepted = cross_check(plant(lambda d: d["operator-decision"]["decision"].update(
         status="accept", exceptions=[{"findingId": "f1", "reason": "accepted for this release; fix tracked"}])))
-    if excepted:
-        print(f"selftest FAIL: an accept with an explicit exception raised {excepted}")
-        failed += 1
+    extra(excepted, f"an accept with an explicit exception raised {excepted}")
     # The two other alignment statuses, each with a decision allowed for it,
     # are valid rounds: a mismatched revision with rerun, and an unresolved
     # one (the report gives no revision) with abstain.
@@ -1347,9 +1355,7 @@ def selftest_cross():
         return edit
     for status, outcome, reviewed in (("mismatched", "rerun", other), ("unresolved", "abstain", None)):
         raised = cross_check(plant(misaligned(status, outcome, reviewed)))
-        if raised:
-            print(f"selftest FAIL: a valid round with alignment {status} and decision {outcome} raised {raised}")
-            failed += 1
+        extra(raised, f"a valid round with alignment {status} and decision {outcome} raised {raised}")
     # An accept needs an exception for each reproduced major finding only:
     # a reproduced minor f2 without one is valid.
     def minor_unexcepted(d):
@@ -1362,50 +1368,36 @@ def selftest_cross():
         d["operator-decision"]["decision"].update(
             status="accept", exceptions=[{"findingId": "f1", "reason": "accepted for this release; fix tracked"}])
     minor = cross_check(plant(minor_unexcepted))
-    if minor:
-        print(f"selftest FAIL: an accept leaving a reproduced minor finding without an exception raised {minor}")
-        failed += 1
+    extra(minor, f"an accept leaving a reproduced minor finding without an exception raised {minor}")
     def unverified_nit(d):
         # A finding the verifier did not check has no entry; the decision does not cite it.
         f2 = copy.deepcopy(d["review-report"]["findings"][0])
         f2.update(id="f2", severity="nit")
         d["review-report"]["findings"].append(f2)
     unchecked = cross_check(plant(unverified_nit))
-    if unchecked:
-        print(f"selftest FAIL: a reported finding with no verification entry, not cited, raised {unchecked}")
-        failed += 1
+    extra(unchecked, f"a reported finding with no verification entry, not cited, raised {unchecked}")
     raised = cross_check(plant(rejects)) + answer_key_check(valid_key(), plant(rejects))
-    if raised:
-        print(f"selftest FAIL: valid-verification-rejects-finding raised {raised}")
-        failed += 1
-    else:
+    if extra(raised, f"valid-verification-rejects-finding raised {raised}"):
         COVERED.add("valid-verification-rejects-finding")
     # An absent section is named once by the spec layer, not once per
     # subfield, and a section the schema reported is not reported again.
     gone = [m for _, inv, m in spec_check(plant(delp("operator-decision", "decision")))
             if inv == "spec-required-field"]
-    if gone != ["decision is required by artifactRequirements"]:
-        print(f"selftest FAIL: an absent decision section gave {gone}")
-        failed += 1
+    extra(gone != ["decision is required by artifactRequirements"], f"an absent decision section gave {gone}")
     # The cross-checks do not then report the absent section's subfields.
     nodec = plant(delp("operator-decision", "decision"))
     again = [p for p in cross_check(nodec) + answer_key_check(valid_key(), nodec)
              if p[1] != "spec-required-field"]
-    if again:
-        print(f"selftest FAIL: an absent decision section also raised {again}")
-        failed += 1
-    if schema_missing_paths(["$: missing required field 'decision'",
-                             "$.findings[0].verification: missing required field 'evidence'"]) != \
-            {"decision", "findings[0].verification.evidence"}:
-        print("selftest FAIL: schema_missing_paths misread a schema message")
-        failed += 1
+    extra(again, f"an absent decision section also raised {again}")
+    extra(schema_missing_paths(["$: missing required field 'decision'",
+                                "$.findings[0].verification: missing required field 'evidence'"]) !=
+          {"decision", "findings[0].verification.evidence"}, "schema_missing_paths misread a schema message")
     # An absent field must read as "missing" in a message, never as an
     # object's repr.
     absent = cross_check(plant(delp("operator-decision", "decision.madeBy.role")))
     leaked = [m for _, _, m in absent if "<object" in m]
-    if leaked or not any("madeBy.role is missing" in m for _, _, m in absent):
-        print(f"selftest FAIL: an absent decision.madeBy.role reads as {[m for _, _, m in absent]}")
-        failed += 1
+    extra(leaked or not any("madeBy.role is missing" in m for _, _, m in absent),
+          f"an absent decision.madeBy.role reads as {[m for _, _, m in absent]}")
     for invariant, edit in cases:
         raised = cross_check(plant(edit))
         leaked = [m for _, _, m in raised if "<object" in m]
@@ -1418,7 +1410,7 @@ def selftest_cross():
             failed += 1
         elif invariant in MATRIX_OF:
             COVERED.add(MATRIX_OF[invariant])
-    return failed, len(cases) + 10 + key_cases
+    return failed, len(cases) + extras + key_cases
 
 
 def valid_key():
