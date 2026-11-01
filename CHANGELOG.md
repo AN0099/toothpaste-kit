@@ -65,6 +65,11 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Fixed
 
+- `README.md` and `docs/installing.md`: the README names the five scripts in
+  `scripts/` it had left out, and says `repomix` is a separate tool that the
+  counts check depends on. The installing guide creates the skills directory
+  before copying into it, and says which hook rules work as shipped and which
+  name paths you must edit first.
 - `scripts/gates.sh --selftest` (pull request #70): counts its planted
   positives as they run, so the "all N planted positives fired" message can
   no longer drift from the code.

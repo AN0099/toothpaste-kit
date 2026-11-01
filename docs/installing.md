@@ -74,6 +74,7 @@ default when you run the script with no argument at all.
 Copy instead if you intend to edit the skills yourself:
 
 ```sh
+mkdir -p ~/tpkit-workspace/.claude/skills
 cp -R ~/toothpaste-kit/skills/* ~/tpkit-workspace/.claude/skills/
 ```
 
@@ -109,10 +110,19 @@ copied into the workspace.
 
 3. Start a new Claude Code session in the workspace.
 
-`hookify.em-dash-gate.local.md` works anywhere: it blocks a write containing
-an em dash. The `restricted-*` rules assume a tiered scheme and name its
-paths; edit their patterns to your own paths before enabling them, or they
-match nothing and report clean.
+Four rules work anywhere as shipped: `hookify.em-dash-gate.local.md` blocks
+a write containing an em dash, and the branch name guard and the two
+`repomix` rules match commands, not paths.
+
+The three `restricted-*` rules assume a tiered scheme and name its paths;
+edit their patterns to your own paths before enabling them. Unedited, the two
+read notices match nothing and report clean, and the egress guard catches
+only its `.env` and private key names.
+
+`hookify.memory-read-notice.local.md` names no path. It warns on every read
+through a memory server's `mcp__memory__` tools, and only its message names a
+tier path, `CLASSIFIED/04-restricted/memory/`. Edit the message to say where
+your memory store lives, or leave the rule out.
 
 ## Updating
 
