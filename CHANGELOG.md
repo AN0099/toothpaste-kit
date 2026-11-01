@@ -43,6 +43,12 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- Selftests for nine scripts, from mutation testing: `check-hooks.py`,
+  `check-pr-body`, `compliance.sh`, `mdlint.py`, `reflow-md.py`, `reorient`,
+  `round-check.py`, `spdx-fragment.py`, and the schema-check plants in
+  `gates.sh`. Each new case kills a mutant the old selftest let through.
+  `check-hooks.py` now reports a `pattern:` or `operator:` line that comes
+  before any `- field:` as a finding, where it used to drop the line.
 - `orchestration/ingestion/VENDOR-AGNOSTIC-DIGEST-SPEC.md` (pull request #60):
   one spec, its duplicate sections merged, with
   `CONVERSATION-EXTRACTION-PACKET.md` linked as a fast first pass.

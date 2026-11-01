@@ -25,6 +25,8 @@ code fences do not count. It does NOT check that the boxes ticked are true,
 that a Provenance line matches the commits, or anything about the prose.
 """
 
+import contextlib
+import io
 import json
 import os
 import pathlib
@@ -117,9 +119,36 @@ def selftest():
         ("empty provenance", good + "- [x] Yes\n\n<details>\n<summary>Provenance</summary>\n\n</details>\n",
          {"provenance"}),
     ]
+    # Each block-start kind after a plain line, and each before one, is not a
+    # wrapped paragraph.
+    starts = ["#5 next", "- a", "1. a", "| a |", "> q", "<br>", "[r]: https://e.x", "  - a"]
+    blocks = "".join(f"Intro:\n{s}\n\n" for s in starts)
+    # A template whose comment holds a heading, with a deeper heading, and a
+    # "#" line that is not a heading.
+    deep = ("# What this changes\n\n<!--\n## Not required\n-->\n\n#5 is not a heading\n\n"
+            "### Deep\n")
+    cases += [
+        ("block starts unwrapped", good.replace("One line.\n", blocks) + "No.\n", set()),
+        ("heading then text", good.replace("changes\n\n", "changes\n") + "No.\n", set()),
+        ("text then box", good.replace("- [x] done", "Ran:\n- [x] done") + "No.\n", set()),
+        ("fenced lines", good.replace("One line.", "```\na\nb\n- [ ] x\n```") + "No.\n", set()),
+        ("text after fence", good.replace("One line.", "Para.\n```\nx\n```\nAfter.") + "No.\n", set()),
+        ("heading trailing space", good.replace("## Checks\n", "## Checks  \n") + "No.\n", set()),
+        ("nested empty box", good.replace("- [x] done", "- [x] done\n  - [ ] sub") + "No.\n",
+         {"unticked"}),
+        ("capital X Yes", good + "- [X] Yes\n", {"provenance"}),
+        ("Yes not a word", good + "- [x] Yesterday\n", set()),
+        ("comment-only provenance", good + "- [x] Yes\n\n<details>\n<summary>Provenance</summary>\n\n"
+         "<!-- t -->\n\n</details>\n", {"comment", "provenance"}),
+        ("other details only", good + "- [x] Yes\n\n<details>\n<summary>Notes</summary>\n\nx\n\n</details>\n",
+         {"provenance"}),
+        ("deep template, met", "# What this changes\n\n### Deep\n", set(), deep),
+        ("deep template, unmet", "# What this changes\n\n## Deep\n", {"heading"}, deep),
+        ("no provenance in template", good + "- [x] Yes\n", set(), template.split("<details>")[0]),
+    ]
     ok = True
-    for name, body, want in cases:
-        got = {f.split(":")[0] for f in check(body, template)}
+    for name, body, want, *tpl in cases:
+        got = {f.split(":")[0] for f in check(body, tpl[0] if tpl else template)}
         print(f"{'ok  ' if got == want else 'FAIL'}  {name}" + ("" if got == want else f": want {sorted(want)}, got {sorted(got)}"))
         ok = ok and got == want
     # The file paths main() uses, end to end, so the event reader is exercised too.
@@ -130,6 +159,27 @@ def selftest():
         ok_event = got == "# What this changes\n"
         print(f"{'ok  ' if ok_event else 'FAIL'}  event body read")
         ok = ok and ok_event
+        event.write_text(json.dumps({"pull_request": {"body": None}}))
+        ok_null = read_event(event) == ""
+        print(f"{'ok  ' if ok_null else 'FAIL'}  event body null")
+        ok = ok and ok_null
+        # main() on a body file: the exit code follows the findings.
+        global TEMPLATE
+        saved, TEMPLATE = TEMPLATE, pathlib.Path(d) / "template.md"
+        TEMPLATE.write_text(template)
+        rcs = []
+        for body in (good + "No.\n", good + "- [ ] Yes\n"):
+            (pathlib.Path(d) / "body.md").write_text(body)
+            with contextlib.redirect_stdout(io.StringIO()):
+                rcs.append(main([str(pathlib.Path(d) / "body.md")]))
+        TEMPLATE = saved
+        ok_main = rcs == [0, 1]
+        print(f"{'ok  ' if ok_main else 'FAIL'}  main exit codes" + ("" if ok_main else f": got {rcs}"))
+        ok = ok and ok_main
+    msg = check(good.replace("- [x] done", "- [ ] done") + "No.\n", template)
+    ok_msg = msg == ["unticked: Checks: - [ ] done"]
+    print(f"{'ok  ' if ok_msg else 'FAIL'}  empty box names its section" + ("" if ok_msg else f": got {msg}"))
+    ok = ok and ok_msg
     print("check-pr-body selftest:", "passed" if ok else "FAILED")
     return 0 if ok else 1
 
