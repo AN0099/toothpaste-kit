@@ -7,6 +7,11 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `scripts/blog.py` and `blog/`: the kit blog. `blog.py build OUT` turns
+  `blog/posts/*.md` into static HTML pages, an index and an RSS 2.0
+  `feed.xml`; `--selftest` runs the planted cases for both. Three posts, one
+  per release from 0.3.0 to 0.5.0. `blog/README.md` indexes the directory and
+  [The kit blog](docs/blog.md) is the guide. Nothing is published.
 - `scripts/check-qblock` (pull request #62): checks a reply's closing question
   block against `skills/working-preferences/SKILL.md`, "Questions and
   Answers", with 30 planted cases in `tests/qblock-cases/` run from
