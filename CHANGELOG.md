@@ -58,6 +58,11 @@ skill lives in that skill's own `CHANGELOG.md`.
   under those names. All three reported as `check` before, so a required
   `check` was met by whichever ran; each can now be required on its own.
 
+- The pull request template's "Drafted with an agent?" section is one box,
+  ticked, or replaced by a "No." line. The unticked Yes or No box had
+  counted as an open task, so every merged pull request showed one task
+  left. `scripts/check-pr-body` now treats that box like any other.
+
 ### Fixed
 
 - `scripts/gates.sh --selftest` (pull request #70): counts its planted

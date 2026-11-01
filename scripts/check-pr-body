@@ -15,8 +15,9 @@ Fails (exit 1) on any of:
   comment     a template <!-- comment --> left in the body
   wrapped     a paragraph broken across lines; GitHub shows each break
   unticked    an empty box; a box that does not apply is replaced by a
-              "Does not apply" line, never left empty or ticked
-  provenance  "Yes" ticked under "Drafted with an agent?" and no filled
+              "Does not apply" line, never left empty or ticked, and the
+              one box under "Drafted with an agent?" by a "No." line
+  provenance  the box under "Drafted with an agent?" ticked and no filled
               Provenance section, when the template has one
 
 The template is read on every run, so the check follows it. Headings inside
@@ -55,20 +56,15 @@ def headings(text):
 
 
 def unticked(text):
-    """Every box ticked; under "Drafted with an agent?" exactly one of Yes or No."""
-    found, section, fence, agent = [], "", False, []
+    """Every box ticked. Each empty box is listed with the section it sits in."""
+    found, section, fence = [], "", False
     for line in text.splitlines():
         if line.startswith("```"):
             fence = not fence
         elif not fence and re.match(r"^#{1,6} ", line):
             section = line.lstrip("# ").strip()
-        elif not fence and re.match(r"^\s*- \[[ xX]\] ", line):
-            if section == "Drafted with an agent?":
-                agent.append(line)
-            elif re.match(r"^\s*- \[ \] ", line):
-                found.append(f"unticked: {section}: {line.strip()}")
-    if agent and sum(1 for a in agent if re.match(r"^\s*- \[[xX]\]", a)) != 1:
-        found.append("unticked: Drafted with an agent?: tick exactly one of Yes or No")
+        elif not fence and re.match(r"^\s*- \[ \] ", line):
+            found.append(f"unticked: {section}: {line.strip()}")
     return found
 
 
@@ -104,21 +100,21 @@ def check(body, template):
 def selftest():
     template = ("# What this changes\n\n<!-- say it -->\n\n## Checks\n\n"
                 "```sh\n# not a heading\n```\n\n## Drafted with an agent?\n\n"
-                "- [ ] Yes\n- [ ] No\n\n<details>\n<summary>Provenance</summary>\n\n"
+                "- [ ] Yes\n\n<details>\n<summary>Provenance</summary>\n\n"
                 "<!-- trailers -->\n\n</details>\n")
     prov = "\n\n<details>\n<summary>Provenance</summary>\n\nAssisted-by: m via t/1\n\n</details>\n"
     good = "# What this changes\n\nOne line.\n\n## Checks\n\n- [x] done\n\n## Drafted with an agent?\n\n"
     cases = [
-        ("clean, agent", good + "- [x] Yes\n- [ ] No" + prov, set()),
-        ("clean, no agent", good + "- [ ] Yes\n- [x] No\n", set()),
+        ("clean, agent", good + "- [x] Yes" + prov, set()),
+        ("clean, no agent", good + "No.\n", set()),
         ("missing heading", "# What this changes\n\nText.\n", {"heading"}),
         ("out of order", "## Checks\n\n# What this changes\n\n## Drafted with an agent?\n", {"heading"}),
-        ("comment left", good + "- [ ] Yes\n- [x] No\n\n<!-- left -->\n", {"comment"}),
-        ("wrapped", good.replace("One line.", "One\nline.") + "- [ ] Yes\n- [x] No\n", {"wrapped"}),
-        ("empty box", good.replace("- [x] done", "- [ ] done") + "- [ ] Yes\n- [x] No\n", {"unticked"}),
-        ("neither yes nor no", good + "- [ ] Yes\n- [ ] No\n", {"unticked"}),
-        ("no provenance", good + "- [x] Yes\n- [ ] No\n", {"provenance"}),
-        ("empty provenance", good + "- [x] Yes\n- [ ] No\n\n<details>\n<summary>Provenance</summary>\n\n</details>\n",
+        ("comment left", good + "No.\n\n<!-- left -->\n", {"comment"}),
+        ("wrapped", good.replace("One line.", "One\nline.") + "No.\n", {"wrapped"}),
+        ("empty box", good.replace("- [x] done", "- [ ] done") + "No.\n", {"unticked"}),
+        ("agent box left empty", good + "- [ ] Yes\n", {"unticked"}),
+        ("no provenance", good + "- [x] Yes\n", {"provenance"}),
+        ("empty provenance", good + "- [x] Yes\n\n<details>\n<summary>Provenance</summary>\n\n</details>\n",
          {"provenance"}),
     ]
     ok = True
