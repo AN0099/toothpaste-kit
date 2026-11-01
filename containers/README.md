@@ -1,12 +1,13 @@
 # Containers
 
-Images that run the kit's checks with every tool they call, so that no check is skipped for a
-missing tool and nothing is installed on the host. Each image has its own directory, with its
-Containerfile, its scripts and a README that lists every tool in it, its version and where that
-version came from. The scripts need `podman`.
+Images that hold what the kit needs, so nothing is installed on the host: one to try the kit, and
+one that runs its checks with every tool they call, so that no check is skipped for a missing tool.
+Each image has its own directory, with its Containerfile, its scripts and a README that lists every
+tool in it, its version and where that version came from. The scripts need `podman`.
 
 | Directory | Image | What it runs |
 |---|---|---|
+| [`starter/`](starter/README.md) | `localhost/kit-starter:v0` | Python, git and Claude Code, to try the quickstart without installing them; `containers/starter/run` starts it |
 | [`verify/`](verify/README.md) | `localhost/kit-verify:v1` | The third-party checkers: reuse, CodeQL with its python and actions queries, yamllint, shellcheck, actionlint, check-jsonschema and CUE |
 
 ## Running `verify`

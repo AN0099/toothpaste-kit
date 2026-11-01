@@ -6,6 +6,16 @@ symlinked into that workspace. This guide says what each of those choices
 does, what the alternatives are, and what each alternative costs. Run the
 quickstart first unless you already know which alternative you want.
 
+## Trying it without installing
+
+To try the kit before installing anything on your machine, the starter
+container in [`containers/starter/`](../containers/starter/README.md) holds
+what the quickstart and the kit's scripts need, Claude Code included, and
+needs only Podman on the host. It mounts the kit read-only and a directory
+you name as the workspace, so what you make stays on your machine. Skill
+links made inside it point into the container, so copy the skills instead
+when you move to an installed setup.
+
 ## What goes where
 
 Claude Code loads the kit's parts in different ways, and each part goes

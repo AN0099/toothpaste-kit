@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Start the starter container as the calling user, with this kit read-only at
+# /kit and DIR (default: the current directory) read-write at /workspace.
+# No network unless --network is given. With CMD, runs it instead of a shell.
+#
+# usage: containers/starter/run [--network] [DIR [CMD...]]
+#
+# Builds the image (localhost/kit-starter:v0) on first use. Rebuild after
+# editing the Containerfile: podman rmi localhost/kit-starter:v0
+set -eu
+usage() { echo "usage: containers/starter/run [--network] [DIR [CMD...]]" >&2; exit 2; }
+net=--network=none
+case "${1:-}" in
+  --network) net=; shift ;;
+  -h|--help) echo "usage: containers/starter/run [--network] [DIR [CMD...]]"; exit 0 ;;
+  -*) usage ;;
+esac
+dir=${1:-.}
+[ $# -eq 0 ] || shift
+[ -d "$dir" ] || { echo "run: $dir is not a directory" >&2; exit 2; }
+dir=$(cd "$dir" && pwd -P)
+here=$(dirname "$(readlink -f "$0")")
+kit=$(cd "$here/../.." && pwd -P)
+# DIR inside the kit would put the kit back in read-write, and the quickstart
+# keeps a user's work outside the clone.
+case "$dir/" in
+  "$kit/"*) echo "run: $dir is inside the kit at $kit; give a directory outside it" >&2; exit 2 ;;
+esac
+img=localhost/kit-starter:v0
+# The kit and DIR are not relabelled for SELinux: a relabel rewrites the
+# labels of DIR and everything under it on the host, and DIR defaults to
+# wherever the user stands, which may be their home. label=disable leaves the
+# host's files as they are and lifts SELinux separation for this container.
+podman image exists "$img" || podman build -q -t "$img" "$here" >/dev/null
+tty=; [ -t 0 ] && [ -t 1 ] && tty=-t
+exec podman run --rm -i $tty $net --userns=keep-id --security-opt label=disable \
+  -v "$kit:/kit:ro" -v "$dir:/workspace" -w /workspace "$img" "$@"
