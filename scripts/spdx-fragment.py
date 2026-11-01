@@ -378,6 +378,10 @@ def selftest():
             capture_output=True, text=True, env=env)
 
     with tempfile.TemporaryDirectory() as d:
+        # Resolved, because cli_path.under() returns the real path: where the
+        # temp directory sits under a symbolic link (/var on macOS), messages
+        # name /private/var and an expected message built from d must too.
+        d = os.path.realpath(d)
         git(d, "init", "-q")
         git(d, "config", "user.email", "t@example.com")
         git(d, "config", "user.name", "T")
