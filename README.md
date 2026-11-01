@@ -105,6 +105,11 @@ The gates call these, and each runs on its own as well:
 - `check-workspace-stubs.py`: checks `examples/workspace/` against `docs/standing-documents.md`
 - `schema-check.py`: validates `orchestration/registry/*.json` against its schema
 - `check-qblock`: checks a reply's closing question block against `working-preferences`
+- `check-pr-body`: checks a pull request body against `.github/pull_request_template.md`; CI also runs it on each pull request
+- `spdx-fragment.py`: builds an SPDX fragment of who assisted a commit range from its `Assisted-by:` trailers, taking per-model values from `spdx-models.json`
+- `remote-level.sh`: classifies a repository by where its remotes point, as none, internal or external, and treats any host it cannot prove internal as external
+- `reorient`: prints where a workspace stands in one screen, for the start of a session and after a compaction; the observing half of the `orient` skill
+- `round-check.py`: validates review-round documents against their schemas in `orchestration/schemas/round/`
 
 `auto-qa-tuner.py` proposes CI job timeouts from the repository's own run history.
 
@@ -148,13 +153,13 @@ Otherwise, [the installing guide](docs/installing.md) covers workspace-level and
 
 ## Packing this repo for an LLM
 
-`repomix` collapses the whole repo into one file suitable for pasting into a model:
+`repomix` collapses the whole repo into one file suitable for pasting into a model. It is a separate tool, not shipped with the kit; it runs from npm, as `npx repomix` or installed globally, so it needs Node.js:
 
 ```sh
 repomix --output repomix-output.xml
 ```
 
-Check that the pack covers the tracked tree. The two counts should match:
+Check that the pack covers the tracked tree. This reads the pack the step above writes, so it needs `repomix` first; without a global install, run that step as `npx repomix --output repomix-output.xml`. The two counts should match:
 
 ```sh
 git ls-files | wc -l
