@@ -33,8 +33,8 @@ jobs:
       - name: Install reuse
         run: pipx install reuse==6.2.0
 
-      # --require turns a missing tool into a failure, so a broken install
-      # cannot pass as "not checked". --selftest shows the check rejects a
+      # A missing tool fails the script, so a broken install cannot pass as
+      # "not checked"; --require asks for that explicitly. --selftest shows the check rejects a
       # planted file with no declaration before its clean result is trusted.
       - name: Compliance checks
         run: ./scripts/compliance.sh --require --selftest

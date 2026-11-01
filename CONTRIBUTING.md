@@ -66,7 +66,7 @@ Checks that need a tool from outside this repository run from a separate script,
 ./scripts/compliance.sh --selftest
 ```
 
-Today it runs `reuse lint`, which checks that every file declares a copyright and a licence in the form the [REUSE specification](https://reuse.software/spec-3.3/) sets out. Install the linter with `pipx install reuse==6.2.0`, the version `.github/workflows/compliance.yml` pins. Without it, the script prints `SKIP` and reports the check as not run, never as passed; CI installs it and fails on any missing declaration.
+Today it runs `reuse lint`, which checks that every file declares a copyright and a licence in the form the [REUSE specification](https://reuse.software/spec-3.3/) sets out. Install the linter with `pipx install reuse==6.2.0`, the version `.github/workflows/compliance.yml` pins. Without it, the script fails and names the missing tool; `--allow-missing` reports the check as not run instead, never as passed. CI installs it and fails on any missing declaration. To run the check without installing anything, use the verification container: `containers/verify/verify . ./scripts/compliance.sh --selftest`, described in [`containers/README.md`](containers/README.md).
 
 ## Skills
 

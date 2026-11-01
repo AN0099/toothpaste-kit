@@ -12,6 +12,15 @@ skill lives in that skill's own `CHANGELOG.md`.
   `feed.xml`; `--selftest` runs the planted cases for both. Three posts, one
   per release from 0.3.0 to 0.5.0. `blog/README.md` indexes the directory and
   [The kit blog](docs/blog.md) is the guide. Nothing is published.
+- `containers/verify/`: a verification container that
+  holds every third-party checker the kit's checks call, so no check is
+  skipped and nothing is installed on the host: reuse 6.2.0, the CodeQL 2.27.2
+  bundle with its python and actions query packs, yamllint 1.38.0, shellcheck
+  0.11.0, actionlint 1.7.12, check-jsonschema 0.38.2 and CUE 0.17.1, each at an
+  exact version and each download checked by sha256. `verify TREE CMD...` runs
+  a command on a read-only copy of a tree with no network; `codeql TREE` runs
+  the python and actions analyses and prints each alert as `file:line rule`.
+  `containers/README.md` says how to run each image.
 - `scripts/check-qblock` (pull request #62): checks a reply's closing question
   block against `skills/working-preferences/SKILL.md`, "Questions and
   Answers", with 30 planted cases in `tests/qblock-cases/` run from
@@ -55,6 +64,11 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `scripts/compliance.sh`: a check whose tool is not
+  installed now fails the script, exit 1, and names the tool; `--allow-missing`
+  reports it as not checked instead. `--require` is still accepted. The
+  selftest shows both cases, and `scripts/gates.sh --selftest` checks them with
+  nothing installed.
 - Selftests for nine scripts, from mutation testing: `check-hooks.py`,
   `check-pr-body`, `compliance.sh`, `mdlint.py`, `reflow-md.py`, `reorient`,
   `round-check.py`, `spdx-fragment.py`, and the schema-check plants in

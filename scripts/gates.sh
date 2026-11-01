@@ -738,6 +738,13 @@ PY
   bad=$?
   ( cd "$tmp/sc-ok" && python3 scripts/schema-check.py ) >/dev/null 2>&1
   plant_rejected $bad $? "schema-check gate (an argument)"
+  # scripts/compliance.sh with its tool not installed: it fails without
+  # --allow-missing and exits 0 with it, so a check that could not run is
+  # never read as a pass. Nothing needs installing for this, as for any gate.
+  COMPLIANCE_REUSE=gates-selftest-not-installed sh scripts/compliance.sh >/dev/null 2>&1
+  bad=$?
+  COMPLIANCE_REUSE=gates-selftest-not-installed sh scripts/compliance.sh --allow-missing >/dev/null 2>&1
+  plant_rejected $bad $? "compliance.sh, a missing tool without --allow-missing"
 
   mkdir -p "$tmp/skills/nofm" "$tmp/skills/withfm"
   printf -- '---\ndescription: has no name\n---\n' > "$tmp/skills/nofm/SKILL.md"

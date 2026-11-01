@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Run a command inside the verification container on a tree, read-only, with
+# no network.
+# usage: containers/verify/verify TREE CMD...
+#   e.g. containers/verify/verify . ./scripts/compliance.sh --selftest
+# Builds the image on first use. The tree is copied to a scratch /tmp/work
+# inside the container, so a check that writes (compliance.sh plants) never
+# touches the tree. A worktree's .git file points outside the mount, so it is
+# replaced in the copy by a fresh git init; the source tree is never changed.
+set -eu
+[ $# -ge 2 ] || { echo "usage: verify TREE CMD..." >&2; exit 2; }
+tree=$(cd "$1" && pwd -P); shift
+img=localhost/kit-verify:v1
+here=$(dirname "$(readlink -f "$0")")
+podman image exists "$img" || podman build -q -t "$img" "$here" >/dev/null
+exec podman run --rm --network=none --userns=keep-id -v "$tree:/src:ro,Z" "$img" \
+  sh -c 'cp -a /src /tmp/work && cd /tmp/work && { [ ! -f .git ] || { rm -f .git && git init -q && git add -A && git -c user.name=verify -c user.email=verify@localhost commit -qm snapshot --no-verify; }; } && exec "$@"' verify "$@"
