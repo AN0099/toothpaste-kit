@@ -522,6 +522,65 @@ def selftest():
         print(f'EXEMPT FAIL MD010 reported at {nums}, expected [8]')
         ok = False
 
+    # Edges, each one a rule's boundary rather than its centre. Every row is a
+    # path, a body, a rule, and whether that rule must fire. A row that wants
+    # silence sits beside a planted positive above, so its clean result is the
+    # boundary and not the rule being broken. Failures print as PLANT FAIL so
+    # that gates.sh, which greps for that, sees them.
+    long_ok = "# T\n\n" + "a" * MAX_LINE + "\n"
+    long_bad = "# T\n\n" + "[go](#nope) " + "a" * MAX_LINE + "\n"
+    edges = [
+        ('MD047 two newlines', 'docs/x.md', "# T\n\ntext\n\n", 'MD047', True),
+        ('MD041 frontmatter closed by ...', 'docs/x.md',
+         "---\nname: x\n...\n\n## Section\n", 'MD041', False),
+        ('MD025 off under a backslash skills path', 'skills\\x\\SKILL.md',
+         "# One\n\n# Two\n", 'MD025', False),
+        ('MD025 a tilde line inside a backtick fence does not close it',
+         'docs/x.md', "# T\n\n```text\n~~~\n# Not a heading\n```\n", 'MD025', False),
+        ('MDLINT001 silent at exactly the limit', 'docs/x.md', long_ok,
+         'MDLINT001', False),
+        ('MDLINT001 fires one past the limit', 'docs/x.md',
+         long_ok.replace('a\n', 'aa\n'), 'MDLINT001', True),
+        ('MD051 not run on an over-long line', 'docs/x.md', long_bad, 'MD051', False),
+        ('MD045 whitespace alt text', 'docs/x.md', "# T\n\n![ ](img.png)\n", 'MD045', True),
+        ('MD059 trailing punctuation', 'docs/x.md', "# T\n\n[here.](x.md)\n", 'MD059', True),
+        ('MD059 capitalised', 'docs/x.md', "# T\n\n[Here](x.md)\n", 'MD059', True),
+        ('MD059 emphasised', 'docs/x.md', "# T\n\n[**here**](x.md)\n", 'MD059', True),
+        ('MD059 URL as text', 'docs/x.md',
+         "# T\n\n[https://example.com](https://example.com)\n", 'MD059', True),
+        ('MD011 escaped closing paren', 'docs/x.md', "# T\n\n(a\\)[b]\n", 'MD011', False),
+        ('MD056 table at end of file with no newline', 'docs/x.md',
+         "# T\n\n| a | b |\n|---|---|\n| 1 |", 'MD056', True),
+        ('MD056 a line opening with a pipe but not closing is not a row',
+         'docs/x.md', "# T\n\n| note\n| a | b |\n|---|---|\n| 1 | 2 |\n", 'MD056', False),
+        ('MD051 a heading with a link resolves to its text', 'docs/x.md',
+         "# T\n\n## See [the guide](g.md)\n\n[go](#see-the-guide)\n", 'MD051', False),
+        ('MD042 whitespace destination', 'docs/x.md', "# T\n\n[text]( )\n", 'MD042', True),
+    ]
+    for label, path, body, rule, want in edges:
+        hits = {r for _p, _l, r, _m in check(path, body)}
+        if (rule in hits) == want:
+            print(f'PLANT ok    {label}')
+        else:
+            print(f'PLANT FAIL  {label}: {rule} {"did not fire" if want else "fired"} '
+                  f'(saw: {sorted(hits) or "nothing"})')
+            ok = False
+
+    # gather() prunes .git and node_modules and skips the reflow fixtures by
+    # name. Shown on a scratch tree, with a kept file beside each dropped one.
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        for rel in ('keep.md', '.git/x.md', 'node_modules/x.md',
+                    'scripts/reflow-md.test.md', 'scripts/reflow-md.expected.md'):
+            os.makedirs(os.path.dirname(os.path.join(tmp, rel)), exist_ok=True)
+            open(os.path.join(tmp, rel), 'w').close()
+        got = [os.path.relpath(f, tmp) for f in gather([tmp])]
+    if got == ['keep.md']:
+        print('PLANT ok    gather prunes .git and node_modules and skips the fixtures')
+    else:
+        print(f'PLANT FAIL  gather kept {got}, expected only keep.md')
+        ok = False
+
     clean = "# Title\n\nA paragraph.\n\n## Section\n\nMore text, see [the guide](g.md).\n"
     hits = check('<control>', clean)
     if hits:

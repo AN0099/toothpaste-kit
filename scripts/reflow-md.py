@@ -184,33 +184,83 @@ def selftest():
         print(f'selftest: cannot read fixture: {err}', file=sys.stderr)
         return 1
 
+    ok = run_checks(reflow, src, expected, quiet=False)
+
+    # Front matter opens only on the very first line. A '---' later, even
+    # with nothing written out yet, is a setext underline, so the fixture
+    # (which opens with front matter) cannot show this one.
+    late = 'Title\n---\nname: x\n---\n'
+    if reflow(late) != late:
+        ok = False
+        print('FAIL  a --- after the first line opened front matter',
+              file=sys.stderr)
+    else:
+        print('pass  front matter only on the first line')
+
+    # The fixture file ends in a newline, so its last paragraph is flushed by
+    # the blank line that follows. A file without one needs the final flush.
+    if reflow('no final\nnewline') != 'no final newline\n':
+        ok = False
+        print('FAIL  a last paragraph with no newline after it was lost',
+              file=sys.stderr)
+    else:
+        print('pass  last paragraph kept without a final newline')
+
+    # The two checks after the fixture match only fire on faults the match
+    # cannot see, so the real reflow never exercises them. Each is planted
+    # here: a stand-in that matches the expected file but is not idempotent,
+    # and one whose expected file lost a word. Both must fail.
+    def not_idempotent(text):
+        return expected if text == src else text + 'x\n'
+    lossy = expected.replace('wrapped', '', 1)
+
+    def drops_a_word(text):
+        return lossy if text == src else text
+    for name, fn, want in (('idempotence', not_idempotent, expected),
+                           ('token', drops_a_word, lossy)):
+        if run_checks(fn, src, want, quiet=True):
+            ok = False
+            print(f'FAIL  planted {name} fault passed the checks',
+                  file=sys.stderr)
+        else:
+            print(f'pass  planted {name} fault is caught')
+
+    return 0 if ok else 1
+
+
+def run_checks(fn, src, expected, quiet):
+    """Fixture match, idempotence and token checks on reflow function fn."""
+    def say(msg, bad):
+        if not quiet:
+            print(msg, file=sys.stderr if bad else sys.stdout)
+
     ok = True
 
-    got = reflow(src)
+    got = fn(src)
     if got != expected:
         ok = False
-        print('FAIL  fixture output does not match expected:', file=sys.stderr)
+        say('FAIL  fixture output does not match expected:', True)
         for line in difflib.unified_diff(
                 expected.split('\n'), got.split('\n'),
                 fromfile='expected', tofile='got', lineterm=''):
-            print('  ' + line, file=sys.stderr)
+            say('  ' + line, True)
     else:
-        print('pass  fixture reflows to the expected output')
+        say('pass  fixture reflows to the expected output', False)
 
-    if reflow(expected) != expected:
+    if fn(expected) != expected:
         ok = False
-        print('FAIL  not idempotent: reflowing the expected output changed it',
-              file=sys.stderr)
+        say('FAIL  not idempotent: reflowing the expected output changed it',
+            True)
     else:
-        print('pass  idempotent on already-unwrapped input')
+        say('pass  idempotent on already-unwrapped input', False)
 
     if tokens(src) != tokens(got):
         ok = False
-        print('FAIL  token stream changed', file=sys.stderr)
+        say('FAIL  token stream changed', True)
     else:
-        print('pass  token stream unchanged')
+        say('pass  token stream unchanged', False)
 
-    return 0 if ok else 1
+    return ok
 
 
 def main():

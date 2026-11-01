@@ -910,6 +910,9 @@ def selftest():
     roles_failed, roles_cases = selftest_roles()
     failed += roles_failed
     cross_cases += roles_cases
+    edge_failed, edge_cases = selftest_edges()
+    failed += edge_failed
+    cross_cases += edge_cases
     for row in MATRIX_ROWS:
         if row in MATRIX_PENDING:
             print(f"selftest note: matrix row {row} pending: {MATRIX_PENDING[row]}")
@@ -922,6 +925,102 @@ def selftest():
     total = engine_cases + cross_cases
     print(f"round-check selftest: {total - failed} of {total} cases behaved")
     return 1 if failed else 0
+
+
+def selftest_edges():
+    """Edge cases of the engine, the cross-artifact and answer-key checks,
+    check_round and the command line, each pinned to the result it gives."""
+    def trio(edit):
+        docs = copy.deepcopy(valid_trio())
+        edit(docs)
+        return docs
+
+    def fired(found):
+        return {inv for _, inv, _ in found}
+
+    def errs(fn, *args):
+        out = []
+        fn(*args, out)
+        return out
+
+    def dec_alone(d):
+        del d["review-round"], d["review-report"]
+        del d["operator-decision"]["verification"]["performedBy"]
+        d["operator-decision"]["alignment"] = {"status": "mismatched"}
+
+    def key(**kw):
+        k = valid_key()
+        k.update(kw)
+        return k
+
+    def cli(*args):
+        return subprocess.run([sys.executable, os.path.abspath(__file__), *args],
+                              capture_output=True, text=True).returncode
+
+    def round_dir(text):
+        with tempfile.TemporaryDirectory(prefix="round-check-edge.") as tmp:
+            with open(os.path.join(tmp, "review-round.json"), "w", encoding="utf-8") as f:
+                f.write(text)
+            return check_round(tmp, load_schemas(os.path.join(REPO_ROOT, SCHEMA_DIR)))
+
+    def no_findings(d):
+        d["review-report"]["findings"] = []
+
+    def severity(value):
+        return lambda d: d["review-report"]["findings"][0].update(severity=value)
+
+    cases = {
+        "date-time with a lower-case t": lambda: is_date_time("2026-10-31t09:40:06Z"),
+        "date-time with a lower-case z": lambda: is_date_time("2026-10-31T09:40:06z"),
+        "objects with other keys differ": lambda: json_equal({"a": 1}, {"b": 1}) is False,
+        "lists of other lengths differ": lambda: json_equal([1], [1, 2]) is False,
+        "a type mismatch stops there": lambda: len(errs(validate, 5, {"type": "string", "const": "x"},
+                                                        {}, "$")) == 1,
+        "pattern matches anywhere": lambda: errs(validate, "xab", {"pattern": "ab"}, {}, "$") == [],
+        "keyword guard inside else": lambda: len(errs(check_keywords, {"else": {"oneOf": []}}, "p")) == 1,
+        "a drive letter is absolute": lambda: repo_relative("C:/x") == "is absolute",
+        "mismatched with no revisions is not equal":
+            lambda: not any("revisions are equal" in m for _, _, m in cross_check(trio(dec_alone))),
+        "a decision alone names no unknown finding": lambda: "finding-exists" not in fired(cross_check(trio(dec_alone))),
+        "no reviewer role, no self-verification":
+            lambda: "independent-verification" not in fired(cross_check(trio(dec_alone))),
+        "unresolved cannot accept": lambda: any("relies on a report" in m for _, _, m in cross_check(trio(
+            lambda d: d["operator-decision"]["alignment"].update(status="unresolved")
+            or d["operator-decision"]["decision"].update(status="accept")))),
+        "cited with no evidence": lambda: "cites-reproduced-only" in fired(cross_check(trio(
+            lambda d: d["operator-decision"]["verification"]["findings"][0].update(evidence=[])))),
+        "noFindingsAcceptable not boolean, no expectation finding":
+            lambda: "missing-answer-key-expectation" not in fired(answer_key_check(
+                key(noFindingsAcceptable=None, expectedFindings=[]), valid_trio())),
+        "noFindingsAcceptable not boolean, empty report":
+            lambda: "no-findings-against-planted-defect" not in fired(answer_key_check(
+                key(noFindingsAcceptable=None), trio(no_findings))),
+        "an unknown severity is below nit": lambda: "required-finding-missing" in fired(answer_key_check(
+            key(expectedFindings=[dict(valid_key()["expectedFindings"][0], minimumSeverity="nit")]),
+            trio(severity("critical")))),
+        "an empty report misses no required finding": lambda: "required-finding-missing" not in fired(
+            answer_key_check(key(noFindingsAcceptable=True), trio(no_findings))),
+        "an absolute answer key is not read": lambda: "answer-key-readable" not in fired(round_findings(trio(
+            lambda d: d["review-round"].update(fixture={"answerKey": "/nonexistent/answer-key.json"})))[0]),
+        "a non-string roundId names round ?":
+            lambda: {p.split(":")[0] for p in round_dir('{"metadata": {"roundId": 5}}')
+                     if p.startswith("round ")} == {"round ?"},
+        "an unreadable document is not a missing one":
+            lambda: not any("no round documents" in p for p in round_dir("{")),
+        "--cases after --repo is a usage error": lambda: cli("--repo", REPO_ROOT, "--cases", REPO_ROOT) == 2,
+        "a dash argument is a usage error": lambda: cli("--bogus") == 2,
+        "--repo that is not a directory": lambda: cli("--repo", os.path.join(REPO_ROOT, "no-such-dir"), "x") == 2,
+    }
+    failed = 0
+    for name, case in cases.items():
+        try:
+            ok = case()
+        except Exception as e:  # a crash is a case that did not behave
+            ok, name = False, f"{name} ({type(e).__name__}: {e})"
+        if not ok:
+            print(f"selftest FAIL: edge case {name} did not behave")
+            failed += 1
+    return failed, len(cases)
 
 
 def selftest_cases():
@@ -1183,6 +1282,20 @@ def selftest_repo():
                 failed += 1
             elif plant is not None and "commit-in-repo" not in fired:
                 print(f"selftest FAIL: --repo did not catch a planted {name}")
+                failed += 1
+        # A provenance.commit that names a tree, not a commit, is caught; a
+        # references artifactPath that is not repository-relative is the
+        # path check's to report, so --repo does not look it up.
+        tree = copy.deepcopy(good)
+        tree["provenance"]["commit"] = git("rev-parse", commits["review-report"] + "^{tree}")
+        absolute = copy.deepcopy(good)
+        absolute["references"]["reviewRound"]["artifactPath"] = "/r/review-round.json"
+        for name, dec, want in (("tree as provenance.commit", tree, True),
+                                ("absolute references artifactPath", absolute, False)):
+            cases += 1
+            got = "commit-in-repo" in {inv for _, inv, _ in repo_findings(docs | {"operator-decision": dec}, repo)}
+            if got != want:
+                print(f"selftest FAIL: --repo on a {name} {'missed' if want else 'raised'} commit-in-repo")
                 failed += 1
     return failed, cases
 

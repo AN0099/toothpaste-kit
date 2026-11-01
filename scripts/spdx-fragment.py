@@ -345,16 +345,16 @@ def selftest():
         subprocess.run(["git"] + list(args), cwd=cwd, check=True,
                         capture_output=True, text=True)
 
-    def commit(cwd, path, text, message, date, author="T"):
+    def commit(cwd, path, text, message, date, author="T", author_date=None):
         with open(os.path.join(cwd, path), "a") as f:
             f.write(text)
         git(cwd, "add", path)
-        env_commit(cwd, message, date, author)
+        env_commit(cwd, message, date, author, author_date)
 
-    def env_commit(cwd, message, date, author="T"):
+    def env_commit(cwd, message, date, author="T", author_date=None):
         env = dict(os.environ)
         env["GIT_COMMITTER_DATE"] = date
-        env["GIT_AUTHOR_DATE"] = date
+        env["GIT_AUTHOR_DATE"] = author_date or date
         env["GIT_AUTHOR_NAME"] = author
         env["GIT_AUTHOR_EMAIL"] = "t@example.com"
         env["GIT_COMMITTER_NAME"] = "Hosting Site"  # differs from the author, as in a web merge
@@ -386,6 +386,7 @@ def selftest():
             "Assisted-by: model-b via tool-y/2.0.0\n",
             "2026-01-02T04:00:00-07:00",
             author="Head Author",  # the range's head: not the base's author, not user.name
+            author_date="2026-01-01T12:00:00+00:00",  # created comes from the committer date
         )
         c3 = git_output(d, ["rev-parse", "HEAD"]).strip()
         commit(
@@ -403,6 +404,19 @@ def selftest():
             "2026-01-02T05:00:00-07:00",
         )
         c5 = git_output(d, ["rev-parse", "HEAD"]).strip()
+        commit(
+            d, "f", "z\n",
+            "model-a again\n\n"
+            "Assisted-by: model-a via tool-x/1.0.0\n"
+            "Agent-Effort: low\n",
+            "2026-01-02T05:30:00-07:00",
+        )
+        c6 = git_output(d, ["rev-parse", "HEAD"]).strip()
+        malformed_commits = []
+        for k, value in enumerate(("model-a via /x/1.0", "model-a via tool-x/")):
+            commit(d, "f", f"w{k}\n", f"malformed {k}\n\nAssisted-by: {value}\n",
+                   f"2026-01-02T06:0{k}:00-07:00")
+            malformed_commits.append((git_output(d, ["rev-parse", "HEAD"]).strip(), value))
 
         models_path = os.path.join(d, "models.json")
         with open(models_path, "w") as f:
@@ -518,6 +532,24 @@ def selftest():
               if supplied_by_ok else
               f"FAIL  AIPackage.suppliedBy: got {model_a['suppliedBy'] if model_a else None}, agents={agents}")
         ok = ok and supplied_by_ok
+
+        # --- the document's fixed values, and the file's values copied as they are ---
+        graph_ids = [x.get("spdxId", x.get("@id")) for x in doc["@graph"]] if doc else []
+        fixed_ok = bool(
+            doc and doc["@context"] == CONTEXT_URL
+            and doc["@graph"][0]["specVersion"] == "3.0.1"
+            and pkg["name"] == PACKAGE_NAME
+            and len(set(graph_ids)) == len(graph_ids)
+            and [x["name"] for x in tools] == ["tool-x/1.0.0", "tool-y/2.0.0"]
+            and all(x.get("software_primaryPurpose") == "model" for x in aipkgs)
+            and model_a["software_downloadLocation"] == "https://example.com/model-a"
+            and model_a["releaseTime"] == "2025-12-01T00:00:00Z"
+            and model_a["software_packageVersion"] == "1.0"
+        )
+        n += 1
+        print(f"{'ok  ' if fixed_ok else 'FAIL'}  @context, specVersion, package and tool names, primaryPurpose, unique ids, file values copied"
+              if fixed_ok else f"FAIL  fixed values or ids: ids={graph_ids} doc={doc}")
+        ok = ok and fixed_ok
 
         # --- autonomyType comes from the models file, not a hard-coded value ---
         yes_models = os.path.join(d, "yes-autonomy-models.json")
@@ -776,6 +808,46 @@ def selftest():
               if not bad_autonomy_ok else "ok    bad autonomyType exits 2")
         ok = ok and bad_autonomy_ok
 
+        # --- a bad entry the range does not name, after a good one: still exits 2 ---
+        unnamed_bad = os.path.join(d, "unnamed-bad-models.json")
+        with open(unnamed_bad, "w") as f:
+            json.dump({"model-a": dict(valid_b, suppliedBy="vendor-a"),
+                       "model-z": dict(valid_b, autonomyType="noAssertion")}, f)
+        code, out, errs = run(["--models", unnamed_bad, f"{c0}..{c1}"], d)
+        unnamed_bad_ok = (code == 2 and not out
+                          and errs == ["spdx-fragment: model-z autonomyType is not yes or no"])
+        n += 1
+        print(f"{'ok  ' if unnamed_bad_ok else 'FAIL'}  bad unnamed second entry: got code={code} errs={errs}"
+              if not unnamed_bad_ok else "ok    a later entry the range does not name is checked too (autonomyType noAssertion exits 2)")
+        ok = ok and unnamed_bad_ok
+
+        # --- an entry that is not an object ---
+        str_entry = os.path.join(d, "str-entry-models.json")
+        with open(str_entry, "w") as f:
+            json.dump({"model-a": "suppliedBy", "model-b": valid_b}, f)
+        code, out, errs = run(["--models", str_entry, range_full], d)
+        str_entry_ok = (code == 2 and not out
+                        and errs == [f"spdx-fragment: model-a in {str_entry} is not a JSON object"])
+        n += 1
+        print(f"{'ok  ' if str_entry_ok else 'FAIL'}  entry not an object: got code={code} errs={errs}"
+              if not str_entry_ok else "ok    models entry that is not an object exits 2")
+        ok = ok and str_entry_ok
+
+        # --- releaseTime near misses: each part of the pattern holds ---
+        for value in ("2025-12-01T00:00Z", "2025-12-01 00:00:00Z", "2025-12-01T00:00:00",
+                      "02025-12-01T00:00:00Z", "2025-1a-01T00:00:00Z"):
+            near = os.path.join(d, "near-release-models.json")
+            with open(near, "w") as f:
+                json.dump({"model-a": dict(valid_b, suppliedBy="vendor-a", releaseTime=value),
+                           "model-b": valid_b}, f)
+            code, out, errs = run(["--models", near, range_full], d)
+            near_ok = (code == 2 and not out
+                       and errs == ["spdx-fragment: model-a releaseTime is not YYYY-MM-DDTHH:MM:SSZ"])
+            n += 1
+            print(f"{'ok  ' if near_ok else 'FAIL'}  releaseTime {value!r}: got code={code} errs={errs}"
+                  if not near_ok else f"ok    releaseTime {value!r} exits 2")
+            ok = ok and near_ok
+
         # --- no trailers in range: a real, non-empty range, never base..base ---
         no_trailer_range = f"{c1}..{c2}"
         code, out, errs = run(["--models", models_path, no_trailer_range], d)
@@ -829,6 +901,38 @@ def selftest():
               f"FAIL  one Agent-Effort applied to both models named in one commit: code={code} errs={errs}")
         ok = ok and shared_effort_ok
 
+        # --- a model named again in a later commit: one AIPackage, one Tool, later effort wins ---
+        code, out, errs = run(["--models", models_path, f"{c4}..{c6}"], d)
+        doc4 = json.loads(out) if code == 0 else None
+        again = {x["name"]: x for x in doc4["@graph"] if x["type"] == "ai_AIPackage"} if doc4 else {}
+        again_tools = [x["name"] for x in doc4["@graph"] if x["type"] == "Tool"] if doc4 else []
+        again_agents = [x["name"] for x in doc4["@graph"] if x["type"] == "Agent"] if doc4 else []
+        again_ok = bool(
+            code == 0 and not errs
+            and sorted(again) == ["model-a", "model-c"]
+            and len([x for x in doc4["@graph"] if x["type"] == "ai_AIPackage"]) == 2
+            and again_tools == ["tool-x/1.0.0", "tool-z/3.0.0"]
+            and again_agents == ["T", "vendor-a"]
+            and again["model-a"].get("ai_hyperparameter") == [{"key": "agent-effort", "value": "low"}]
+            and again["model-c"].get("ai_hyperparameter") == [{"key": "agent-effort", "value": "medium"}]
+        )
+        n += 1
+        print(f"{'ok  ' if again_ok else 'FAIL'}  model named again: one AIPackage and Tool each, one supplier Agent, later Agent-Effort wins"
+              if again_ok else f"FAIL  model named again: code={code} errs={errs} doc={doc4}")
+        ok = ok and again_ok
+
+        # --- an Assisted-by with an empty tool or an empty version ---
+        prev = c6
+        for bad_hash, value in malformed_commits:
+            code, out, errs = run(["--models", models_path, f"{prev}..{bad_hash}"], d)
+            empty_part_ok = (code == 2 and not out
+                             and errs == [f"spdx-fragment: {bad_hash} has a malformed Assisted-by: {value}"])
+            n += 1
+            print(f"{'ok  ' if empty_part_ok else 'FAIL'}  malformed Assisted-by {value!r}: got code={code} errs={errs}"
+                  if not empty_part_ok else f"ok    malformed Assisted-by {value!r} exits 2")
+            ok = ok and empty_part_ok
+            prev = bad_hash
+
         # --- bad arguments: exit 2 with the usage line ---
         for name, argv in [
             ("no arguments", []),
@@ -850,6 +954,7 @@ def selftest():
         for name, argv in [
             ("--help", ["--help"]),
             ("-h", ["-h"]),
+            ("-h after the range", [range_full, "-h"]),
         ]:
             code, out, errs = run(argv, d)
             case_ok = (code == 0 and out == USAGE + "\n" and errs == [])

@@ -33,7 +33,7 @@
 # tree and against planted positives, and scripts/link-skills.sh's selftest,
 # which links the skills into a temporary directory and checks each link, and
 # the hooks/ rules' structure, regex validity and planted cases via
-# scripts/check-hooks.py, which states its own coverage, including the branch
+# scripts/check-hooks.py and its --selftest, which states its own coverage, including the branch
 # name guard's cases in tests/branch-guard-cases.tsv, and the branch and tag
 # name rule's selftest in scripts/check-branch-name, which also fails if the
 # ruleset's prefix list has drifted from the script's, and the commit-msg
@@ -284,7 +284,7 @@ gate_link_skills() {
 
 gate_hooks() {
   gate_start "hooks rules"
-  if python3 scripts/check-hooks.py; then
+  if python3 scripts/check-hooks.py --selftest && python3 scripts/check-hooks.py; then
     gate_ok "hooks rules"
   else
     gate_bad "hooks rules"
@@ -639,6 +639,106 @@ JSON
   ( cd "$tmp/sc-ok" && python3 scripts/schema-check.py ) >/dev/null 2>&1
   plant_rejected $bad $? "schema-check gate"
 
+  # More schema-check plants, one per rule it applies, each with a clean
+  # fixture of its own: the keyword walk in every place a schema nests, each
+  # keyword and format value, type lists, pointer escapes, relative $refs
+  # inside the referenced file, every registry file read, and the no-argument
+  # rule. A case that edits the schema keeps the edit in its clean fixture too,
+  # so the clean copy shows the edit alone is accepted. The registry and
+  # schemas in the tree are not touched; these are copies under $tmp.
+  python3 - "$tmp/scx" <<'PY'
+import copy, json, os, shutil, sys
+root = sys.argv[1]
+SC = json.load(open("orchestration/registry/surface-descriptor.schema.json"))
+EB = json.load(open("orchestration/schemas/event-base.json"))
+OK = {"vendor": "acme", "surfaces": [{"id": "acme:x", "display_name": "X",
+      "capability": {"interface": "programmatic", "autonomy": "none",
+                     "human_presence": "optional", "workspace": "none",
+                     "tool_execution": "none", "egress": "local", "audit": "unknown"},
+      "regime": "programmatic-contractual", "confidence": "derived",
+      "verified_on": "2026-10-27", "sources": []}]}
+def sd(s): return s["definitions"]["surface_descriptor"]
+def sp(s): return sd(s)["properties"]
+def doc(**kw):
+    d = copy.deepcopy(OK); d["surfaces"][0].update(kw); return d
+def typed(s):
+    sp(s).update({"n_int": {"type": "integer"}, "n_bool": {"type": "boolean"},
+                  "n_null": {"type": ["string", "null"]}})
+TYPED_OK = doc(n_int=3, n_bool=True, n_null=None)
+def renamed(s):
+    sd_ = s["definitions"].pop("surface_descriptor")
+    s["definitions"]["surface/descriptor"] = sd_
+    s["properties"]["surfaces"]["items"]["$ref"] = "#/definitions/surface~1descriptor"
+def hop(s, e):
+    e["definitions"]["cp_hop"] = {"$ref": "event-base.json#/definitions/capability_profile"}
+    sp(s)["capability"]["$ref"] = "../schemas/event-base.json#/definitions/cp_hop"
+def fmt(f):
+    def edit(s): sp(s)["verified_on"]["format"] = f
+    return edit
+def unanchored(s): s["properties"]["vendor"]["pattern"] = "cm"
+# name: (schema edit, event-base edit, bad files, clean files); files map name -> doc
+CASES = {
+  "kw-top": (lambda s: s.update(minProperties=1), None, None, None),
+  "kw-properties": (lambda s: s["properties"]["vendor"].update(maxLength=9), None, None, None),
+  "kw-definitions": (lambda s: sd(s).update(additionalProperties=False), None, None, None),
+  "kw-items": (lambda s: sp(s)["sources"]["items"].update(minLength=1), None, None, None),
+  "kw-event-base": (None, lambda e: e["definitions"]["capability_profile"].update(additionalProperties=False), None, None),
+  "enum": (None, None, {"acme.json": doc(regime="bogus")}, None),
+  "type-string": (None, None, {"acme.json": doc(display_name=5)}, None),
+  "type-object": (None, None, {"acme.json": doc(capability="none")}, None),
+  "type-integer": (typed, None, {"acme.json": doc(n_int=True)}, {"acme.json": TYPED_OK}),
+  "type-boolean": (typed, None, {"acme.json": doc(n_bool=1)}, {"acme.json": TYPED_OK}),
+  "pattern": (None, None, {"acme.json": doc(id="Acme:x")}, None),
+  "pattern-unanchored": (unanchored, None, {"acme.json": dict(OK, vendor="xyz")}, {"acme.json": OK}),
+  "format-date": (None, None, {"acme.json": doc(verified_on="2026-13-01")}, None),
+  "format-date-suffix": (None, None, {"acme.json": doc(verified_on="2026-10-27 05")}, None),
+  "format-date-time": (fmt("date-time"), None, {"acme.json": doc(verified_on="2026-10-27 noon")},
+                       {"acme.json": doc(verified_on="2026-10-27T00:00:00Z")}),
+  "format-unknown": (fmt("email"), None, None, {}),
+  "format-uri-no-netloc": (None, None, {"acme.json": doc(sources=["https:example.com"])}, None),
+  "format-uri-no-scheme": (None, None, {"acme.json": doc(sources=["//example.com/doc"])}, None),
+  "required": (None, None, {"acme.json": {"vendor": "acme", "surfaces": [
+      {k: v for k, v in OK["surfaces"][0].items() if k != "display_name"}]}}, None),
+  "items-second": (None, None, {"acme.json": doc(sources=["https://example.com/a", "bad"])}, None),
+  "pointer-escape": (renamed, None, {"acme.json": doc(sources="bad")}, {"acme.json": OK}),
+  "ref-in-event-base": (hop, hop, {"acme.json": doc(sources="bad")}, {"acme.json": OK}),
+  "files-last": (None, None, {"aaa.json": OK, "zzz.json": doc(regime="bogus")}, {"aaa.json": OK, "zzz.json": OK}),
+}
+for name, (se, ee, bad, ok) in CASES.items():
+    for kind, files in (("bad", bad), ("ok", ok)):
+        s, e = copy.deepcopy(SC), copy.deepcopy(EB)
+        # A schema edit always goes to the bad copy, and to the clean copy only
+        # when the case names clean files: a keyword plant (clean None) or
+        # format-unknown (clean {}) needs the untouched schema there.
+        if kind == "bad" or ok:
+            if se and ee and se is ee: se(s, e)
+            else:
+                if se: se(s)
+                if ee: ee(e)
+        files = files if files else {"acme.json": OK}
+        d = os.path.join(root, name, kind)
+        os.makedirs(d + "/orchestration/registry"); os.makedirs(d + "/orchestration/schemas")
+        os.makedirs(d + "/scripts")
+        shutil.copy("scripts/schema-check.py", d + "/scripts/")
+        json.dump(s, open(d + "/orchestration/registry/surface-descriptor.schema.json", "w"))
+        json.dump(e, open(d + "/orchestration/schemas/event-base.json", "w"))
+        for fn, body in files.items():
+            json.dump(body, open(d + "/orchestration/registry/" + fn, "w"))
+    print(name)
+PY
+  [ $? -eq 0 ] || { echo "PLANT FAIL  schema-check fixtures could not be built"; plant_fail=1; }
+  for c in "$tmp"/scx/*/; do
+    c=${c%/}
+    ( cd "$c/bad" && python3 scripts/schema-check.py ) >/dev/null 2>&1
+    bad=$?
+    ( cd "$c/ok" && python3 scripts/schema-check.py ) >"$tmp/gate.out" 2>&1
+    plant_rejected $bad $? "schema-check gate (${c##*/})"
+  done
+  ( cd "$tmp/sc-ok" && python3 scripts/schema-check.py --verbose ) >/dev/null 2>&1
+  bad=$?
+  ( cd "$tmp/sc-ok" && python3 scripts/schema-check.py ) >/dev/null 2>&1
+  plant_rejected $bad $? "schema-check gate (an argument)"
+
   mkdir -p "$tmp/skills/nofm" "$tmp/skills/withfm"
   printf -- '---\ndescription: has no name\n---\n' > "$tmp/skills/nofm/SKILL.md"
   head -6 "$tmp/skills/nofm/SKILL.md" | grep -q '^name:'
@@ -731,6 +831,21 @@ JSON
   bad=$?
   ( fail=0; gate_attribution >/dev/null 2>&1; exit "$fail" )
   plant_rejected $bad $? "attribution gate, weakened hook"
+
+  # The hooks checker's own selftest, on a copy that no longer counts a
+  # missing event as a finding: its "no event" plant must then fail.
+  mkdir -p "$tmp/hk-weak/scripts" "$tmp/hk-weak/tests" && cp -R hooks "$tmp/hk-weak/hooks" && cp tests/branch-guard-cases.tsv "$tmp/hk-weak/tests/"
+  python3 - "$hk" "$tmp/hk-weak/scripts/check-hooks.py" <<'PY2'
+import sys
+t = open(sys.argv[1]).read()
+a = 'print(f"::error file={path}::no event")\n            bad += 1\n'
+assert t.count(a) == 1
+open(sys.argv[2], "w").write(t.replace(a, 'print(f"::error file={path}::no event")\n'))
+PY2
+  ( cd "$tmp/hk-weak" && python3 scripts/check-hooks.py --selftest ) >/dev/null 2>&1
+  bad=$?
+  ( cd "$tmp/hk-ok" && python3 "$hk" --selftest ) >/dev/null 2>&1
+  plant_rejected $bad $? "hooks checker selftest, a check weakened"
 
   # Gate 15: the selftest must fail when a fail case is filed as a pass case.
   for d in qb-bad qb-ok; do

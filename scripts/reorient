@@ -57,7 +57,7 @@ selftest() {
   out=$(bash "$0" "$tmp" 2>&1); rc=$?
   [ "$rc" -eq 0 ] && echo "ok   exits 0 on the example workspace" || { echo "FAIL exit $rc"; fails=$((fails+1)); }
   check "standing set read from the manifest"   '^STANDING 5 files, 0 over a week old, 0 defective'
-  check "queue found through the manifest"      '^QUEUE task-queue +0 tasks'
+  check "queue found through the manifest"      '^QUEUE task-queue +0 tasks$'
   check "no capture reported as none"           '^CAP  no session-\[0-9\]\*\.md in '
   check "flag register without Open says so"    '^FLAG threads-flagged.md has no Open section'
   check "mail off by default"                   '!^MAIL'
@@ -79,21 +79,23 @@ selftest() {
     git -C "$tmp/inbox" switch -qc other && : > "$tmp/inbox/inbox-dt/note.md" &&
     git -C "$tmp/inbox" add -A && git -C "$tmp/inbox" -c user.name=t -c user.email=t@t commit -qm note &&
     git -C "$tmp/inbox" update-ref refs/remotes/origin/other other && git -C "$tmp/inbox" switch -q dt || return 1
+  git -C "$tmp/inbox" update-ref refs/remotes/origin/dt other  # this seat's own branch is never mail
   bash -c 'sleep 20; :' shell-snapshots/snapshot-bash-plant.sh >/dev/null 2>&1 & pid=$!
   bash -c 'sleep 20; :' not-a-snapshot.sh >/dev/null 2>&1 & pid2=$!
   sleep 1
   out=$(REORIENT_FG_LIMIT=0 REORIENT_INBOX_REPO="$tmp/inbox" bash "$0" "$tmp" 2>&1)
   kill "$pid" "$pid2" 2>/dev/null; wait "$pid" "$pid2" 2>/dev/null
   check "provenance path read from CLAUDE.md"   '^CAP  session-2026-01-01-plant.md  5 lines, 2 entries'
-  check "partials counted"                      '^PART 1 log, 1 jot, 0 touch since the last close'
+  check "partials counted"                      '^PART 1 log, 1 jot, 0 touch since the last close \(no close heading in this file\)$'
   check "missing standing file named"           'MISSING \.agents/lead-handoff\.md'
   check "missing standing file counted"         '^STANDING .*, 1 defective$'
   check "queue counts statuses"                 '^QUEUE task-queue +1 tasks: pending 1'
   check "marked flags counted"                  '^FLAG 1 date groups, 1 marked flags, <=1 unmarked bound'
-  check "flag below Resolved reported"          'MISFILED 1 below Resolved'
+  check "flag below Resolved reported"          'MISFILED 1 below Resolved, first at line 12$'
   check "runbook not read as the capture"       '^CAP  session-2026-01-01-plant\.md '
   check "mail on a sibling branch reported"     '^MAIL other +1 file\(s\) not in dt'
   check "mail found is not also reported none"  '!^MAIL none'
+  check "own seat's branch not read as mail"     '!^MAIL dt '
   if command -v ps >/dev/null 2>&1; then
     check "old harness shell reported"          "^TASK pid $pid "
     check "old process without a snapshot not reported" "!^TASK pid $pid2 "
@@ -119,10 +121,85 @@ selftest() {
   check "missing ps says not checked"           '^TASK not checked: reorient-no-such-ps not found'
   check "missing ps is not read as no shells"   '!^TASK no harness shell'
   # A malformed age from ps skips the row instead of reading as 0; the good row proves the fake is read.
-  printf '#!/bin/sh\ncase "$1" in -eo) echo "4242 7- bash -c x shell-snapshots/snapshot-bash-9.sh"; echo "4243 10:00 bash -c y shell-snapshots/snapshot-bash-9.sh" ;; *) exec ps "$@" ;; esac\n' > "$tmp/fake-ps" && chmod +x "$tmp/fake-ps"
+  # The fake also gives every pid the parent 4244, so 4244 is this script's own ancestry.
+  cat > "$tmp/fake-ps" <<'FAKE'
+#!/bin/sh
+case "$1" in
+  -eo)
+    echo "4242 7- bash -c x shell-snapshots/snapshot-bash-9.sh"
+    echo "4243 10:00 bash -c y shell-snapshots/snapshot-bash-9.sh"
+    echo "4244 99:00 bash -c anc shell-snapshots/snapshot-bash-9.sh"
+    echo "4245 1-01:02:03 bash -c shell-snapshots/snapshot-bash-9.sh && eval 'cmdx' < /dev/null && pwd"
+    echo "4246 02:59 bash -c young shell-snapshots/snapshot-bash-9.sh"
+    echo "4247 03:00 bash -c limit shell-snapshots/snapshot-bash-9.sh" ;;
+  -o) if [ "$4" = 4244 ]; then echo 1; else echo 4244; fi ;;
+  *) exec ps "$@" ;;
+esac
+FAKE
+  chmod +x "$tmp/fake-ps"
   out=$(REORIENT_FG_LIMIT=0 REORIENT_PS="$tmp/fake-ps" bash "$0" "$tmp" 2>&1)
   check "malformed process age skipped"        '!^TASK pid 4242 '
   check "fake ps read: well-formed row reported" '^TASK pid 4243 '
+  check "mm:ss age read minutes first"          '^TASK pid 4243 +age +10m '
+  check "own ancestry not reported"             '!^TASK pid 4244 '
+  check "dd-hh:mm:ss age and eval command"      '^TASK pid 4245 +age 1502m  cmdx$'
+  out=$(REORIENT_PS="$tmp/fake-ps" bash "$0" "$tmp" 2>&1)
+  check "default limit: 179s not reported"      '!^TASK pid 4246 '
+  check "default limit: 180s reported"          '^TASK pid 4247 '
+  # Captures: each close form resets the counts; the newest by mtime is read, not by name.
+  printf '# S\n\n## 09:00 a\n\n## session-close run\n\n## 09:30 b\n\n## Close, 2026-01-01\n\n## 10:00 c\n\n## 12:00 PDT, session-close\n\n## 13:00 [touch] z\n' > "$tmp/.agents/elsewhere/session-2025-12-31-close.md"
+  touch -t 203001010000 "$tmp/.agents/elsewhere/session-2025-12-31-close.md"
+  # Flags: a date group below Resolved is misfiled and not counted in Open.
+  printf '# Flags\n\n## Open\n\n### 2026-01-02\n\n<!--flag-->\n**F**\n\n## Resolved\n\n### 2025-12-01\n' > "$tmp/.agents/threads-flagged.md"
+  python3 -c 'import os,sys,time; t=time.time()-10*86400; os.utime(sys.argv[1],(t,t))' "$tmp/.agents/task-queue.json"
+  # Repositories: names cut after three, the overflow count, a worktree's .git file,
+  # detached HEAD, no upstream, ahead and behind, and the REORIENT_REPOS list.
+  r="$tmp/projects/r"
+  { git init -q -b base "$r" && mkdir "$r/sub" && for f in d1 d2 d3 d4; do : > "$r/$f"; done &&
+    git -C "$r" add -A && git -C "$r" -c user.name=t -c user.email=t@t commit -qm c1 &&
+    git -C "$r" switch -qc work && git -C "$r" -c user.name=t -c user.email=t@t commit -q --allow-empty -m c2 &&
+    git -C "$r" -c user.name=t -c user.email=t@t commit -q --allow-empty -m c3 &&
+    git -C "$r" switch -q base && git -C "$r" -c user.name=t -c user.email=t@t commit -q --allow-empty -m c4 &&
+    git -C "$r" switch -q work && git -C "$r" branch -q -u base &&
+    git -C "$r" worktree add -q --detach "$tmp/projects/wt" && : > "$tmp/projects/wt/w1" &&
+    for f in d1 d2 d3 d4; do echo x > "$r/$f"; done && : > "$r/s1" && git -C "$r" add s1 &&
+    : > "$r/sub/u1" && : > "$r/sub/u2" && : > "$r/sub/u3"; } || return 1
+  : > "$tmp/projects/file.txt"
+  out=$(REORIENT_REPOS=":$tmp/inbox" bash "$0" "$tmp" 2>&1)
+  check "HH:MM TZ, session-close resets counts"  '^PART 0 log, 0 jot, 1 touch since the last close$'
+  check "last entry is the newest heading"      '^LAST 13:00 \[touch\] z$'
+  check "newest capture by mtime, not name"     '^CAP  session-2025-12-31-close\.md '
+  check "date group below Resolved misfiled"    'MISFILED 1 below Resolved, first at line 12$'
+  check "date groups counted in Open only"      '^FLAG 1 date groups, 1 marked flags'
+  check "ten-day-old standing file counted"     '^STANDING .*, 1 over a week old, '
+  check "ahead and behind the upstream"         '^GIT  r .* work +staged 1 +dirty 4 +untracked 3 +ahead 2 behind 1$'
+  check "names: four cut to three and +1"       '^      staged: s1 dirty: d1 d2 d3 \+1 new: u1 u2 u3$'
+  check "worktree read, detached, no upstream"  '^GIT  wt .* detached@[0-9a-f]+ .* ahead - behind -$'
+  check "names line for untracked only"         '^      new: w1$'
+  check "file under projects is not a repo"     '!^GIT  file\.txt'
+  check "REORIENT_REPOS repository read"        '^GIT  inbox '
+  check "empty REORIENT_REPOS element skipped"  '!^GIT  +not a repository$'
+  for h in 'Close, 2026-01-01' 'session-close run'; do  # only the newest close counts, so one form per run
+    printf '# S\n\n## 09:00 a\n\n## %s\n\n## 13:00 [touch] z\n' "$h" > "$tmp/.agents/elsewhere/session-2025-12-31-close.md"
+    touch -t 203001010000 "$tmp/.agents/elsewhere/session-2025-12-31-close.md"
+    out=$(bash "$0" "$tmp" 2>&1)
+    check "close heading '$h' resets the counts" '^PART 0 log, 0 jot, 1 touch since the last close$'
+  done
+  out=$(bash "$0" --wide "$tmp" 2>&1)
+  check "--wide names every file"               ' dirty: d1 d2 d3 d4 new:'
+  # A workspace with no CLAUDE.md, no provenance layer and no manifest uses and names the defaults.
+  mkdir "$tmp/bare"
+  out=$(bash "$0" "$tmp/bare" 2>&1)
+  check "default provenance layer named"        '^CAP  provenance layer \.agents/context not found$'
+  check "default manifest named"                '^STANDING no manifest at index\.md$'
+  # PIN reads the user settings; an alias and a null env are not errors.
+  mkdir -p "$tmp/home/.claude"
+  printf '{"model": "opus", "env": null}\n' > "$tmp/home/.claude/settings.json"
+  out=$(HOME="$tmp/home" bash "$0" "$tmp/bare" 2>&1)
+  check "PIN alias, null env, autoupdate on"    '^PIN  model opus \(ALIAS\)  claude-code .*  autoupdate ON$'
+  printf '{"model": "claude-x-4", "env": {"DISABLE_AUTOUPDATER": "1"}}\n' > "$tmp/home/.claude/settings.json"
+  out=$(HOME="$tmp/home" bash "$0" "$tmp/bare" 2>&1)
+  check "PIN pinned, autoupdate off"            '^PIN  model claude-x-4 \(pinned\)  claude-code .*  autoupdate off$'
   [ "$fails" -eq 0 ] && { echo "reorient: selftest passed"; return 0; }
   echo "reorient: selftest FAILED ($fails)"; return 1
 }
@@ -164,9 +241,9 @@ repo() { # $1 label, $2 path
   lvl=$(bash "$HERE/remote-level.sh" "$dir" 2>/dev/null || printf 'external')
   br=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null || printf '?')
   [ "$br" = HEAD ] && br="detached@$(git -C "$dir" rev-parse --short HEAD 2>/dev/null)"
-  staged=$(git -C "$dir" diff --cached --name-only 2>/dev/null | wc -l)
-  dirty=$(git -C "$dir" diff --name-only 2>/dev/null | wc -l)
-  untr=$(git -C "$dir" ls-files --others --exclude-standard 2>/dev/null | wc -l)
+  staged=$(git -C "$dir" diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
+  dirty=$(git -C "$dir" diff --name-only 2>/dev/null | wc -l | tr -d ' ')
+  untr=$(git -C "$dir" ls-files --others --exclude-standard 2>/dev/null | wc -l | tr -d ' ')
   st=$(git -C "$dir" rev-list --left-right --count "@{u}...HEAD" 2>/dev/null || true)
   if [ -n "$st" ]; then behind=${st%%[!0-9]*}; ahead=${st##*[!0-9]}; else behind=-; ahead=-; fi
   printf 'GIT  %-14s %-9s %-10s staged %-3s dirty %-3s untracked %-3s ahead %s behind %s\n' \
