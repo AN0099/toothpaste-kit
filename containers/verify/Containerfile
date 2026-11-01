@@ -1,0 +1,61 @@
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Verification container, v1: every third-party checker the kit's checks call,
+# so a check never reports a tool as not installed, and nothing is installed on
+# the host. The tree goes in read-only and checks run with no network
+# (containers/verify/verify). Built for linux/amd64.
+#
+# Every version below is exact. Every download is verified against a sha256,
+# and pip installs only files whose hash is in requirements.txt. The version of
+# each tool, and where it came from, is in containers/verify/README.md.
+
+FROM docker.io/library/python@sha256:2d44738ebf4ce5f63b9d9ea871e9c7cfdc0426f7b0c97cac915fd88ded1d86bb
+
+RUN apt-get update -qq \
+ && apt-get install -y -qq --no-install-recommends libmagic1 git xz-utils \
+ && rm -rf /var/lib/apt/lists/*
+
+# Python checkers, each at an exact version. requirements.txt carries one hash
+# per package, and pip refuses any package or dependency without one.
+# reuse is built from its sdist with the backend pinned in
+# build-requirements.txt, installed first, so no build step downloads anything
+# unpinned.
+COPY requirements.txt build-requirements.txt /tmp/
+RUN pip install --no-cache-dir --require-hashes -r /tmp/build-requirements.txt \
+ && pip install --no-cache-dir --require-hashes --no-build-isolation -r /tmp/requirements.txt \
+ && rm /tmp/requirements.txt /tmp/build-requirements.txt
+
+# Downloads: one per line, each at an exact version and checked by digest.
+# The CodeQL bundle holds the CLI with the codeql/python-queries and
+# codeql/actions-queries packs at the versions released with it, so no pack is
+# downloaded at analysis time, when there is no network.
+ADD --checksum=sha256:f002864be6dd8d5d7bdb123aaf7291ec8e291012bd9f70b6d2362f730db52aeb https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.27.2/codeql-bundle-linux64.tar.gz /tmp/dl/codeql-bundle-linux64.tar.gz
+ADD --checksum=sha256:8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198 https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz /tmp/dl/shellcheck.tar.xz
+ADD --checksum=sha256:8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8 https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz /tmp/dl/actionlint.tar.gz
+ADD --checksum=sha256:a39b0c97695069d95d276d99be0f5dbabb081d801bfdc9ba49b76efaf94e2369 https://github.com/cue-lang/cue/releases/download/v0.17.1/cue_v0.17.1_linux_amd64.tar.gz /tmp/dl/cue.tar.gz
+
+RUN cd /tmp/dl \
+ && tar -xzf codeql-bundle-linux64.tar.gz -C /opt && chmod -R a+rX /opt/codeql \
+ && tar -xJf shellcheck.tar.xz && mv shellcheck-v0.11.0/shellcheck /usr/local/bin/ \
+ && tar -xzf actionlint.tar.gz actionlint && mv actionlint /usr/local/bin/ \
+ && tar -xzf cue.tar.gz cue && mv cue /usr/local/bin/ \
+ && ln -s /opt/codeql/codeql /usr/local/bin/codeql \
+ && cd / && rm -rf /tmp/dl
+
+# Each tool must report the version pinned above, so a download that
+# unpacks to a different release fails the build rather than the first check.
+RUN codeql version --format=terse | grep -qx '2.27.2' \
+ && shellcheck --version | grep -qx 'version: 0.11.0' \
+ && actionlint -version | head -1 | grep -qx '1.7.12' \
+ && cue version | head -1 | grep -qx 'cue version v0.17.1' \
+ && reuse --version | grep -q '6.2.0' \
+ && yamllint --version | grep -qx 'yamllint 1.38.0' \
+ && check-jsonschema --version | grep -q '0.38.2' \
+ && codeql resolve packs | grep -E 'codeql/(python|actions)-queries' > /opt/codeql-packs.txt
+
+COPY codeql-scan /usr/local/bin/codeql-scan
+RUN useradd -m -u 1000 check
+USER check
+WORKDIR /src
