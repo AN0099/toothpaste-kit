@@ -45,7 +45,7 @@ python3 scripts/blog.py build OUT
 writes into OUT one `<slug>.html` per post, where the slug is the file name without `.md`; an
 `index.html` listing the posts newest first; a `style.css`; and a `feed.xml`. The feed is written
 by `write_feed` in `blog.py`, from the same posts: RSS 2.0, each post's whole body in
-`content:encoded`, its `guid` `tp-kit-blog:` and the slug, and its date in RFC 822 at midnight UTC.
+`content:encoded`, its `link` the post's page on the site, its `guid` `tp-kit-blog:` and the slug, and its date in RFC 822 at midnight UTC.
 `python3 scripts/blog.py --selftest` runs the planted cases for both, and `scripts/gates.sh` runs it
 as gate 20.
 

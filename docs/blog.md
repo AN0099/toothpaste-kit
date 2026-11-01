@@ -77,13 +77,15 @@ tell is the writer's; adding to them is not.
    ```
 
    You should now see one page per post, an index page newest first, one stylesheet and
-   `feed.xml`. The feed is RSS 2.0, with each post's full body in `content:encoded`, a stable
-   `guid` per post and dates in RFC 822.
+   `feed.xml`. The feed is RSS 2.0, with each post's full body in `content:encoded`, a link to
+   each post's page, a stable `guid` per post and dates in RFC 822.
 
-## What it does not do
+## Where it is published
 
-It does not host or publish the site. A Pages site, a domain or a workflow that deploys are the
-maintainer's decision, and the build directory is the deliverable.
+`.github/workflows/pages.yml` runs the selftest, builds the site and deploys it to GitHub Pages at
+<https://kit.bridleworks.org/> on each push to `main` that changes `blog/`, `scripts/blog.py` or the
+workflow itself. It can also be started by hand from the Actions tab. A post is published by merging
+it.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

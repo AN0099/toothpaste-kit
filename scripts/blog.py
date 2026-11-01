@@ -611,14 +611,18 @@ def selftest():
 import email.utils
 import xml.etree.ElementTree as ET
 
-# The channel link: the feed's posts are about this repository, and the
-# blog has no hosted address yet (hosting is the maintainer's decision).
-SITE_URL = 'https://github.com/AN0099/toothpaste-kit'
+# The channel link: the address .github/workflows/pages.yml deploys to.
+SITE_URL = 'https://kit.bridleworks.org/'
 FEED_DESCRIPTION = 'Changes to the toothpaste kit, each post with its full text.'
 CONTENT_NS = 'http://purl.org/rss/1.0/modules/content/'
 # A post's guid is its slug under this prefix: stable across builds and
 # hosts, and changed only by renaming the post's file.
 GUID_PREFIX = 'tp-kit-blog:'
+
+
+def post_url(slug):
+    """A post's page on the site: the item link a feed reader opens."""
+    return f'{SITE_URL}{slug}.html'
 # Characters XML 1.0 cannot carry at all, even escaped.
 XML_BAD_CHAR = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\ufffe\uffff]')
 RFC822_RE = re.compile(r'^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} '
@@ -651,6 +655,7 @@ def feed_xml(posts):
     for p in posts:
         item = ET.SubElement(channel, 'item')
         ET.SubElement(item, 'title').text = p['title']
+        ET.SubElement(item, 'link').text = post_url(p['slug'])
         ET.SubElement(item, 'description').text = p['summary']
         ET.SubElement(item, 'pubDate').text = rfc822(p['date'])
         ET.SubElement(item, 'guid', isPermaLink='false').text = GUID_PREFIX + p['slug']
@@ -669,8 +674,8 @@ def feed_problems(text, posts):
     """What is wrong with a feed for these posts: well-formed XML, the RSS 2.0
     required elements (rss version, channel title, link and description; an
     item's title or description), and this blog's own promises (one item
-    per post in order, a unique guid, an RFC 822 pubDate on the post's
-    date, the whole body in content:encoded). Empty when nothing is.
+    per post in order, a link to the post's page, a unique guid, an RFC
+    822 pubDate on the post's date, the whole body in content:encoded). Empty when nothing is.
     A feed with a DOCTYPE is refused before parsing, so no entity it
     declares is ever expanded; this blog's feed never carries one."""
     if '<!DOCTYPE' in text:
@@ -697,6 +702,8 @@ def feed_problems(text, posts):
             probs.append(f'item {n} is not the post {p["slug"]} (posts go newest first)')
         if not ((item.findtext('title') or '').strip() or (item.findtext('description') or '').strip()):
             probs.append(f'item {n} has neither title nor description')
+        if item.findtext('link') != post_url(p['slug']):
+            probs.append(f'item {n} link is not the page of {p["slug"]}')
         guid = (item.findtext('guid') or '').strip()
         if not guid:
             probs.append(f'item {n} has no guid')
@@ -832,14 +839,18 @@ FEED_PLANTED = [
      'is not RFC 822'),
     ('pubDate on another day', ('<pubDate>Tue, 20 Oct 2026 00:00:00 GMT</pubDate>',
                                 '<pubDate>Wed, 21 Oct 2026 00:00:00 GMT</pubDate>'), 'is not the post date'),
+    ('item link to another post', (f'<link>{post_url("2026-10-20-later")}</link>',
+                                   f'<link>{post_url("2026-10-13-good")}</link>'), 'link is not the page of'),
     ('no guid', (f'<guid isPermaLink="false">{GUID_PREFIX}2026-10-20-later</guid>', ''), 'has no guid'),
     ('duplicate guid', (f'{GUID_PREFIX}2026-10-20-later<', f'{GUID_PREFIX}2026-10-13-good<'), 'share a guid'),
     ('body cut short', ('&lt;h2&gt;What changed&lt;/h2&gt;\n', ''), 'not the whole post body'),
-    ('item without title or description', ('<title>Later &amp; newer</title>\n      <description>S</description>', ''),
+    ('item without title or description',
+     (f'<title>Later &amp; newer</title>\n      <link>{post_url("2026-10-20-later")}</link>\n'
+      '      <description>S</description>', f'<link>{post_url("2026-10-20-later")}</link>'),
      'neither title nor description'),
 ]
 FEED_REQUIRED = ('not well-formed', 'wrong rss version', 'no channel title', 'no channel link',
-                 'no channel description', 'pubDate not RFC 822', 'pubDate on another day', 'no guid',
+                 'no channel description', 'pubDate not RFC 822', 'pubDate on another day', 'item link to another post', 'no guid',
                  'duplicate guid', 'body cut short', 'item without title or description')
 
 # REUSE-IgnoreStart
