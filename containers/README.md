@@ -8,14 +8,14 @@ tool in it, its version and where that version came from. The scripts need `podm
 | Directory | Image | What it runs |
 |---|---|---|
 | [`starter/`](starter/README.md) | `localhost/kit-starter:v0` | Python, git and Claude Code, to try the quickstart without installing them; `containers/starter/run` starts it |
-| [`verify/`](verify/README.md) | `localhost/kit-verify:v1` | The third-party checkers: reuse, CodeQL with its python and actions queries, yamllint, shellcheck, actionlint, check-jsonschema and CUE |
+| [`verify/`](verify/README.md) | `localhost/kit-verify:v2` | The third-party checkers: reuse, CodeQL with its python and actions queries, yamllint, shellcheck, actionlint, check-jsonschema and CUE |
 
 ## Running `verify`
 
 `containers/verify/verify TREE CMD...` runs `CMD` in the image on a copy of `TREE`. The tree is
 mounted read-only and copied to a scratch directory inside the container, and the command runs
 with no network. The image is built on first use; after editing the Containerfile, remove it with
-`podman rmi localhost/kit-verify:v1` so the next run rebuilds it.
+`podman rmi localhost/kit-verify:v2` so the next run rebuilds it.
 
 ```sh
 containers/verify/verify . ./scripts/compliance.sh --selftest

@@ -63,10 +63,11 @@ them, as the installing guide's "Symlink or copy" section describes.
 | Python 3.13, the base image, pinned by digest | The `.py` scripts and `check-qblock` and `check-pr-body` run on `python3`, standard library only. The same base as the verification container |
 | git | Quickstart step 1 runs `git --version`; `gates.sh`, `remote-level.sh`, `reorient` and `spdx-fragment.py` read a repository |
 | `sh`, `bash`, GNU `grep`, `find`, `sed`, `awk`, `sort`, `mktemp`, `ln -r` | Called by the shell scripts; all are in the base image's Debian already, so nothing is added for them |
-| Node.js 22.12.0 and Claude Code 2.1.304, with its `linux-x64` platform package | Quickstart steps 1 and 5 run `claude` |
+| Node.js 22.12.0 and Claude Code 2.1.304, with its platform package for the architecture being built (`linux-x64` or `linux-arm64`) | Quickstart steps 1 and 5 run `claude` |
 
 Each download in the `Containerfile` names its exact version and its sha256, and the build fails
-on a hash that does not match.
+on a hash that does not match. The image builds for linux/amd64 and linux/arm64; the downloads
+that differ by architecture are pinned once for each.
 
 ## What it does not do
 
@@ -81,9 +82,6 @@ on a hash that does not match.
 - It does not relabel files for SELinux. `run` starts the container with SELinux separation turned
   off for it (`--security-opt label=disable`), because a relabel rewrites the labels of the
   workspace directory and everything under it on the host, and that directory may be your home.
-- It is for x86-64 only for now. The Node.js download and Claude Code's platform package are both
-  pinned for `linux-x64`, and the image installs the platform package from that pinned file with no
-  registry access, so on another architecture the build has nothing to install.
 - The Containerfile installs the platform package before the main package, and that order must
   stay: the main package's install step copies the `claude` binary out of the platform package,
   and if it runs first it finds nothing and leaves a stub, so `claude` does not run.

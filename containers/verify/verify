@@ -15,7 +15,7 @@
 set -eu
 [ $# -ge 2 ] || { echo "usage: verify TREE CMD..." >&2; exit 2; }
 tree=$(cd "$1" && pwd -P); shift
-img=localhost/kit-verify:v1
+img=localhost/kit-verify:v2
 here=$(dirname "$(readlink -f "$0")")
 podman image exists "$img" || podman build -q -t "$img" "$here" >/dev/null
 exec podman run --rm --network=none --userns=keep-id -v "$tree:/src:ro,Z" "$img" \
