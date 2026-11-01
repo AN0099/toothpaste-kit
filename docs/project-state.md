@@ -3,7 +3,7 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-10-30.
+Last updated 2026-11-01.
 
 ## Live
 
@@ -28,6 +28,12 @@ classifier `merge-proxy` runs, with its own `--selftest`, and `reorient`, the ob
 writes relative symlink targets where `ln -r` exists, so the links survive the tree being moved.
 `examples/workspace/` is the workspace `docs/quickstart.md` copies, and
 `scripts/check-workspace-stubs.py` checks its stubs against `docs/standing-documents.md`.
+
+The kit blog is published at <https://kit.bridleworks.org/>: `scripts/blog.py` builds `blog/posts/`
+into pages and an RSS feed, and `.github/workflows/pages.yml` deploys it when a post merges. Two
+containers, each built for linux/amd64 and linux/arm64: `containers/verify/` holds every third-party
+checker the gates use, and `containers/starter/` lets a new user try the kit without installing its
+tools.
 
 The orchestration protocol has run relay traffic across Claude, local models, and several vendor
 surfaces. The message schema requires a seven-field capability profile as the normative part, and
@@ -221,6 +227,44 @@ Merged to `main` after 0.5.0, listed under Unreleased in `CHANGELOG.md`.
 - **Named check jobs (pull request #72).** The `dco`, `pr-body` and `commit-attribution` jobs carry
   those names, so each can be bound as a required check, and the default branch ruleset binds all
   three.
+- **Changelog catch-up (pull request #73).** `CHANGELOG.md` gained the entries for #70 to #72.
+- **`scripts/spdx-fragment.py` (pull request #74).** Renders a commit range's `Assisted-by:` and
+  `Agent-Effort:` trailers as an SPDX 3.0.1 fragment.
+- **Required checks recorded (pull request #75).** The documents name the seven contexts the
+  default branch ruleset binds.
+- **`security-insights.yml` (pull request #76).** An OpenSSF Security Insights file, schema v2.2.0,
+  stating the kit's security arrangements in a form tools read.
+- **Stale lines corrected (pull requests #77, #78, #79 and #82).** Claims the tree contradicted, in
+  the release documents, `docs/security-posture.md`, the README, `CONTRIBUTING.md`,
+  `GOVERNANCE.md` and 26 further files, each reworded to name its source rather than carry a count.
+- **Review rounds (pull request #80, READMEs in #81).** A local workflow for checking one change
+  between two commits: a reviewer reports findings, a verifier reproduces each, and the operator
+  decides on reproduced findings only. Schemas, `scripts/round-check.py` and a worked example in
+  `examples/review-round/`.
+- **Pull request template (pull request #83).** "Drafted with an agent?" is one box, so a merged
+  pull request no longer shows an open task.
+- **`round-check.py` selftest (pull request #84).** Counts its extra checks in code, and a new plant
+  covers duplicate finding ids.
+- **The kit blog (pull request #85).** `scripts/blog.py` builds `blog/posts/*.md` into pages, an
+  index and an RSS feed; three posts cover releases 0.3.0 to 0.5.0. Guide: `docs/blog.md`.
+- **New-user fixes (pull request #86).** The README names every script, and `docs/installing.md`
+  creates the skills directory and says which hook rules need editing.
+- **`scripts/sbom.py`, gate 19 (pull request #87).** An SPDX 3.0.1 bill of materials for the tree;
+  it fails on a file without licence or copyright and on an action not pinned by commit SHA.
+- **Mutation-tested selftests (pull request #88).** New selftest cases for nine scripts, each
+  killing a mutant the old selftest let through.
+- **`containers/verify/` (pull request #89).** One pinned image holding every third-party checker.
+- **`gates.sh` from any directory (pull request #90).** It changes to the kit root first, so the
+  selftest passes wherever it is run.
+- **`scripts/cli_path.py` (pull request #91).** One check that a path from the command line stays
+  inside its root; `spdx-fragment.py` uses it.
+- **`containers/starter/` (pull request #92).** Try the kit without installing its tools.
+- **Multi-architecture containers (pull request #93).** Both images build for linux/amd64 and
+  linux/arm64, each tested on a native runner, and the verification image runs the CodeQL version
+  GitHub runs.
+- **Blog selftest, gate 20 (pull request #94).** `gates.sh` runs `scripts/blog.py --selftest`.
+- **Blog deploy (pull request #95).** `.github/workflows/pages.yml` publishes the blog to GitHub
+  Pages at <https://kit.bridleworks.org/>.
 
 ## In v0.5.0
 
