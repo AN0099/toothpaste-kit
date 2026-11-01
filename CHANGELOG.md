@@ -83,6 +83,13 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Fixed
 
+- `scripts/gates.sh`: changes to the kit root, found from its own path
+  rather than from git, before any gate runs. Run from another directory,
+  `--selftest` had failed 9 plants with messages about the gates ("rejected
+  its own clean fixture", "accepted a planted positive") rather than about the
+  directory. The selftest adds a plant for it: two copies of the kit without
+  `.git` are run from a third directory, and the one whose `cd` is removed
+  must fail while the one as installed passes every gate.
 - `README.md` and `docs/installing.md`: the README names the five scripts in
   `scripts/` it had left out, and says `repomix` is a separate tool that the
   counts check depends on. The installing guide creates the skills directory
