@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: pages
+
+# Builds the kit blog with scripts/blog.py and deploys it to GitHub Pages,
+# served at https://kit.bridleworks.org/. The domain is set in the
+# repository's Pages settings, not by a CNAME file: a site deployed from a
+# workflow ignores one.
+#
+# The selftest runs before the build, so a blog.py whose planted cases fail
+# never publishes. The same text runs locally:
+#   python3 scripts/blog.py --selftest && python3 scripts/blog.py build _site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'blog/**'
+      - 'scripts/blog.py'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time, and a running one is never cancelled: a cancelled
+# deploy can leave the site half replaced.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      # checkout is pinned by tag, as in every workflow here
+      # (docs/security-posture.md row 3.7); the Pages actions are new, so
+      # they are pinned by full commit SHA, which the sbom gate requires.
+      - uses: actions/checkout@v7
+      - run: python3 scripts/blog.py --selftest
+      - run: python3 scripts/blog.py build _site
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    # Only this job can write to Pages, and only through the OIDC token
+    # deploy-pages exchanges; the build job above stays read-only.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

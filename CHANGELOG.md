@@ -7,11 +7,16 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `.github/workflows/pages.yml`: deploys the kit blog to GitHub Pages at
+  <https://kit.bridleworks.org/> on a push to `main` that changes the blog,
+  after `blog.py --selftest` passes. The feed's channel link is now that
+  address instead of the repository, and each item links to its post's
+  page there, which `--selftest` checks with a planted wrong link.
 - `scripts/blog.py` and `blog/`: the kit blog. `blog.py build OUT` turns
   `blog/posts/*.md` into static HTML pages, an index and an RSS 2.0
   `feed.xml`; `--selftest` runs the planted cases for both. Three posts, one
   per release from 0.3.0 to 0.5.0. `blog/README.md` indexes the directory and
-  [The kit blog](docs/blog.md) is the guide. Nothing is published.
+  [The kit blog](docs/blog.md) is the guide.
 - `scripts/cli_path.py`: one function, `under(root, arg)`, that keeps a
   command-line path argument inside a root directory, using `realpath` and a
   `startswith` on the root plus the separator. A path outside, through `..`,
