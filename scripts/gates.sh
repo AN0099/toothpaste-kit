@@ -44,7 +44,9 @@
 # request body checker's selftest in scripts/check-pr-body, which plants each
 # finding it reports, and the SPDX fragment builder's selftest in
 # scripts/spdx-fragment.py, which builds fragments from commits in a scratch
-# repository and checks each models file rule, and the review-round records under
+# repository and checks each models file rule and that --models stays inside
+# the repository through scripts/cli_path.py, whose own selftest --selftest
+# runs against a weakened copy, and the review-round records under
 # examples/ via scripts/round-check.py, which states its own keyword coverage
 # and runs its own selftest first, and the SBOM generator in
 # scripts/sbom.py, run on its own planted trees and then on this tree, so a
@@ -881,11 +883,28 @@ PY2
 
   # Gate 17: a copy of the builder whose releaseTime pattern ends in $ rather
   # than \Z, so it accepts a trailing newline, must fail its own selftest.
+  # The copy imports scripts/cli_path.py from its own directory, so that goes
+  # beside it; without it the copy would fail on the import, not the pattern.
   mkdir -p "$tmp/sp/scripts" && sed '/^RELEASE_TIME_RE/s/\\Z"/$"/' scripts/spdx-fragment.py > "$tmp/sp/scripts/spdx-fragment.py"
+  cp scripts/cli_path.py "$tmp/sp/scripts/"
   python3 "$tmp/sp/scripts/spdx-fragment.py" --selftest >/dev/null 2>&1
   bad=$?
   python3 scripts/spdx-fragment.py --selftest >/dev/null 2>&1
   plant_rejected $bad $? "spdx-fragment gate, releaseTime pattern loosened"
+
+  # The path helper every CLI path argument goes through, run the way gate 17
+  # runs spdx-fragment.py: a copy whose check drops the separator, so a
+  # sibling such as <root>-old counts as inside, must fail its own selftest,
+  # and the helper as installed must pass it.
+  mkdir -p "$tmp/cp/scripts" && sed 's/startswith(real_root + os.sep)/startswith(real_root)/' scripts/cli_path.py > "$tmp/cp/scripts/cli_path.py"
+  if cmp -s scripts/cli_path.py "$tmp/cp/scripts/cli_path.py"; then
+    echo "PLANT FAIL  cli_path helper, separator dropped: the plant did not apply"; plant_fail=1
+  else
+    python3 "$tmp/cp/scripts/cli_path.py" --selftest >/dev/null 2>&1
+    bad=$?
+    python3 scripts/cli_path.py --selftest >/dev/null 2>&1
+    plant_rejected $bad $? "cli_path helper, separator dropped"
+  fi
 
   # Gate 18: a round directory whose verifier has the reviewer's role must
   # fail the gate, and the same directory with the roles apart must pass. Both

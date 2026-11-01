@@ -106,6 +106,7 @@ The gates call these, and each runs on its own as well:
 - `schema-check.py`: validates `orchestration/registry/*.json` against its schema
 - `check-qblock`: checks a reply's closing question block against `working-preferences`
 - `check-pr-body`: checks a pull request body against `.github/pull_request_template.md`; CI also runs it on each pull request
+- `cli_path.py`: keeps a path given on a script's command line inside a root directory; `spdx-fragment.py` uses it for `--models`
 - `spdx-fragment.py`: builds an SPDX fragment of who assisted a commit range from its `Assisted-by:` trailers, taking per-model values from `spdx-models.json`
 - `remote-level.sh`: classifies a repository by where its remotes point, as none, internal or external, and treats any host it cannot prove internal as external
 - `reorient`: prints where a workspace stands in one screen, for the start of a session and after a compaction; the observing half of the `orient` skill

@@ -12,6 +12,14 @@ skill lives in that skill's own `CHANGELOG.md`.
   `feed.xml`; `--selftest` runs the planted cases for both. Three posts, one
   per release from 0.3.0 to 0.5.0. `blog/README.md` indexes the directory and
   [The kit blog](docs/blog.md) is the guide. Nothing is published.
+- `scripts/cli_path.py`: one function, `under(root, arg)`, that keeps a
+  command-line path argument inside a root directory, using `realpath` and a
+  `startswith` on the root plus the separator. A path outside, through `..`,
+  an absolute path or a symbolic link, exits 2 naming the argument and the
+  root. `scripts/spdx-fragment.py` routes `--models` through it, taken from
+  the repository root, so a `--models` path outside the repository now exits
+  2. `scripts/gates.sh --selftest` runs the helper's selftest against a copy
+  with the separator dropped.
 - `containers/verify/`: a verification container that
   holds every third-party checker the kit's checks call, so no check is
   skipped and nothing is installed on the host: reuse 6.2.0, the CodeQL 2.27.2

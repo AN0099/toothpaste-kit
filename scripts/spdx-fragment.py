@@ -23,7 +23,11 @@ site as its committer, so the author is the person who made it.
 
 The values the trailers cannot give (suppliedBy, downloadLocation, releaseTime,
 packageVersion, autonomyType) come from the file at --models PATH (default
-scripts/spdx-models.json), a JSON object keyed by model name. The file is read
+scripts/spdx-models.json), a JSON object keyed by model name. PATH is taken
+relative to the repository root (`git rev-parse --show-toplevel` from the
+current directory), and a PATH that resolves outside that root, through `..`,
+an absolute path or a symbolic link, exits 2 before anything is read, with
+scripts/cli_path.py's message on stderr. The file is read
 only when the range names a model; then every entry in it is checked, whether
 or not the range names that entry, before any output is printed: a file or
 entry that is not an object, a missing key, a suppliedBy, downloadLocation or
@@ -52,6 +56,9 @@ import re
 import subprocess
 import sys
 from datetime import datetime, timezone
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from cli_path import under  # noqa: E402
 
 DEFAULT_MODELS_PATH = "scripts/spdx-models.json"
 CONTEXT_URL = "https://spdx.org/rdf/3.0.1/spdx-context.jsonld"
@@ -324,6 +331,11 @@ def run(argv, cwd):
         return 2, "", [USAGE]
     models_path, range_arg = parsed
     try:
+        root = git_output(cwd, ["rev-parse", "--show-toplevel"]).strip()
+    except GitError as e:
+        return 2, "", [f"spdx-fragment: {e}"]
+    models_path = under(root, models_path)
+    try:
         graph, warnings = build_graph(cwd, range_arg, models_path)
     except (ModelsValidationError, MalformedAssistedBy) as e:
         return 2, "", [str(e)]
@@ -336,6 +348,8 @@ def run(argv, cwd):
 
 
 def selftest():
+    import contextlib
+    import io
     import tempfile
 
     ok = True
@@ -364,6 +378,10 @@ def selftest():
             capture_output=True, text=True, env=env)
 
     with tempfile.TemporaryDirectory() as d:
+        # Resolved, because cli_path.under() returns the real path: where the
+        # temp directory sits under a symbolic link (/var on macOS), messages
+        # name /private/var and an expected message built from d must too.
+        d = os.path.realpath(d)
         git(d, "init", "-q")
         git(d, "config", "user.email", "t@example.com")
         git(d, "config", "user.name", "T")
@@ -863,11 +881,8 @@ def selftest():
         ok = ok and no_trailer_ok
 
         # --- models file is never loaded when no model is named ---
-        # Point at a path that cannot accidentally exist (unlike the real
-        # DEFAULT_MODELS_PATH, which resolves against the process's actual
-        # cwd, not the tempdir, and happens to hit the real shipped file
-        # there): if build_graph loads it anyway, open() fails and this
-        # becomes exit 2 instead of 0.
+        # Point at a path that cannot accidentally exist: if build_graph
+        # loads it anyway, open() fails and this becomes exit 2 instead of 0.
         bogus_models_path = os.path.join(d, "does-not-exist.json")
         code, out, errs = run(["--models", bogus_models_path, no_trailer_range], d)
         never_loaded_ok = (code == 0 and not errs)
@@ -932,6 +947,46 @@ def selftest():
                   if not empty_part_ok else f"ok    malformed Assisted-by {value!r} exits 2")
             ok = ok and empty_part_ok
             prev = bad_hash
+        # --- --models is taken from the repository root and kept inside it ---
+        # A relative PATH resolves against the root, not the current
+        # directory: run from a subdirectory, "models.json" still names d's.
+        sub = os.path.join(d, "sub")
+        os.makedirs(sub, exist_ok=True)
+        code, out, errs = run(["--models", "models.json", f"{c0}..{c1}"], sub)
+        rel_ok = code == 0 and not errs
+        n += 1
+        print(f"{'ok  ' if rel_ok else 'FAIL'}  --models relative to the repository root, run from a subdirectory"
+              + ("" if rel_ok else f": code={code} errs={errs}"))
+        ok = ok and rel_ok
+
+        # Outside the root: each exits 2 before reading, with cli_path's line
+        # on stderr and nothing on stdout, even when no model is named.
+        outside_file = os.path.join(os.path.dirname(d), os.path.basename(d) + "-models.json")
+        with open(outside_file, "w") as f:
+            json.dump({}, f)
+        os.symlink(outside_file, os.path.join(d, "link-out.json"))
+        try:
+            for name, path, rng in [
+                ("a .. escape", "../" + os.path.basename(outside_file), f"{c0}..{c1}"),
+                ("an absolute path outside", outside_file, f"{c0}..{c1}"),
+                ("a symbolic link pointing outside", "link-out.json", f"{c0}..{c1}"),
+                ("an absolute path outside, no model named", outside_file, no_trailer_range),
+            ]:
+                err = io.StringIO()
+                try:
+                    with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()) as so:
+                        run(["--models", path, rng], d)
+                    code = 0
+                except SystemExit as e:
+                    code = e.code
+                want = f"cli_path: {path} is outside {git_output(d, ['rev-parse', '--show-toplevel']).strip()}\n"
+                case_ok = code == 2 and err.getvalue() == want and so.getvalue() == ""
+                n += 1
+                print(f"{'ok  ' if case_ok else 'FAIL'}  --models outside the repository root ({name}) exits 2"
+                      + ("" if case_ok else f": code={code} stderr={err.getvalue()!r}"))
+                ok = ok and case_ok
+        finally:
+            os.remove(outside_file)
 
         # --- bad arguments: exit 2 with the usage line ---
         for name, argv in [
