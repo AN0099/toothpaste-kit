@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These nineteen gates cover: the em dash ban, the private task ID ban,
+# check. These twenty gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency (including every vendor
 # file's shape against surface-descriptor.schema.json, checked by
 # scripts/schema-check.py, which fails loudly on any schema keyword it does
@@ -51,7 +51,9 @@
 # and runs its own selftest first, and the SBOM generator in
 # scripts/sbom.py, run on its own planted trees and then on this tree, so a
 # tracked file with no licence or copyright, a licence with no text under
-# LICENSES/, or a workflow action not pinned by commit SHA fails. They
+# LICENSES/, or a workflow action not pinned by commit SHA fails, and the
+# blog builder's selftest in scripts/blog.py, which plants each page and feed
+# check it makes. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -462,6 +464,17 @@ gate_sbom() {
   fi
 }
 
+# ---------------------------------------------------------------- 20
+gate_blog() {
+  gate_start "blog"
+  if out=$(python3 scripts/blog.py --selftest 2>&1); then
+    gate_ok "blog"
+  else
+    printf '%s\n' "$out" | grep -E '^FAIL|failure' || printf '%s\n' "$out" | tail -5
+    gate_bad "blog"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -482,7 +495,8 @@ run_all() {
   gate_spdx
   gate_review_rounds
   gate_sbom
-  printf '\n%s of 19 gates passed\n' "$pass_n"
+  gate_blog
+  printf '\n%s of 20 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -980,6 +994,14 @@ PY
   bad=$?
   python3 scripts/sbom.py --selftest >/dev/null 2>&1
   plant_rejected $bad $? "sbom gate, action pin check removed"
+
+  # Gate 20: a copy of the blog builder whose bad-character pattern matches
+  # nothing must fail its own selftest.
+  mkdir -p "$tmp/bl/scripts" && sed "s/^XML_BAD_CHAR = re.compile(.*/XML_BAD_CHAR = re.compile(r'(?!)')/" scripts/blog.py > "$tmp/bl/scripts/blog.py"
+  python3 "$tmp/bl/scripts/blog.py" --selftest >/dev/null 2>&1
+  bad=$?
+  python3 scripts/blog.py --selftest >/dev/null 2>&1
+  plant_rejected $bad $? "blog gate, bad-character check matches nothing"
   # gates.sh from another directory: two copies of the kit, each in a fresh
   # repository of one commit (the sbom gate reads the index and HEAD), run
   # from a third directory. The one whose cd to the kit root is removed must

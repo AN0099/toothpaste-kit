@@ -78,6 +78,10 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `scripts/gates.sh` runs `scripts/blog.py --selftest` as gate 20, and
+  `--selftest` plants a copy whose bad-character pattern matches nothing,
+  which must fail. The blog builder's checks shipped with it but no gate
+  ran them.
 - `containers/verify/` and `containers/starter/` build for linux/amd64 and
   linux/arm64. Each download that differs by architecture has one pinned
   stage per architecture, chosen by `TARGETARCH`, and `requirements.txt`
