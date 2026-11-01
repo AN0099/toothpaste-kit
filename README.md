@@ -187,6 +187,7 @@ The lowest-friction first contribution is a surface descriptor in `orchestration
 | [Security posture](docs/security-posture.md) | Every control, its state, and the evidence for each |
 | [Versioning and releases](docs/releasing.md) | The version scheme and the steps to cut a release |
 | [Changelog](CHANGELOG.md) | What each release changed, and what has merged since the last one |
+| [The kit blog](docs/blog.md) | Writing a post and building the blog's pages and feed |
 | [Code of conduct](CODE_OF_CONDUCT.md) | Expected conduct, and who a report reaches |
 | [Project state](docs/project-state.md) | Where the kit itself stands right now |
 | [Standing documents](docs/standing-documents.md) | The document structure the procedure skills assume |
