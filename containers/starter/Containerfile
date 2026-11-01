@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Starter container: what a new user needs to run the kit's quickstart and the
+# scripts its README and docs/installing.md tell them to run, without
+# installing anything on their host. The kit goes in read-only at /kit, the
+# user's directory read-write at /workspace. See README.md beside this file.
+#
+# Pins: the base image by digest, the same as the verification container's v0.
+# Each download carries its exact version and its sha256, and the build fails
+# on a file whose hash does not match.
+FROM docker.io/library/python@sha256:2d44738ebf4ce5f63b9d9ea871e9c7cfdc0426f7b0c97cac915fd88ded1d86bb
+
+# Node.js, for Claude Code (docs/quickstart.md steps 1 and 5 run `claude`).
+ADD --checksum=sha256:e05a4d65232ae2b27b3d77da2e368522fb46b923335b8e0d5f77624c32484044 https://nodejs.org/dist/v22.12.0/node-v22.12.0-linux-x64.tar.gz /tmp/node.tar.gz
+# Claude Code, as the npm package tarball, and its linux-x64 platform
+# package, which the main package names as an optional dependency. Both are
+# installed from these files with --offline, so a fetch from the registry
+# fails the build rather than pulling a file with no hash here.
+# The platform package goes in FIRST: the main package's postinstall copies
+# the native binary out of it, and with it missing leaves a stub that only
+# prints "native binary not installed". --no-update-notifier because npm's
+# check for a newer npm reaches the registry even with --offline.
+ADD --checksum=sha256:94dcc84341b99d0b5f76d6c6ca24feb4109250a2bdba728fa2163aeb7fba00ac https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.304.tgz /tmp/claude-code.tgz
+ADD --checksum=sha256:1eda4ee54631c2e313df7bd9c2b7d3ca22815e09c6145774309214f06a8acd15 https://registry.npmjs.org/@anthropic-ai/claude-code-linux-x64/-/claude-code-linux-x64-2.1.304.tgz /tmp/claude-code-linux-x64.tgz
+
+# git: quickstart step 1 (`git --version`) and every script that reads a
+# repository. The rest (sh, bash, GNU grep, find, sed, awk, sort, mktemp, ln
+# with -r) is in the base image's Debian already.
+RUN apt-get update -qq \
+ && apt-get install -y -qq --no-install-recommends git \
+ && rm -rf /var/lib/apt/lists/* \
+ && tar -xzf /tmp/node.tar.gz -C /usr/local --strip-components=1 \
+      --exclude='*/CHANGELOG.md' --exclude='*/README.md' --exclude='*/LICENSE' \
+ && npm install -g --offline --no-update-notifier /tmp/claude-code-linux-x64.tgz \
+ && npm install -g --offline --no-update-notifier --omit=optional /tmp/claude-code.tgz \
+ && rm -f /tmp/node.tar.gz /tmp/claude-code.tgz /tmp/claude-code-linux-x64.tgz \
+ && mkdir -m 1777 /home/kit /workspace
+
+# run passes --userns=keep-id, so the container runs as the calling user's
+# uid, which has no home in the image. HOME is a directory any uid can write;
+# it is not kept between runs.
+ENV HOME=/home/kit
+WORKDIR /workspace
+CMD ["bash"]

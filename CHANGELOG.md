@@ -29,6 +29,12 @@ skill lives in that skill's own `CHANGELOG.md`.
   a command on a read-only copy of a tree with no network; `codeql TREE` runs
   the python and actions analyses and prints each alert as `file:line rule`.
   `containers/README.md` says how to run each image.
+- `containers/starter/`: a container to try the kit without installing its
+  dependencies on the host. `run [--network] [DIR [CMD...]]` starts it as the
+  calling user, with the kit read-only at `/kit` and DIR read-write at
+  `/workspace`, and no network unless `--network` is given. The image holds
+  Python, git and Claude Code, each download pinned to its version and
+  sha256, on the same base image digest as the verification container.
 - `scripts/check-qblock` (pull request #62): checks a reply's closing question
   block against `skills/working-preferences/SKILL.md`, "Questions and
   Answers", with 30 planted cases in `tests/qblock-cases/` run from
