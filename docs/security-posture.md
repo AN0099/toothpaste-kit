@@ -49,6 +49,25 @@ that a reader can go and form one.
 | 3.6 Dependency declaration | Present, and small by nature | `.github/dependabot.yml`, github-actions only. The repository ships no package manifest, so the surface is this small |
 | 3.7 Actions pinned by digest | **Not done** | Every workflow that checks out the tree uses `actions/checkout@v7`, a tag rather than a digest. `labeler.yml` checks nothing out and pins `actions/labeler` by digest; `ai-fix.yml` uses no action. The two older ones were raised from v4 by Dependabot on 2026-09-19 after Node 20 was deprecated for actions, and `ci.yml` was written at v7. Tag pinning is mutable, and a version bump does not change that: v7 is as mutable as v4 was. Resolving it needs the current digest, which has to be read from the upstream repository rather than guessed. **`v0.1.0` shipped with v4**, since the bump landed after the release merge and the tag deliberately points at that merge rather than at the tip |
 
+### The software bill of materials
+
+`scripts/sbom.py` prints an SPDX 3.0.1 JSON-LD bill of materials for the tree,
+standard library only and fetching nothing. It lists every file git tracks that
+REUSE covers, with the copyright and licence REUSE would find for it: the
+file's own tags, a `.license` sidecar, or an annotation in `REUSE.toml`. It
+also lists every action a workflow in `.github/workflows/` uses, by the ref it
+is pinned to. Gate 19 runs it on the tree, so a file with no licence or no
+copyright, a licence with no text under `LICENSES/`, or an action not pinned
+by a full commit SHA fails CI. The one exception is `KNOWN_TAG_PINS` in the
+script, which holds `actions/checkout@v7` and points at row 3.7. Closing row
+3.7 means pinning the digest and deleting that entry, and the gate then fails
+any tag pin. Before printing, the script checks its output's shape
+against the SPDX 3.0.1 model: types, required and allowed properties, unique
+IDs, references, vocabularies and package URLs. It does not expand the JSON-LD
+context, run the model's SHACL shapes, check a licence id against the SPDX
+licence list, or compare the files with what REUSE itself reports, which
+`scripts/compliance.sh` does.
+
 ## 4. Automated checks
 
 | Control | State | Evidence |

@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These eighteen gates cover: the em dash ban, the private task ID ban,
+# check. These nineteen gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency (including every vendor
 # file's shape against surface-descriptor.schema.json, checked by
 # scripts/schema-check.py, which fails loudly on any schema keyword it does
@@ -46,7 +46,10 @@
 # scripts/spdx-fragment.py, which builds fragments from commits in a scratch
 # repository and checks each models file rule, and the review-round records under
 # examples/ via scripts/round-check.py, which states its own keyword coverage
-# and runs its own selftest first. They
+# and runs its own selftest first, and the SBOM generator in
+# scripts/sbom.py, run on its own planted trees and then on this tree, so a
+# tracked file with no licence or copyright, a licence with no text under
+# LICENSES/, or a workflow action not pinned by commit SHA fails. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -441,6 +444,16 @@ gate_review_rounds() {
   fi
 }
 
+# ---------------------------------------------------------------- 19
+gate_sbom() {
+  gate_start "sbom"
+  if python3 scripts/sbom.py --selftest && python3 scripts/sbom.py >/dev/null; then
+    gate_ok "sbom"
+  else
+    gate_bad "sbom"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -460,7 +473,8 @@ run_all() {
   gate_pr_body
   gate_spdx
   gate_review_rounds
-  printf '\n%s of 18 gates passed\n' "$pass_n"
+  gate_sbom
+  printf '\n%s of 19 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -811,6 +825,14 @@ PY
   else
     echo "PLANT skip  review-round gate: no round-check.py or valid-complete-round in this tree"
   fi
+
+  # Gate 19: a copy of the generator that no longer checks action pins must
+  # fail its own selftest.
+  mkdir -p "$tmp/sb/scripts" && sed 's/if not ok and uses not in KNOWN_TAG_PINS:/if False:/' scripts/sbom.py > "$tmp/sb/scripts/sbom.py"
+  python3 "$tmp/sb/scripts/sbom.py" --selftest >/dev/null 2>&1
+  bad=$?
+  python3 scripts/sbom.py --selftest >/dev/null 2>&1
+  plant_rejected $bad $? "sbom gate, action pin check removed"
 
   printf '\n'
   [ "$plant_fail" -eq 0 ] || { echo "selftest: a gate could not be shown to fail. Do not trust a clean run."; return 1; }
