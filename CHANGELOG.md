@@ -7,6 +7,7 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `tests/e2e/`: an end-to-end entry point for the review-round workflow, running the fixture rounds under `examples/review-round/` through `scripts/round-check.py` (#25).
 - `.github/workflows/pages.yml`: deploys the kit blog to GitHub Pages at
   <https://kit.bridleworks.org/> on a push to `main` that changes the blog,
   after `blog.py --selftest` passes. The feed's channel link is now that

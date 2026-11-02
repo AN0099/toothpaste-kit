@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# End-to-end test of the review-round workflow (docs/review-rounds.md): the
+# same three steps as the "review-round records" gate in scripts/gates.sh,
+# run on their own. Keep the two in step.
+cd "$(dirname "$0")/../.." || exit 1
+python3 scripts/round-check.py --selftest >/dev/null || { echo "e2e: round-check selftest failed"; exit 1; }
+for c in $(find examples -name cases.json | sort); do
+  python3 scripts/round-check.py --cases "$(dirname "$c")" || { echo "e2e: schema cases differ: $c"; exit 1; }
+done
+dirs=$(find examples -name review-round.json ! -path '*/invalid/*' | sed 's|/review-round.json$||' | sort)
+[ -n "$dirs" ] || { echo "e2e: no round directory under examples/"; exit 1; }
+# Word splitting on $dirs is intended, as in the gate.
+# shellcheck disable=SC2086
+python3 scripts/round-check.py $dirs || exit 1
+echo "e2e: review rounds pass"
