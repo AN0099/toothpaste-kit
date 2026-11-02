@@ -84,6 +84,10 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `scripts/gates.sh` runs `scripts/auto-qa-tuner.py --selftest` as gate 21,
+  and `--selftest` plants a copy that never doubles a timeout a run ended
+  at, which must fail. Only the weekly `auto-qa.yml` ran the tuner's
+  selftest before, so a pull request could break the tuner unseen. Part of #27.
 - `scripts/gates.sh` runs `scripts/blog.py --selftest` as gate 20, and
   `--selftest` plants a copy whose bad-character pattern matches nothing,
   which must fail. The blog builder's checks shipped with it but no gate
