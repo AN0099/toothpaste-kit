@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These twenty gates cover: the em dash ban, the private task ID ban,
+# check. These twenty-one gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency (including every vendor
 # file's shape against surface-descriptor.schema.json, checked by
 # scripts/schema-check.py, which fails loudly on any schema keyword it does
@@ -53,7 +53,9 @@
 # tracked file with no licence or copyright, a licence with no text under
 # LICENSES/, or a workflow action not pinned by commit SHA fails, and the
 # blog builder's selftest in scripts/blog.py, which plants each page and feed
-# check it makes. They
+# check it makes, and the CI timeout tuner's selftest in
+# scripts/auto-qa-tuner.py, which plants each workflow shape it reads or
+# refuses and each proposal rule. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -475,6 +477,17 @@ gate_blog() {
   fi
 }
 
+# ---------------------------------------------------------------- 21
+gate_qa_tuner() {
+  gate_start "auto-qa-tuner selftest"
+  if out=$(python3 -I scripts/auto-qa-tuner.py --selftest 2>&1); then
+    gate_ok "auto-qa-tuner selftest"
+  else
+    printf '%s\n' "$out" | grep -E '^FAIL' || printf '%s\n' "$out" | tail -5
+    gate_bad "auto-qa-tuner selftest"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -496,7 +509,8 @@ run_all() {
   gate_review_rounds
   gate_sbom
   gate_blog
-  printf '\n%s of 20 gates passed\n' "$pass_n"
+  gate_qa_tuner
+  printf '\n%s of 21 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -504,8 +518,8 @@ run_all() {
 
 # A gate that has never returned a hit has not been shown capable of
 # returning one, so each of the first five, and the eighth, is run against a
-# planted positive in a scratch tree, as are 12, 13, 14, 15, 16, 17 and 18. Gates 6, 9, 10 and
-# 11 run their tools' own selftests, which carry their own planted cases, and
+# planted positive in a scratch tree, as are 12, 13, 14, 15, 16, 17 and 18. Gates 6, 9, 10, 11
+# and 21 run their tools' own selftests, which carry their own planted cases, and
 # gate 7 plants one positive per rule below.
 run_selftest() {
   tmp=$(mktemp -d) || return 1
@@ -1002,6 +1016,14 @@ PY
   bad=$?
   python3 scripts/blog.py --selftest >/dev/null 2>&1
   plant_rejected $bad $? "blog gate, bad-character check matches nothing"
+
+  # Gate 21: a copy of the CI timeout tuner that never doubles a timeout a
+  # run ended at must fail its own selftest.
+  mkdir -p "$tmp/qa/scripts" && sed 's/return max(value, 2 \* current), /return value, /' scripts/auto-qa-tuner.py > "$tmp/qa/scripts/auto-qa-tuner.py"
+  python3 -I "$tmp/qa/scripts/auto-qa-tuner.py" --selftest >/dev/null 2>&1
+  bad=$?
+  python3 -I scripts/auto-qa-tuner.py --selftest >/dev/null 2>&1
+  plant_rejected $bad $? "auto-qa-tuner gate, timeout doubling removed"
   # gates.sh from another directory: two copies of the kit, each in a fresh
   # repository of one commit (the sbom gate reads the index and HEAD), run
   # from a third directory. The one whose cd to the kit root is removed must
