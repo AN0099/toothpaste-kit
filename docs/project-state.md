@@ -3,7 +3,7 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-11-01.
+Last updated 2026-11-02.
 
 ## Live
 
@@ -265,6 +265,16 @@ Merged to `main` after 0.5.0, listed under Unreleased in `CHANGELOG.md`.
 - **Blog selftest, gate 20 (pull request #94).** `gates.sh` runs `scripts/blog.py --selftest`.
 - **Blog deploy (pull request #95).** `.github/workflows/pages.yml` publishes the blog to GitHub
   Pages at <https://kit.bridleworks.org/>.
+- **End-to-end tests (pull request #97).** `tests/e2e/run` runs the review-round workflow end to end
+  on its own: `round-check.py`'s selftest, the schema cases, and every valid fixture round under
+  `examples/`. Closes #25.
+- **CI timeout tuner, gate 21 (pull request #98).** `gates.sh` runs `scripts/auto-qa-tuner.py`'s
+  54-case selftest, which only the weekly `auto-qa.yml` ran before, and `--selftest` plants a
+  tuner that never doubles a timeout, which must fail. The first of two pull requests for #27.
+- **Coverage floors (pull request #99).** `scripts/coverage-check.py` runs the gates selftest under
+  coverage.py in the verification image and holds each of the 13 Python scripts it runs at its floor in
+  `.coverage-thresholds.json` (77 to 99%); `containers.yml` runs it on linux/amd64 and linux/arm64.
+  Closes #27.
 
 ## In v0.5.0
 
