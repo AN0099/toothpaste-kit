@@ -67,6 +67,13 @@ jobs:
               && cp -a /src /tmp/work && cd /tmp/work \
               && ./scripts/gates.sh --selftest && ./scripts/compliance.sh --require --selftest'
 
+      - name: Coverage floors in the verification image
+        run: |
+          docker run --rm --network=none -v "$PWD:/src:ro" kit-verify \
+            sh -c 'cp -a /src /tmp/work && cd /tmp/work \
+              && python3 -I scripts/coverage-check.py --selftest \
+              && python3 -I scripts/coverage-check.py'
+
       - name: CodeQL scan in the verification image
         run: |
           set +e
