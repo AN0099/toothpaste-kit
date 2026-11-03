@@ -28,6 +28,13 @@ RUN pip install --no-cache-dir --require-hashes -r /tmp/build-requirements.txt \
  && pip install --no-cache-dir --require-hashes --no-build-isolation -r /tmp/requirements.txt \
  && rm /tmp/requirements.txt /tmp/build-requirements.txt
 
+# coverage.py's startup hook, for scripts/coverage-check.py: a .pth file runs
+# at every python3 start, -I included, and process_startup() does nothing
+# unless COVERAGE_PROCESS_START names a config file.
+RUN python3 -c 'import coverage, sys; sys.exit(coverage.__version__ != "7.16.2")' \
+ && printf 'import coverage; coverage.process_startup()\n' \
+    > "$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')/kit-coverage-startup.pth"
+
 # Downloads: one stage per architecture, one per line, each at an exact
 # version and checked by digest. The build uses the stage named by
 # TARGETARCH, which podman and docker set to the platform being built, and

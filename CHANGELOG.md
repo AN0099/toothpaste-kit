@@ -7,6 +7,14 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `scripts/coverage-check.py` and `.coverage-thresholds.json`: a coverage gate.
+  The gates selftest runs under coverage.py in the verification image, and
+  each of the 13 Python scripts it runs must stay at or over its floor, the
+  measured statement coverage on adding it (77 to 99%). A script the suite
+  runs with no floor, or a floor for a script it no longer runs, also fails.
+  `.github/workflows/containers.yml` runs it on linux/amd64 and linux/arm64.
+  `containers/verify/` pins coverage.py 7.16.2 by hash for both architectures
+  with its startup hook; the image is now `localhost/kit-verify:v3`. Closes #27.
 - `tests/e2e/`: an end-to-end entry point for the review-round workflow, running the fixture rounds under `examples/review-round/` through `scripts/round-check.py` (#25).
 - `.github/workflows/pages.yml`: deploys the kit blog to GitHub Pages at
   <https://kit.bridleworks.org/> on a push to `main` that changes the blog,

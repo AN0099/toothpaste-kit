@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "scripts/auto-qa-tuner.py": 96,
+    "scripts/blog.py": 91,
+    "scripts/check-hooks.py": 92,
+    "scripts/check-pr-body": 99,
+    "scripts/check-qblock": 82,
+    "scripts/check-workspace-stubs.py": 89,
+    "scripts/cli_path.py": 96,
+    "scripts/mdlint.py": 89,
+    "scripts/reflow-md.py": 77,
+    "scripts/round-check.py": 88,
+    "scripts/sbom.py": 90,
+    "scripts/schema-check.py": 96,
+    "scripts/spdx-fragment.py": 97
+  }
+}
