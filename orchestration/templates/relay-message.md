@@ -51,6 +51,42 @@ Leave unused fields out rather than filling them with null, except where the sch
 
 If you, the human, are relaying content produced by an LLM agent that cannot format this block itself, everything inside the JSON payload comes from that agent's actual output. Do not paraphrase into the payload; paraphrase belongs in the header summary line, not inside `params`, `result`, or `human_summary`.
 
+## Faculty consultation template
+
+Use this template, instead of the block above, when the receiving agent is a faculty. Between two Claude-tier agents the block above applies unchanged. See Which format applies in `protocol.md`.
+
+Send the faculty an ordinary prose request, and ask it to reply under these eight headers, in this order, with no JSON.
+
+```text
+## Task
+<one or two sentences restating what was asked>
+
+## Output status
+<complete | partial | could not do, and what is missing>
+
+## Key result
+<the answer, stated first and plainly>
+
+## Evidence and artifacts
+<sources, quotations, file names, commands or outputs, with locations>
+
+## Assumptions
+<what was taken as given; mark any the result depends on>
+
+## Confidence
+<low | medium | high, with one line of reason>
+
+## Open questions
+<what could not be settled, and what would settle it>
+
+## Required next decision
+<what the consulting agent must decide before use, or None>
+```
+
+Notes:
+
+The consulting Claude-tier agent labels the reply's content under [Gate 3: Trust-label assignment](../ROUTING-THRESHOLD.md#gate-3-trust-label-assignment). The faculty does not label itself.
+
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
 

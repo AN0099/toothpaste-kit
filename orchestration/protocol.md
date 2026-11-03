@@ -2,7 +2,7 @@
 
 ## Format
 
-Every message that crosses a surface boundary is a single block with two parts: a short human-readable header, and a JSON payload conforming to `schemas/request.json` or `schemas/response.json`.
+Every message that crosses a surface boundary, except a faculty consultation (see Which format applies), is a single block with two parts: a short human-readable header, and a JSON payload conforming to `schemas/request.json` or `schemas/response.json`.
 
 ```text
 ---
@@ -24,7 +24,7 @@ The header exists so a human relay agent never has to parse JSON to know where a
 
 Exactly one agent holds the token, meaning it is expected to produce the next message, at any point in a thread. The `to` field of the most recent message names who holds it.
 
-An LLM agent that cannot itself format the header-plus-JSON block, for example a chat instance replying only in prose mid-conversation, delegates formatting to whichever human is acting as relay for that hop. The relay human's job in that case still excludes editing the LLM's actual content; only the wrapping is theirs to produce.
+An LLM agent that cannot itself format the header-plus-JSON block, for example a chat instance replying only in prose mid-conversation, delegates formatting to whichever human is acting as relay for that hop. The relay human's job in that case still excludes editing the LLM's actual content; only the wrapping is theirs to produce. A faculty consultation does not use this route; it uses the lighter format described under Which format applies.
 
 A `broadcast` intent is addressed to all agents in the thread, and each replies independently, referencing `in_reply_to`. Its event still carries the one `to` that `schemas/event-base.json` requires.
 
@@ -49,6 +49,57 @@ A human agent with `role: "relay"` forwards the JSON payload byte for byte. If a
 It does not resolve conflicting instructions arriving from two agents in the same thread; that remains a judgment call for whoever holds the token next.
 
 It does not enforce that a human agent claiming `role: "relay"` actually behaves as one rather than as a participant. That enforcement is social, not technical: the format makes deviation visible after the fact, by comparing the payload to what got pasted, but it does not prevent it.
+
+## Which format applies
+
+Two formats exist, and the pair of agents decides which one is used.
+
+| Sender and receiver | Format |
+|---|---|
+| A Claude-tier agent and another Claude-tier agent | The header and JSON payload described under Format, unchanged |
+| A Claude-tier agent and a faculty | The faculty-consultation format described below |
+
+A faculty is a model a Claude-tier agent routes part of a task to, as defined in the [glossary](../docs/glossary.md) and governed by [the routing threshold](ROUTING-THRESHOLD.md). It is consulted in an ordinary chat interface, which will not reliably emit the JSON payload, so the lighter format applies to every faculty consultation and the JSON payload is never required of a faculty. No other pair is covered by this section. A human relay between a Claude-tier agent and a faculty still follows Relay fidelity: the reply is forwarded as the faculty wrote it.
+
+## Faculty-consultation format
+
+The consulting Claude-tier agent sends its request as ordinary prose; this protocol prescribes no request format for a faculty. The faculty's reply is plain Markdown with no JSON payload and no header block, using these eight headers in this order. Every header appears, and a header with nothing to report says "None".
+
+### Task
+
+One or two sentences restating what the faculty was asked to do, so the reply stands alone if separated from the request.
+
+### Output status
+
+One of: complete, partial, or could not do. A partial or could-not-do status says what is missing.
+
+### Key result
+
+The answer itself, stated first and plainly. Anything the consulting agent will use goes here.
+
+### Evidence and artifacts
+
+The sources, quotations, file names, commands or outputs the result rests on. A source the faculty cites is listed here with its location, so the consulting agent can check it. Strip any signed or token-bearing URL before it lands in a file, per Gate 3.
+
+### Assumptions
+
+What the faculty took as given without being told. An assumption the result depends on is marked as such.
+
+### Confidence
+
+Low, medium or high, with one line of reason. This is the faculty's own estimate and is not a trust label.
+
+### Open questions
+
+What the faculty could not settle and what would settle it.
+
+### Required next decision
+
+What the consulting agent must decide before the result is used, or "None" if the result can be used as it stands.
+
+## Trust label for a faculty reply
+
+The reply carries no trust label from the faculty. The consulting Claude-tier agent assigns the label to the reply's content under [Gate 3: Trust-label assignment](ROUTING-THRESHOLD.md#gate-3-trust-label-assignment), which this protocol does not restate. Confidence above does not set the label.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

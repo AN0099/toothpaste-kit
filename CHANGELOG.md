@@ -7,6 +7,16 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `orchestration/protocol.md` and `orchestration/templates/relay-message.md`:
+  a faculty-consultation format. A Claude-tier agent consulting a faculty
+  gets a reply under eight plain Markdown headers (Task, Output status, Key
+  result, Evidence and artifacts, Assumptions, Confidence, Open questions,
+  Required next decision) with no JSON payload, since a chat interface will
+  not reliably emit the schema. A new Which format applies table names the
+  format for each agent pair; between two Claude-tier agents the JSON
+  payload is unchanged. The consulting agent, not the faculty, assigns the
+  reply's trust label under Gate 3. The template file gains a second
+  template beside the existing one.
 - `scripts/coverage-check.py` and `.coverage-thresholds.json`: a coverage gate.
   The gates selftest runs under coverage.py in the verification image, and
   each of the 13 Python scripts it runs must stay at or over its floor, the
