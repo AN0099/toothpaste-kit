@@ -114,7 +114,9 @@ falls on every second Tuesday from that date.
 - **The Friday before is the cutoff.** No new scope enters the release. The
   release notes, citation fields and redaction result are assembled, and the
   maintainer decides to go to Monday's review, defer, split the scope, or
-  abandon it. The weekend is buffer, never planned work.
+  abandon it. Between the cutoff and the tag, branches and pull requests may
+  proceed; nothing merges into `main` except the release itself. The weekend is
+  buffer, never planned work.
 - **Monday is the final review** of the exact commit that will be tagged.
 - **Tuesday, late morning, is the release**: tag, GitHub release, Zenodo.
   Wednesday to Friday are for watching it and correcting it.
