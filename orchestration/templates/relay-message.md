@@ -85,7 +85,7 @@ Send the faculty an ordinary prose request, and ask it to reply under these eigh
 
 Notes:
 
-The consulting Claude-tier agent labels the reply's content under [Gate 3: Trust-label assignment](../ROUTING-THRESHOLD.md#gate-3-trust-label-assignment). The faculty does not label itself.
+The consulting Claude-tier agent labels the reply's content under [Gate 3: Trust-label assignment](../routing-threshold.md#gate-3-trust-label-assignment). The faculty does not label itself.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

@@ -20,7 +20,7 @@ Do not use this system for tasks a single session already handles well. The rela
 - `schemas/round/`: JSON Schema definitions for the three review-round records (`review-round.json`, `review-report.json`, `operator-decision.json`), checked by `scripts/round-check.py`. See `docs/review-rounds.md`.
 - `templates/relay-message.md`: the literal template a human copies, fills, and pastes to move a message from one agent's surface to another.
 - `templates/handoff-note.md`: the template for closing out one agent's turn and briefing whichever agent picks up next.
-- `ROUTING-THRESHOLD.md`: the rule for deciding whether a task runs locally, on a Claude-tier agent, or through a vendor faculty.
+- `routing-threshold.md`: the rule for deciding whether a task runs locally, on a Claude-tier agent, or through a vendor faculty.
 - `ingestion/`: specs for turning vendor data exports into machine-readable digests.
 - `CHANGELOG.md`: the decision log for this system's own design choices.
 
