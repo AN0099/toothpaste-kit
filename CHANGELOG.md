@@ -179,6 +179,10 @@ skill lives in that skill's own `CHANGELOG.md`.
   did. The `finding-id-unique` plant now differs from the finding it
   duplicates, and the report's ids are kept as a set, which removes a mutant
   the selftest could not tell apart.
+- `containers/verify/requirements.txt`: certifi 2026.10.18, whose CA bundle drops
+  the emSign roots with compromised intermediate keys (Dependabot alert 1). The
+  image runs with no network, so its checks made no TLS connection through the
+  old bundle. The image is now `localhost/kit-verify:v4`.
 
 ### Skill revisions
 
