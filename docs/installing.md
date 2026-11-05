@@ -151,6 +151,53 @@ for what changed; a skill's own `CHANGELOG.md` says why.
 The example workspace is not updated by a pull. Your workspace's files are
 yours from the moment you copy them.
 
+### Updating a fork
+
+A fork holds the kit's work and yours, so keep them apart. Keep `main` an exact
+copy of the kit's `main`, and put your own work on a branch. Run this with your
+GitHub user name in the first line. It assumes a clone of your fork at
+`~/toothpaste-kit` and a branch named `my-work`:
+
+```sh
+me=YOUR-GITHUB-USER
+gh repo sync "$me/toothpaste-kit" --source AN0099/toothpaste-kit --branch main
+git -C ~/toothpaste-kit checkout main
+git -C ~/toothpaste-kit pull --ff-only
+git -C ~/toothpaste-kit rebase main my-work
+~/toothpaste-kit/scripts/link-skills.sh ~/tpkit-workspace/.claude/skills
+```
+
+Do not pass `--force` to `gh repo sync` unless your own commits are safe on a
+branch, since it overwrites your fork's `main`. Rerun `link-skills.sh` after each
+update, for the same reason as above. The commands leave `my-work` checked out,
+so the linked skills are yours plus the kit's. To hear about releases, choose Watch, then
+Custom, then Releases on the kit's GitHub page.
+
+**If your own commits are on `main`,** the sync refuses. Move them to a branch
+first. This keeps every commit on `my-work` and then resets `main`:
+
+```sh
+git -C ~/toothpaste-kit remote add upstream https://github.com/AN0099/toothpaste-kit.git
+git -C ~/toothpaste-kit fetch upstream
+git -C ~/toothpaste-kit checkout main
+git -C ~/toothpaste-kit branch my-work
+git -C ~/toothpaste-kit reset --hard upstream/main
+git -C ~/toothpaste-kit push --force-with-lease origin main
+git -C ~/toothpaste-kit rebase main my-work
+```
+
+**A conflict during the rebase** means the kit changed a file you changed too.
+This is likely if you edited a skill and your fork is several releases behind.
+Resolve it and run `git rebase --continue`, or run `git rebase --abort` to return
+to where you were. To avoid the conflict next time, keep a changed skill under a
+new name, in its own directory: a pull never touches it, and `link-skills.sh`
+leaves a real directory alone.
+
+**Read `CHANGELOG.md` across every release you skipped.** Skills marked BREAKING
+may change what your workspace needs, and a pull does not change your workspace.
+The licence also changed: releases up to 0.4.0 are MIT, and 0.5.0 onward is
+Apache 2.0.
+
 ## Removing
 
 Remove the skill links, then the clone. The links are found by where they

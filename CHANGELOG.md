@@ -102,6 +102,8 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `docs/installing.md`: Updating gains a section for a fork, covering the sync,
+  own commits already on `main`, rebase conflicts and skipped releases.
 - `scripts/gates.sh` runs `scripts/auto-qa-tuner.py --selftest` as gate 21,
   and `--selftest` plants a copy that never doubles a timeout a run ended
   at, which must fail. Only the weekly `auto-qa.yml` ran the tuner's
