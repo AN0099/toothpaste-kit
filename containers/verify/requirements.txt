@@ -6,16 +6,16 @@
 # depend on, each at an exact version with its sha256, so pip's
 # --require-hashes refuses anything else. reuse is the version
 # .github/workflows/compliance.yml installs. Resolved for python 3.13 on
-# linux/amd64 and linux/arm64 from files uploaded before 2026-10-17; a
-# package with compiled code carries one hash per architecture. reuse 6.2.0
+# linux/amd64 and linux/arm64 from files uploaded before 2026-10-17,
+# except certifi, taken from 2026-10-18 for its CA fix; a package with compiled code carries one hash per architecture. reuse 6.2.0
 # has no python 3.13 wheel, so it is built from its sdist with the backend
 # pinned in build-requirements.txt.
 attrs==26.1.0 \
     --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309
 boolean-py==5.0 \
     --hash=sha256:ef28a70bd43115208441b53a045d1549e2f0ec6e3d08a9d142cbc41c1938e8d9
-certifi==2026.7.22 \
-    --hash=sha256:62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775
+certifi==2026.10.18 \
+    --hash=sha256:73191c47aaa79da394e8fee2dbc2ec827432cab56311122c9e47abf79e390f62
 charset-normalizer==3.5.2 \
     --hash=sha256:7218e8f32b0956cfcd048fd42d9d5779809745ca1d86113ca56f66e7ae1549c4 \
     --hash=sha256:849df64e889b2e17230d58410a03dba311a65b163508fd33679b2b737d4b7858
