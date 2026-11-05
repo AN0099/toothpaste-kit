@@ -153,6 +153,8 @@ skill lives in that skill's own `CHANGELOG.md`.
   ticked, or replaced by a "No." line. The unticked Yes or No box had
   counted as an open task, so every merged pull request showed one task
   left. `scripts/check-pr-body` now treats that box like any other.
+- `docs/releasing.md`: between the cutoff and the tag, nothing merges into `main`
+  except the release itself.
 
 ### Fixed
 
