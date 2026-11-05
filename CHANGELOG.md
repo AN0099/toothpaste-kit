@@ -102,6 +102,9 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `orchestration/ROUTING-THRESHOLD.md` is now `routing-threshold.md`, under the
+  lowercase naming rule, and states roles in place of one desk's seat names.
+  Links are updated.
 - `docs/installing.md`: Updating gains a section for a fork, covering the sync,
   own commits already on `main`, rebase conflicts and skipped releases.
 - `scripts/gates.sh` runs `scripts/auto-qa-tuner.py --selftest` as gate 21,

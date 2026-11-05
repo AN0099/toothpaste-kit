@@ -59,7 +59,7 @@ Two formats exist, and the pair of agents decides which one is used.
 | A Claude-tier agent and another Claude-tier agent | The header and JSON payload described under Format, unchanged |
 | A Claude-tier agent and a faculty | The faculty-consultation format described below |
 
-A faculty is a model a Claude-tier agent routes part of a task to, as defined in the [glossary](../docs/glossary.md) and governed by [the routing threshold](ROUTING-THRESHOLD.md). It is consulted in an ordinary chat interface, which will not reliably emit the JSON payload, so the lighter format applies to every faculty consultation and the JSON payload is never required of a faculty. No other pair is covered by this section. A human relay between a Claude-tier agent and a faculty still follows Relay fidelity: the reply is forwarded as the faculty wrote it.
+A faculty is a model a Claude-tier agent routes part of a task to, as defined in the [glossary](../docs/glossary.md) and governed by [the routing threshold](routing-threshold.md). It is consulted in an ordinary chat interface, which will not reliably emit the JSON payload, so the lighter format applies to every faculty consultation and the JSON payload is never required of a faculty. No other pair is covered by this section. A human relay between a Claude-tier agent and a faculty still follows Relay fidelity: the reply is forwarded as the faculty wrote it.
 
 ## Faculty-consultation format
 
@@ -99,7 +99,7 @@ What the consulting agent must decide before the result is used, or "None" if th
 
 ## Trust label for a faculty reply
 
-The reply carries no trust label from the faculty. The consulting Claude-tier agent assigns the label to the reply's content under [Gate 3: Trust-label assignment](ROUTING-THRESHOLD.md#gate-3-trust-label-assignment), which this protocol does not restate. Confidence above does not set the label.
+The reply carries no trust label from the faculty. The consulting Claude-tier agent assigns the label to the reply's content under [Gate 3: Trust-label assignment](routing-threshold.md#gate-3-trust-label-assignment), which this protocol does not restate. Confidence above does not set the label.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

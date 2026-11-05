@@ -133,7 +133,7 @@ The protocol for passing work between agents on different surfaces.
 | `orchestration/taxonomy.md` | Role and surface definitions |
 | `orchestration/ROLES.md` | The operator, lead, aide and minion roles |
 | `orchestration/rounds.md` | Rounds: delegated work, checked and decided |
-| `orchestration/ROUTING-THRESHOLD.md` | When work goes to a local model and when to a vendor |
+| `orchestration/routing-threshold.md` | When work goes to a local model and when to a vendor |
 | `orchestration/CHANGELOG.md` | The decision log for the protocol's own design |
 | `orchestration/schemas/request.json` | Request message schema |
 | `orchestration/schemas/response.json` | Response message schema |
