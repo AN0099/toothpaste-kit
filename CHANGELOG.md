@@ -208,6 +208,10 @@ skill lives in that skill's own `CHANGELOG.md`.
   the emSign roots with compromised intermediate keys (Dependabot alert 1). The
   image runs with no network, so its checks made no TLS connection through the
   old bundle. The image is now `localhost/kit-verify:v4`.
+- `containers/verify/`: the CodeQL 2.27.4 bundle, the version GitHub's default
+  setup now runs, so a local scan reports the alerts CI reports. The bundle is
+  pinned by digest for linux/amd64 and linux/arm64. The image is now
+  `localhost/kit-verify:v5`.
 
 ### Skill revisions
 
