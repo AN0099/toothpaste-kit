@@ -121,24 +121,24 @@ Once condensed, `grep` for the specific things the digest needs before reading s
 Reserve sequential reading for threads short enough to read whole (under roughly 30 condensed turns) or for the specific stretch right before an export cuts off, since end-of-thread content is disproportionately likely to be unresolved/time-sensitive and won't show up as a keyword hit for anything you already know to look for.
 
 ### Step 6: Reconstruct chronology across sources
-Requires a usable timestamp field per thread/turn, confirmed in Step 0.3. Once you have candidate material from multiple threads/containers, order it by timestamp, not by source file or upload order. Cross-account or cross-container work is often interleaved (work-account and personal-account sessions running in the same week, sometimes referencing shared state). A chronological spine is usually worth writing out explicitly as its own section: it's cheap to produce once you have timestamps and is often the single most useful piece of orientation for whoever reads the digest next.
+Requires a usable timestamp field per thread/turn, confirmed in Step 0.3. Once you have candidate material from multiple threads/containers, order it by timestamp, not by source file or upload order. Cross-account or cross-container work is often interleaved (sessions from different accounts running in the same week, sometimes referencing shared state). A chronological spine is usually worth writing out explicitly as its own section: it's cheap to produce once you have timestamps and is often the single most useful piece of orientation for whoever reads the digest next.
 
 ### Step 7: Cross-reference, don't restate
 Before writing anything into the digest, check whether it's already captured in a doc the reader already has. If it is, cite it by name and move on. If the export shows something that **contradicts or postdates** an existing doc, that is the highest-priority content in the whole digest. Lead with it, flag it explicitly as time-sensitive or unresolved, and do not bury it under routine material.
 
-This check earns its place. In practice the most consequential finding a digest ever produced was a storage-durability claim that the export contradicted, and it surfaced only because new material was read against the standing ground-truth claim in an existing document rather than in isolation.
+This check earns its place. A claim in an existing document that the export contradicts surfaces only when new material is read against that claim rather than in isolation.
 
 ### Step 8: Write with these priorities, in this order
 1. Anything unresolved, time-sensitive, or contradicting existing docs.
 2. The actual process/narrative behind standing rules and incidents: not just that a rule exists, but the failure that produced it, in enough detail that the pattern is recognizable if it starts recurring.
-3. Current state (roster, task status, decisions): but only the parts not already covered by an existing doc.
+3. Current state (standing configuration, task status, decisions): but only the parts not already covered by an existing doc.
 4. Provenance/origin material: where something came from, when it's not obvious from current state alone.
 5. Low-value-but-complete inventory (e.g., listing every thread even the irrelevant ones by name): last, brief, and only if completeness itself has value for the reader.
 
 For provenance/origin digests specifically: a strong structural resemblance noticed across sources (the same hierarchy, naming pattern, or design reused later for an unrelated purpose) is a high-value observation, but state it as an observed pattern ("this later structure is isomorphic to this earlier one") rather than an asserted causal fact ("this became that") unless a source explicitly says so. The strength of the resemblance doesn't convert it into a confirmed claim, and the digest should let the reader tell the difference.
 
 ### Step 9: Format conventions that made these digests usable
-- Dense bullets and short paragraphs over prose narrative; tables for anything enumerable (roster, task status, hardware).
+- Dense bullets and short paragraphs over prose narrative; tables for anything enumerable (configuration, task status, inventory).
 - Verbatim quotes used sparingly and only where exact wording carries meaning a paraphrase would lose (a rule's precise scope, a diagnostic phrase the human coined): not as decoration.
 - Every non-obvious claim traceable to its source (thread title/id, doc filename) so the reader can go verify if needed, without demanding they open the raw export to do so.
 - State uncertainty plainly rather than resolving it with a guess: "this wasn't fully determinable from the export, worth asking directly" is a correct and complete sentence in a digest; a confident wrong reconstruction is not recoverable the same way.

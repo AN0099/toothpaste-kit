@@ -22,7 +22,7 @@ Fill this out before ending a turn, a session, or handing a thread to a differen
 - <a concrete check: a command, a file to read, a test to run>
 ```
 
-This mirrors the session-handoff pattern already in use elsewhere in this project: good handoff notes name what was completed, what's next with enough specificity to act on, and how to verify current state. This version generalizes it to apply between any two agents in this system, not only between two sessions of the same tool.
+This mirrors the session-handoff pattern in [`examples/workspace/.agents/lead-handoff.md`](../../examples/workspace/.agents/lead-handoff.md): good handoff notes name what was completed, what's next with enough specificity to act on, and how to verify current state. This version generalizes it to apply between any two agents in this system, not only between two sessions of the same tool.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

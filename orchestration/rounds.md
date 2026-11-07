@@ -5,8 +5,9 @@ checked by someone other than its author, and puts the result in front of the op
 every delegation the same shape, and ties each step to the operator's decision, the only point in
 the loop where a person decides. Roles are defined in [`ROLES.md`](ROLES.md).
 
-Notes travel as files: each seat has its own branch in a shared repository, and a seat writes to the
-other seat's inbox directory on its own branch. **Checking mail** means fetching the other seats'
+Notes travel as files over a channel each installation chooses. For example, each seat has its own
+branch in one shared repository, and a seat writes to the other seat's inbox directory on its own
+branch. In that example, **checking mail** means fetching the other seats'
 branches and reading what is new in your inbox there. A report is a file in the lead's inbox, on the
 reporting seat's branch. Where a surface needs a structured message instead, the header and JSON
 relay format is in [`protocol.md`](protocol.md).
@@ -15,8 +16,8 @@ relay format is in [`protocol.md`](protocol.md).
 
 A round is **one task, its dispatches and their replies**. Rounds are numbered `r1` upward, never
 reused, and a round spans as many operator exchanges as it takes. The lead opens every message about
-a round with the step it is on and the report it concerns (`Round step: r12, collect, report 2`), so
-the operator never has to hold the structure in mind.
+a round with the step it is on and the report it concerns (`Round step: r12, collect, report 2`; the
+step-line format is a recommendation), so the operator never has to hold the structure in mind.
 
 A round opened while another is open is an error. A re-check after fixes is **the open round's next
 report**, never a new round.
@@ -102,9 +103,9 @@ A seat logs before it compacts. A compaction inside an open round is recorded in
 the register. After a compaction, a seat orients from the round's note, its last capture and its
 branch's log, never from the summary alone.
 
-The lead's context grows faster than a seat's, since it reads every report. It captures at a round
-close at least every three rounds, or once its context passes 40% of the window, and starts no new
-work past 60%.
+The lead's context grows faster than a seat's, since it reads every report. For example, an
+installation might set the lead to capture at a round close at least every three rounds, or once its
+context passes 40% of the window, and to start no new work past 60%.
 
 ## What rounds deliberately do not add
 

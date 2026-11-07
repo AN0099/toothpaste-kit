@@ -166,6 +166,15 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Fixed
 
+- `orchestration/`: stale claims and text specific to one installation.
+  The README indexes `ROLES.md`; links to documents the repository does
+  not hold now name ones it does; the three event schemas carry
+  `$id` values with their `schemas/` directory, and a human agent no
+  longer needs `capability` or `regime`; usage quotas, a past incident,
+  dated adoption notes and one setup's worked examples are gone from
+  `routing-threshold.md`, `ROLES.md` and the ingestion specs; and
+  `rounds.md` gives its mail channel and context thresholds as examples
+  an installation sets.
 - `scripts/gates.sh`: changes to the kit root, found from its own path
   rather than from git, before any gate runs. Run from another directory,
   `--selftest` had failed 9 plants with messages about the gates ("rejected

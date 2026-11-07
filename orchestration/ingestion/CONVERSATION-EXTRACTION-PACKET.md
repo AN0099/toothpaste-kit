@@ -8,8 +8,8 @@ If it still produces a fenced code block despite rule 7 below (some models defau
 
 This is deliberately vendor-agnostic and doesn't reference this project's own conventions by name, since the extracting model will never have them and different vendors behave differently under the same instructions. The mapping back to this project happens on your end afterward, not inside the prompt:
 
-- `grounding: "quoted"` items are your closest thing to Verified/Derived-grounded once you spot-check the quote against the real export, `paraphrased_only` starts at Derived-candidate, `uncertain` starts at Unknown, same as any other faculty's output.
-- Each `item` line becomes a candidate finding when you compile these into a permanent reference doc; FM-style numbering happens at that compilation step, not here, this packet doesn't know about that scheme.
+- `grounding: "quoted"` items are your closest thing to Derived-grounded (see [Gate 3 of `routing-threshold.md`](../routing-threshold.md#gate-3-trust-label-assignment)) once you spot-check the quote against the real export, `paraphrased_only` starts at Derived-candidate, `uncertain` starts at Unknown, same as any other faculty's output.
+- Each `item` line becomes a candidate finding when you compile these into a permanent reference doc.
 - This is the fast, low-resource first pass. The full JSON export is still the ground truth for anything load-bearing enough to need it, this packet gets you a triage layer over old threads without spending your own tokens re-reading them.
 
 ---

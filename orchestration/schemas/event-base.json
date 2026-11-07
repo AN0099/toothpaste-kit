@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "orchestration/event-base.json",
+  "$id": "orchestration/schemas/event-base.json",
   "title": "EventBase",
   "type": "object",
   "required": ["event_id", "timestamp", "thread_id", "from", "to"],
@@ -32,7 +32,8 @@
   "definitions": {
     "agent_ref": {
       "type": "object",
-      "required": ["agent_id", "kind", "capability", "regime"],
+      "description": "An agent in a message. An llm agent also carries capability and regime; a human agent has neither.",
+      "required": ["agent_id", "kind"],
       "properties": {
         "agent_id": {
           "type": "string",
@@ -100,11 +101,11 @@
         },
         "tool_execution": {
           "enum": ["none", "sandboxed", "host"],
-          "description": "Whether the surface executes tools, and whether execution reaches the host filesystem. Read by the routing rule's standing tool-call exclusion."
+          "description": "Whether the surface executes tools, and whether execution reaches the host filesystem. Recorded for audit."
         },
         "egress": {
           "enum": ["local", "operator-hosted", "vendor-cloud"],
-          "description": "Where content goes when this surface processes it. This is the sensitivity gate's join key: a routing rule can read this field instead of relying on an operator remembering which faculties are cloud-hosted."
+          "description": "Where content goes when this surface processes it. Recorded for audit, so where content went is a field rather than an operator's memory."
         },
         "audit": {
           "enum": [

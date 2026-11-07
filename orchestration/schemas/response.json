@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "orchestration/response.json",
+  "$id": "orchestration/schemas/response.json",
   "title": "ResponseEvent",
   "allOf": [
     { "$ref": "event-base.json" },
