@@ -6,8 +6,10 @@ and which criterion it was added for. Read it to find out why a file such as
 
 ## What ACMM is here
 
-ACMM is a scale of levels for how far a repository is set up for AI agents to work in it. At lower
-levels agents only advise; at higher levels designated agents may open issues and pull requests
+ACMM, the AI Codebase Maturity Model, is a scale of levels for how far a repository is set up for AI
+agents to work in it. It comes from Anderson, "[The AI Codebase Maturity Model: From Assisted Coding
+to Fully Autonomous Systems](https://arxiv.org/abs/2604.09388)", version 2. At lower levels agents
+only advise; at higher levels designated agents may open issues and pull requests
 directly (issue #23). An outside evaluation scores the kit against it and opens one issue
 per unmet criterion, titled `[ACMM Ln] Add ...`. Each issue names its level, a category, a
 criterion ID such as `acmm:claude-md`, and a list of paths. A criterion is met when any one of
@@ -33,6 +35,22 @@ quality; [quality](quality.md) lists what the kit actually measures.
 
 Each entry gives the file, what it is, what it does, and the criterion it was added for, with its
 issue number.
+
+## Three sets of level names
+
+Three sources name levels, and the same number can mean different things across them. The section
+headings in this file use the evaluation's names.
+
+| Source | Levels it names |
+|---|---|
+| [The paper](https://arxiv.org/abs/2604.09388) | L1 Assisted, L2 Instructed, L3 Measured, L4 Adaptive, L5 Semi-Automated, L6 Fully Autonomous |
+| The evaluation's issues | L0 with no name, L2 Advisory, L3 Quality-Gated |
+| The Hive dashboard | L4 Security-Aware, an autonomy level for its agents: some file issues, some open held pull requests, and none merges |
+
+The paper's scale is the reference. **Level 5 is the kit's ceiling.** At level 6 the system merges
+its own pull requests, and here a person merges every one ([governance](../GOVERNANCE.md),
+[AI security policy](../SECURITY-AI.md)). This sets a limit and does not claim the kit has reached
+level 5.
 
 ## L0: prerequisites
 
