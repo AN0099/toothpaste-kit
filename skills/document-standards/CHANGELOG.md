@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v6
+
+The frontmatter description is shortened to fit the description gate (pull request #63). No change
+to when the skill fires or to its procedure.
+
+`references/structural-patterns.md` allows the passive in three stated cases, and the table of fixes
+stands for the rest.
+
 ## v5
 
 One line points to `skill-creation` for making a skill and `skill-discovery` for deciding

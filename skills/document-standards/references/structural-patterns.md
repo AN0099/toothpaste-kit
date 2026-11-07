@@ -78,7 +78,8 @@ Short declarative sentences stacked with no connective tissue: "Short sentence. 
 
 ## Passive Voice
 
-Every sentence needs an actor doing something.
+A sentence names its actor. The passive stays in three cases: the actor is unknown, it brings the topic
+forward, or it carries the thread from the last sentence.
 
 | Pattern | Fix |
 |---|---|
