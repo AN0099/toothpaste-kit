@@ -16,7 +16,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 ## A
 
 - **Adapting this skill**: the paragraph near the top of a procedure skill saying its filenames name roles, not literal paths, and that a tree substitutes its own. Each procedure skill carries one, as [`daily-review`](../skills/daily-review/SKILL.md#when-to-use) does; [standing documents](standing-documents.md#adapting-this) lists the roles the files play.
-- **Aide**: the role that verifies and assists. A second party with its own working copy and context and no stake in the lead's work being right. Its verdict is evidence for the operator's decision, never the decision. See [roles](../orchestration/ROLES.md#aide).
+- **Aide**: the role that verifies and assists. A second party with its own working copy and context and no stake in the lead's work being right. Its verdict is evidence for the operator's decision, never the decision. See [roles](../orchestration/roles.md#aide).
 - **Alarm**: a control layer that notices a condition outside normal and hands the judgment to a person without blocking anything. Alarms share a budget: each one added lowers the value of the rest. See [control layers](control-layers.md#3-alarms-the-machine-notices-the-human-decides).
 - **Answer grammar**: how a reply to a question block is written. Segments separated by `;`, each `<code> qN`, as in `f q1; 2 q2; d q3`. Prose in a segment, or after `pr:`, outranks a conflicting code, and `(c: ...)` attaches a comment. See [`working-preferences`](../skills/working-preferences/SKILL.md#questions-and-answers).
 - **Answer key**: in a review round's teaching fixture, the file that says which findings a report must contain, where, at what severity, and the expected decision. `scripts/round-check.py` checks a report against it when the packet names it. See [review rounds](review-rounds.md#the-fixture-and-its-answer-key).
@@ -36,7 +36,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 - **Capture file**: the day's append-only file in the provenance layer, where `session-log` writes its entries and `jot` and `touch` leave theirs. See [partial captures](partial-captures.md#where-they-go).
 - **Carry count**: how many daily reviews a task has stayed in Doing. A count of three or more is said aloud. See [`daily-review`](../skills/daily-review/SKILL.md).
 - **Clean boundary**: a point after a commit, a dispatch or a closed decision, with the work's current state already on disk. The only point at which a compaction is proposed. See [`working-preferences`](../skills/working-preferences/SKILL.md#context-cadence).
-- **Clearance**: what an agent may read, set in the roster. One of the axes role is independent of. See [roles](../orchestration/ROLES.md#what-this-axis-is-and-the-three-it-is-not).
+- **Clearance**: what an agent may read, set in the roster. One of the axes role is independent of. See [roles](../orchestration/roles.md#what-this-axis-is-and-the-three-it-is-not).
 - **Command vocabulary**: the closed set of twenty-seven ALLCAPS commands (CONFIRM, DEEPEN, DECLINE, FLAG, STAGE and the rest), each with a brevity code. See [`working-preferences`](../skills/working-preferences/SKILL.md#command-vocabulary), indexed in [`commands`](../skills/commands/SKILL.md).
 - **Containment**: the outermost control layer. It limits damage after every other layer has failed, through placement such as tier separation or a sandbox. See [control layers](control-layers.md#7-containment-assume-everything-above-failed).
 - **Content-depth principle**: what makes the sensitivity tiers mean something. The lower tiers carry almost nothing sensitive; the third carries operational behaviour with entities abstracted; only the fourth carries real reasoning and named entities. Moving a fact down a tier means stripping the reasoning as well as the names. See [standing documents](standing-documents.md#sensitivity-tiering).
@@ -51,7 +51,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 - **Derived-candidate**: the trust label for faculty output that is plausible and not yet checked. See [the routing threshold](../orchestration/routing-threshold.md#gate-3-trust-label-assignment).
 - **Derived-grounded**: the trust label for faculty output checked independently against ground truth, such as a file's existence, or output that cites its sources. See [the routing threshold](../orchestration/routing-threshold.md#gate-3-trust-label-assignment).
 - **Dials**: numeric settings from 1 to 10 that tune behaviour. AUTONOMY, PROACTIVITY and RIGOR govern work in [`working-preferences`](../skills/working-preferences/SKILL.md#dials); formality, density and audience level govern documents in [`document-standards`](../skills/document-standards/SKILL.md).
-- **Dispatch**: the message in which the lead assigns work; the lead writes the dispatches and is the only role that assigns work to a minion. The [routing threshold](../orchestration/routing-threshold.md#gate-3-trust-label-assignment) also calls an agent sending part of a task to a faculty the dispatching agent. See [roles](../orchestration/ROLES.md#lead).
+- **Dispatch**: the message in which the lead assigns work; the lead writes the dispatches and is the only role that assigns work to a minion. The [routing threshold](../orchestration/routing-threshold.md#gate-3-trust-label-assignment) also calls an agent sending part of a task to a faculty the dispatching agent. See [roles](../orchestration/roles.md#lead).
 - **DMZ (Level 3.5)**: in the Purdue model, the broker between the operational and business sides that nothing crosses directly. Here it is the pre-publish redaction gate. See [control layers](control-layers.md#segmentation-the-purdue-model).
 - **Documentation**: text written for a reader with a task, describing the system as it is now. It lives in this repository and never shares a file with provenance. See [document layers](document-layers.md#documentation-and-provenance).
 
@@ -95,7 +95,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 
 - **Lane**: a column of the task board: Inbox, Someday/Maybe, Next, Waiting, Doing, Verify, and Done or Archive. See [`daily-review`](../skills/daily-review/SKILL.md#the-lanes).
 - **Lane-board tool**: the one command that prints every task grouped by lane and ends with a coverage line. The review skills assume it. See [`daily-review`](../skills/daily-review/SKILL.md).
-- **Lead**: the role that acts and delegates. It holds the plan, sequences the work and writes the dispatches. It prepares decisions and does not take them. See [roles](../orchestration/ROLES.md#lead).
+- **Lead**: the role that acts and delegates. It holds the plan, sequences the work and writes the dispatches. It prepares decisions and does not take them. See [roles](../orchestration/roles.md#lead).
 - **Level**: how far a repository's remotes reach, as `scripts/remote-level.sh` reports it: `none`, `internal` or `external`. A host it cannot prove internal is external. The level sets what an agent may do: commit with `none`, commit and push its own branch with `internal`, and only read, edit and stage with `external`; a merge into a trunk is always a person's. The [Purdue model](#p) and [DMZ](#d) use level in the plant sense, and a [sensitivity tier](#s) is not a level. See [the README](../README.md#scripts), [the level script](../scripts/remote-level.sh) and [growing the workspace](installing.md#growing-the-workspace).
 
 ## M
@@ -103,7 +103,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 - **Major**: the severity grade for a wrong result or a broken rule on input that ordinary use produces. It blocks a round's close. See [rounds](../orchestration/rounds.md#severity). A review round uses the same three grades for its findings, without the rule about closing; see [review rounds](review-rounds.md).
 - **Manifest**: the file, `index.md` by default, that says what is authoritative, what is stale and what was added when, and names which documents must stay current. Read first in any session. See [the document set](standing-documents.md#the-document-set) and [how the documents work together](standing-documents.md#how-they-work-together).
 - **Merge-proxy**: a skill a person invokes to let the agent type a trunk merge they have decided, for one session, on a repository whose level is `internal` or `none`, and only after the agent explains the exact plan in full and halts for explicit approval of it. It never applies to an external remote. See [`merge-proxy`](../skills/merge-proxy/SKILL.md).
-- **Minion**: the role that executes one atomic task cold, from a brief, and reports. It does not interpret. See [roles](../orchestration/ROLES.md#minions).
+- **Minion**: the role that executes one atomic task cold, from a brief, and reports. It does not interpret. See [roles](../orchestration/roles.md#minions).
 - **Minor**: the severity grade for a wrong result with a small, visible consequence, or a gap a reader would trip on. Fixed before the close unless the operator accepts it. See [rounds](../orchestration/rounds.md#severity).
 - **Most Important Task**: the one task the daily review sets for the day. See [`daily-review`](../skills/daily-review/SKILL.md).
 
@@ -115,7 +115,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 ## O
 
 - **OODA loop**: Observe, Orient, Decide, Act. Here Orient is the pivot, and stale orientation is the system's characteristic failure. See [control layers](control-layers.md#tempo-the-ooda-loop).
-- **Operator**: the role that decides. The only role that originates authority, and the only one that takes real-world action such as a merge into a trunk. It may not be simulated. See [roles](../orchestration/ROLES.md#operator).
+- **Operator**: the role that decides. The only role that originates authority, and the only one that takes real-world action such as a merge into a trunk. It may not be simulated. See [roles](../orchestration/roles.md#operator).
 
 ## P
 
@@ -132,7 +132,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 
 ## R
 
-- **Reach**: how bounded an agent's mistakes are, and therefore how much standing latitude it gets. One of the axes role is independent of. See [roles](../orchestration/ROLES.md#what-this-axis-is-and-the-three-it-is-not).
+- **Reach**: how bounded an agent's mistakes are, and therefore how much standing latitude it gets. One of the axes role is independent of. See [roles](../orchestration/roles.md#what-this-axis-is-and-the-three-it-is-not).
 - **Readback**: the first line of a reply to answers, restating each answer's meaning before any work, so a misread is caught before it becomes an action. See [`working-preferences`](../skills/working-preferences/SKILL.md#questions-and-answers).
 - **Redaction gate**: the pre-publish check run before content crosses a tier boundary outward, against the local restricted material, with the decision handed to a person. See [`redaction-gate`](../skills/redaction-gate/SKILL.md).
 - **Regime**: one of three operating modes derived from a surface's capability profile: interactive-synchronous, autonomous-asynchronous and programmatic-contractual. Each adjusts the dials and which skills load. See [`surface-regimes`](../skills/surface-regimes/SKILL.md).
@@ -144,21 +144,21 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 - **Report**: a seat's reply to a round's dispatch, numbered within the round (`r12.2`): what was done, how it was checked, and what the check does not cover. A re-check after fixes is the next report, never a new round. See [rounds](../orchestration/rounds.md#reports-and-findings).
 - **Reproduced**: a review-round finding's status once a role other than the reviewer has repeated its evidence and recorded their own. Only a reproduced finding can be cited in the operator's decision. See [review rounds](review-rounds.md#reported-and-verified).
 - **Review round**: one change, one review of it, the verification of that review and one decision, kept as three records (the packet, the reviewer's report and the operator's decision) and checked by `scripts/round-check.py`. Not a [round](#r), which is one task with its dispatches and replies. See [review rounds](review-rounds.md) and [the quickstart](review-rounds-quickstart.md).
-- **Role**: authority over a decision: operator, lead, aide or minion. One identity may hold several. Role is independent of clearance, seat and reach. See [roles](../orchestration/ROLES.md).
+- **Role**: authority over a decision: operator, lead, aide or minion. One identity may hold several. Role is independent of clearance, seat and reach. See [roles](../orchestration/roles.md).
 - **Role name**: a filename that says what a file does for the system, such as a manifest or a thread log. Published freely, unlike a subject name, which says what a file is about and is treated as content. See [standing documents](standing-documents.md#why-these-filenames-are-here-at-all).
-- **Roster**: the part of the handoff document where each agent's clearance is set. See [the document set](standing-documents.md#the-document-set) and [roles](../orchestration/ROLES.md#what-this-axis-is-and-the-three-it-is-not).
+- **Roster**: the part of the handoff document where each agent's clearance is set. See [the document set](standing-documents.md#the-document-set) and [roles](../orchestration/roles.md#what-this-axis-is-and-the-three-it-is-not).
 - **Round**: one task: the lead's dispatches for it and the replies, numbered `r1` upward, checked by a seat other than the author and decided by the operator. See [rounds](../orchestration/rounds.md). Not a [review round](#r), which records one change's review.
 - **Routing threshold**: four ordered gates (sensitivity, capability, cost, trust label) that decide whether part of a task goes to a local model, a vendor faculty or the agent itself. See [the routing threshold](../orchestration/routing-threshold.md).
 
 ## S
 
 - **Sacrificial part**: a cheap component chosen to break first so failure lands somewhere cheap and loud, such as a scratch directory or a generated file. See [control layers](control-layers.md#6-sacrificial-parts-cheap-components-that-break-first).
-- **Seat**: one working copy of an agent, holding its own branch and inbox; [roles](../orchestration/ROLES.md#what-this-axis-is-and-the-three-it-is-not) calls this axis Surface. Authority never moves sideways between seats, even when one person runs both. See [roles](../orchestration/ROLES.md#how-authority-moves).
+- **Seat**: one working copy of an agent, holding its own branch and inbox; [roles](../orchestration/roles.md#what-this-axis-is-and-the-three-it-is-not) calls this axis Surface. Authority never moves sideways between seats, even when one person runs both. See [roles](../orchestration/roles.md#how-authority-moves).
 - **Selftest**: a tool's `--selftest` option, which runs the tool on inputs whose right answer is known, such as planted positives, a fixture or scratch repositories, and fails when the answer is wrong. Three of the gates in `scripts/gates.sh` run a tool's selftest, and `gates.sh --selftest` plants a positive for each of the others. See [contributing](../CONTRIBUTING.md), [the README](../README.md#scripts) and [the gate script](../scripts/gates.sh).
 - **Sensitivity tier**: one of the four groups material is sorted into by audience, with physical isolation as the main control. Who may read a thing and whether a system may keep it are tracked separately; the routing threshold calls the second the storage-persistence axis. See [standing documents](standing-documents.md#sensitivity-tiering) and [the routing threshold](../orchestration/routing-threshold.md).
 - **Skill revision**: a skill's version label, kept in that skill's own `CHANGELOG.md` and named in each release that moves it. See [releasing](releasing.md#skill-revisions).
 - **Standing documents**: the document set a tree keeps: `CLAUDE.md`, the manifest, the handoff document, the task queue, the thread logs, per-project state, procedures and postmortems, each in one of the two layers. The manifest names which must stay current, and `session-close` checks those. See [the document set](standing-documents.md#the-document-set) and [how the documents work together](standing-documents.md#how-they-work-together).
-- **Surface**: a place an agent runs, such as a chat window, a terminal session or an API call, scored on the capability vector. [Roles](../orchestration/ROLES.md#what-this-axis-is-and-the-three-it-is-not) uses Surface for a different axis, the working copy that owns a branch and inbox, which this page calls a seat, under [S](#s). See [the taxonomy](../orchestration/taxonomy.md#surfaces-and-sub-roles).
+- **Surface**: a place an agent runs, such as a chat window, a terminal session or an API call, scored on the capability vector. [Roles](../orchestration/roles.md#what-this-axis-is-and-the-three-it-is-not) uses Surface for a different axis, the working copy that owns a branch and inbox, which this page calls a seat, under [S](#s). See [the taxonomy](../orchestration/taxonomy.md#surfaces-and-sub-roles).
 
 ## T
 
@@ -168,7 +168,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 - **Timebox**: the time a round's dispatch allows. A round whose timebox passes closes with the silent seat recorded as unanswered. See [rounds](../orchestration/rounds.md#closing-a-round).
 - **Token**: in the relay protocol, the right to produce the next message in a thread, held by whoever the latest message is addressed to. See [the relay protocol](../orchestration/protocol.md#turn-taking).
 - **Touch**: a partial capture of one fact-level edit to a standing file, with a line marked `[touch]` in the capture file. It discharges nothing. See [`touch`](../skills/touch/SKILL.md) and [partial captures](partial-captures.md).
-- **Trunk**: `main`, or any branch a repository treats as shared truth. A merge into it is a decision rather than a record, so a person decides it; [merge-proxy](#m) moves only the typing. See [`merge-proxy`](../skills/merge-proxy/SKILL.md), [growing the workspace](installing.md#growing-the-workspace) and [roles](../orchestration/ROLES.md#operator).
+- **Trunk**: `main`, or any branch a repository treats as shared truth. A merge into it is a decision rather than a record, so a person decides it; [merge-proxy](#m) moves only the typing. See [`merge-proxy`](../skills/merge-proxy/SKILL.md), [growing the workspace](installing.md#growing-the-workspace) and [roles](../orchestration/roles.md#operator).
 - **Trust label**: the grade a dispatching agent gives a faculty's output: a default on receipt, raised only by the agent's own check, on the scale unknown, derived-candidate, derived-grounded, verified. Verified is reserved for content the agent confirmed directly. Output inherits the weakest unverified label in its chain. See [the routing threshold](../orchestration/routing-threshold.md#gate-3-trust-label-assignment).
 - **Two occurrences**: the bar a pattern must reach before it earns a mechanical check, and a cause before it counts as a diagnosis. See [control layers](control-layers.md#3-alarms-the-machine-notices-the-human-decides) and [the example workspace](../examples/workspace/CLAUDE.md).
 

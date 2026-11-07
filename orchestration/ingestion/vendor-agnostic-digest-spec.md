@@ -4,7 +4,7 @@ Purpose: a repeatable procedure for turning AI platform data-export JSON (conver
 
 The procedure (§2) doesn't change across vendors. What changes is how you locate each abstract concept (§1) inside an unfamiliar JSON shape; Step 0 does that mapping. Claude's export shapes are given in §1 as a worked mapping example.
 
-Without an export, or for a fast first pass before one: [CONVERSATION-EXTRACTION-PACKET.md](CONVERSATION-EXTRACTION-PACKET.md) is a prompt pasted into the conversation itself, which extracts findings on that conversation's own tokens. It is a triage layer, not a substitute: the full export stays the ground truth for anything load-bearing.
+Without an export, or for a fast first pass before one: [conversation-extraction-packet.md](conversation-extraction-packet.md) is a prompt pasted into the conversation itself, which extracts findings on that conversation's own tokens. It is a triage layer, not a substitute: the full export stays the ground truth for anything load-bearing.
 
 ---
 

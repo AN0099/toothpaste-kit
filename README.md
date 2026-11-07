@@ -131,10 +131,10 @@ The protocol for passing work between agents on different surfaces.
 | `orchestration/README.md` | What the system is for, and where to start |
 | `orchestration/protocol.md` | The relay protocol itself |
 | `orchestration/taxonomy.md` | Role and surface definitions |
-| `orchestration/ROLES.md` | The operator, lead, aide and minion roles |
+| `orchestration/roles.md` | The operator, lead, aide and minion roles |
 | `orchestration/rounds.md` | Rounds: delegated work, checked and decided |
 | `orchestration/routing-threshold.md` | When work goes to a local model and when to a vendor |
-| `orchestration/CHANGELOG.md` | The decision log for the protocol's own design |
+| `orchestration/changelog.md` | The decision log for the protocol's own design |
 | `orchestration/schemas/request.json` | Request message schema |
 | `orchestration/schemas/response.json` | Response message schema |
 | `orchestration/schemas/event-base.json` | Shared event envelope |
