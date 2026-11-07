@@ -43,13 +43,13 @@ RUN python3 -c 'import coverage, sys; sys.exit(coverage.__version__ != "7.16.2")
 # released with it, so no pack is downloaded at analysis time, when there is
 # no network.
 FROM scratch AS dl-amd64
-ADD --checksum=sha256:64518dc413c8e7b5733fee2489e830a899bb1e3f28c8873b5869d5cc90164c5c https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.27.3/codeql-bundle-linux64.tar.gz /tmp/dl/codeql.tar.gz
+ADD --checksum=sha256:89ed56c8ec6bfccef6a0d2e7fe86da0469ca24b4db08b88016ec134b942c17a4 https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.27.4/codeql-bundle-linux64.tar.gz /tmp/dl/codeql.tar.gz
 ADD --checksum=sha256:8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198 https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz /tmp/dl/shellcheck.tar.xz
 ADD --checksum=sha256:8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8 https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz /tmp/dl/actionlint.tar.gz
 ADD --checksum=sha256:a39b0c97695069d95d276d99be0f5dbabb081d801bfdc9ba49b76efaf94e2369 https://github.com/cue-lang/cue/releases/download/v0.17.1/cue_v0.17.1_linux_amd64.tar.gz /tmp/dl/cue.tar.gz
 
 FROM scratch AS dl-arm64
-ADD --checksum=sha256:0c9e32e9fcf65be4ab8df0cf0a7bb83e64aff4099fffc5f4930e84c12a454c8b https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.27.3/codeql-bundle-linux-arm64.tar.gz /tmp/dl/codeql.tar.gz
+ADD --checksum=sha256:7dd066f805dfed19c9c4323d5f2003cd24fabd6e7304cdf799b94a84509fe92b https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.27.4/codeql-bundle-linux-arm64.tar.gz /tmp/dl/codeql.tar.gz
 ADD --checksum=sha256:12b331c1d2db6b9eb13cfca64306b1b157a86eb69db83023e261eaa7e7c14588 https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.aarch64.tar.xz /tmp/dl/shellcheck.tar.xz
 ADD --checksum=sha256:325e971b6ba9bfa504672e29be93c24981eeb1c07576d730e9f7c8805afff0c6 https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_arm64.tar.gz /tmp/dl/actionlint.tar.gz
 ADD --checksum=sha256:0d729be30d52c952ca38fc9dcb692caa09d8463fa0b64df5781312779183fbcd https://github.com/cue-lang/cue/releases/download/v0.17.1/cue_v0.17.1_linux_arm64.tar.gz /tmp/dl/cue.tar.gz
@@ -68,7 +68,7 @@ RUN cd /tmp/dl \
 
 # Each tool must report the version pinned above, so a download that
 # unpacks to a different release fails the build rather than the first check.
-RUN codeql version --format=terse | grep -qx '2.27.3' \
+RUN codeql version --format=terse | grep -qx '2.27.4' \
  && shellcheck --version | grep -qx 'version: 0.11.0' \
  && actionlint -version | head -1 | grep -qx '1.7.12' \
  && cue version | head -1 | grep -qx 'cue version v0.17.1' \

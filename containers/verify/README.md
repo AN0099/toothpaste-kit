@@ -15,8 +15,8 @@ that each tool reports the version pinned for it.
 | python | 3.13-slim, by digest | The base image | The v0 image |
 | libmagic1, git, xz-utils | The base image's Debian packages | `apt-get` | reuse's file-type detection, as on the CI runner; xz-utils unpacks shellcheck |
 | reuse | 6.2.0 | pip, by hash, built from its sdist (no python 3.13 wheel) with poetry-core 2.5.0 from [`build-requirements.txt`](build-requirements.txt) | `.github/workflows/compliance.yml` |
-| CodeQL CLI | 2.27.3 | The CodeQL bundle, by digest | The version GitHub's default setup ran on main on 2026-11-01 |
-| codeql/python-queries, codeql/actions-queries | The versions in the 2.27.3 bundle | The CodeQL bundle | The bundle; the build writes the resolved packs to `/opt/codeql-packs.txt` |
+| CodeQL CLI | 2.27.4 | The CodeQL bundle, by digest | The version GitHub's default setup ran on pull requests on 2026-11-07 |
+| codeql/python-queries, codeql/actions-queries | The versions in the 2.27.4 bundle | The CodeQL bundle | The bundle; the build writes the resolved packs to `/opt/codeql-packs.txt` |
 | coverage.py | 7.16.2 | pip, by hash, one per architecture, with a startup hook in `site-packages` | The newest release at least 14 days old on 2026-11-02; `scripts/coverage-check.py` uses it |
 | yamllint | 1.38.0 | pip, by hash | The newest release at least 14 days old on 2026-10-31 |
 | shellcheck | 0.11.0 | Release binary, by digest | The newest release at least 14 days old on 2026-10-31 |
