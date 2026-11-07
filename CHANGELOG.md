@@ -158,6 +158,8 @@ skill lives in that skill's own `CHANGELOG.md`.
   left. `scripts/check-pr-body` now treats that box like any other.
 - `docs/releasing.md`: between the cutoff and the tag, nothing merges into `main`
   except the release itself.
+- `skills/document-standards/references/structural-patterns.md` allows the
+  passive in three stated cases, and the table of fixes stands for the rest.
 
 ### Fixed
 
