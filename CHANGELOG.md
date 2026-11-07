@@ -102,6 +102,9 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `docs/acmm.md` cites the paper that defines the model, separates the three
+  sets of level names in use, and states level 5 as the kit's ceiling, since a
+  person merges every pull request.
 - `orchestration/ROUTING-THRESHOLD.md` is now `routing-threshold.md`, under the
   lowercase naming rule, and states roles in place of one desk's seat names.
   Links are updated.
