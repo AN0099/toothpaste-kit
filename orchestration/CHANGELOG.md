@@ -4,7 +4,7 @@ Decision log for this orchestration system's own design. One entry per structura
 
 **Scope: hybrid, custom protocol layered on real surface constraints.** Rejected a pure custom taxonomy, which would drift from the actual capability differences it needs to route around, and rejected pure documentation-of-product-behavior, too narrow on its own since the goal is a coordination protocol rather than a product comparison. The taxonomy is grounded in searched, current material rather than training-data recall, since product surface behavior changes faster than a model's knowledge cutoff.
 
-**Deliverable shape: multi-file.** Matches the three-tier pattern already established in this project's skills repo. Chosen explicitly over single-file after a pro/con comparison; single-file was the safer default under `document-standards`' own split-threshold rule, but multi-file was chosen deliberately for this system rather than by default.
+**Deliverable shape: multi-file.** Matches the three-tier pattern already established in the skills in `skills/`. Chosen explicitly over single-file after a pro/con comparison; single-file was the safer default under the `document-standards` section "Three-Tier Threshold Framework", but multi-file was chosen deliberately for this system rather than by default.
 
 **Relay mechanism: human-readable header wrapping a JSON payload.** Neither pure JSON, illegible to a human relay without tooling, nor pure prose, not machine-parseable and reintroducing the ambiguity the schema exists to remove, satisfied both the human-relay and LLM-agent audiences at once.
 
@@ -23,10 +23,9 @@ one, and a session on any other vendor's product could not be expressed as a val
 The order is now reversed: a seven-field `capability` profile and the `regime` derived from it are
 required and normative, and `surface` is an optional namespaced string resolved against
 `registry/`. Four of the seven fields are the columns the old capability matrix already had.
-The three additions (`interface`, `tool_execution`, `egress`) exist because the routing rule was
-already consulting all three informally, `egress` most consequentially: a sensitivity gate that
-must know whether content leaves the operator's boundary was reading an operator's memory rather
-than a field. The three-clause derivation rule was checked against all eight rows of the existing
+The three additions (`interface`, `tool_execution`, `egress`) are recorded for audit, `egress` most
+consequentially: whether content leaves the operator's boundary is now a field rather than an
+operator's memory. The three-clause derivation rule was checked against all eight rows of the existing
 matrix and reproduces every one, which is the evidence that the vector is complete rather than
 merely plausible.
 
@@ -46,7 +45,7 @@ sweepable by a staleness checker rather than only readable. `unknown` is a legit
 
 **A review round is three records, and the verifier is a different role from the reviewer.** A round's packet, the reviewer's report and the operator's decision are separate files with separate schemas, so each is written by the role that owns it and none can be edited to agree with another after the fact. The reviewer's findings stay unverified in the report; a role other than the reviewer reproduces them in the decision, and the operator cites only reproduced findings. Rejected: one combined record, which lets the reviewer fill in their own verification, and checks within each schema alone, which cannot compare a value across records; those comparisons are in `scripts/round-check.py`.
 
-**Round records allow all four roles of `ROLES.md`, `minion` included.** The TK-081 handoff's `actorModel.vocabulary` lists three roles, `operator`, `lead` and `aide`, and names `ROLES.md` as its source; `ROLES.md` defines four. The round schemas and `scripts/round-check.py` follow the source, so a round that a minion takes part in can be recorded, and a role `ROLES.md` defines is never rejected. The cost is that `minion` can be named as a round's reviewer or verifier, which the handoff's list does not foresee; the independence rule (verifier role differs from reviewer role) applies to it as to any other role.
+**Round records allow all four roles of `ROLES.md`, `minion` included.** The original review-round specification lists three roles, `operator`, `lead` and `aide`, and names `ROLES.md` as its source; `ROLES.md` defines four. The round schemas and `scripts/round-check.py` follow the source, so a round that a minion takes part in can be recorded, and a role `ROLES.md` defines is never rejected. The cost is that `minion` can be named as a round's reviewer or verifier, which the specification's list does not foresee; the independence rule (verifier role differs from reviewer role) applies to it as to any other role.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

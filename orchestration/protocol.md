@@ -36,7 +36,7 @@ Machine agents use `timeout_ms`. Human agents do not operate on millisecond time
 
 Every new chat window starts with no memory of the thread. Two consequences follow.
 
-First, any message addressed to a fresh `chat` or `cowork-interactive` agent should include enough of `templates/handoff-note.md`, inline or as a preceding paste, to bootstrap that agent without requiring it to ask. This is the same principle as the export-style session handoff document already used elsewhere in this project; this protocol generalizes it to apply across agents, not only across sessions of one agent.
+First, any message addressed to a fresh `chat` or `cowork-interactive` agent should include enough of `templates/handoff-note.md`, inline or as a preceding paste, to bootstrap that agent without requiring it to ask. This is the same principle as the session handoff document in [`examples/workspace/.agents/lead-handoff.md`](../examples/workspace/.agents/lead-handoff.md); this protocol generalizes it to apply across agents, not only across sessions of one agent.
 
 Second, `thread_id` is the unit of continuity, not any single agent's memory. Nothing in this protocol assumes an agent remembers a prior message unless that message, or a handoff note summarizing it, is present in its current context.
 

@@ -14,6 +14,7 @@ Do not use this system for tasks a single session already handles well. The rela
 
 - `taxonomy.md`: the seven-field capability vector every surface is scored on, the rule deriving a regime from it, the two human roles (relay vs. participant), and a capability matrix.
 - `registry/`: one file per vendor namespace, mapping surface identifiers to capability profiles. Each entry carries its own evidence and expiry date. This is where support for a new vendor gets added.
+- `ROLES.md`: the four roles (operator, lead, aide, minions): whose decision it is, independent of clearance, surface and reach.
 - `rounds.md`: the round, one task with its dispatches and replies: its steps and who runs each, report and finding notation, the severity scale, the verification rule, and closing a round.
 - `protocol.md`: the relay mechanism (human-readable header wrapping a JSON payload), turn-taking rules, and state handoff rules.
 - `schemas/`: JSON Schema definitions for events exchanged between agents (`event-base.json`, `request.json`, `response.json`).
@@ -32,9 +33,9 @@ Do not use this system for tasks a single session already handles well. The rela
 4. The human, acting as relay, pastes the filled template into the receiving agent's surface. A relay human's job is to move the payload intact, not to edit its content.
 5. At the end of a run or a session boundary, whoever is finishing their turn fills `templates/handoff-note.md` so the next agent, human or LLM, can resume without re-deriving context.
 
-## Relationship to the existing skills repo
+## Relationship to the existing skills
 
-This system is a peer to `working-preferences`, `document-standards`, and `technical-documents`, not a replacement. Those skills govern how a single Claude instance writes and behaves. This system governs how multiple instances, and humans, coordinate across a task that spans more than one of them.
+This system is a peer to the skills in `skills/` (`working-preferences`, `document-standards`, and `technical-documents`), not a replacement. Those skills govern how a single Claude instance writes and behaves. This system governs how multiple instances, and humans, coordinate across a task that spans more than one of them.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

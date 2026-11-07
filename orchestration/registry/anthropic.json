@@ -17,7 +17,7 @@
       "confidence": "derived",
       "verified_on": "2026-09-04",
       "sources": [],
-      "notes": "Tool calls are made and returned within a single turn; no autonomous execution between turns. Audit coverage stated for enterprise plans. Imported from taxonomy.md's original grounding pass; source URLs were not recorded at the time and should be filled on the next verification pass."
+      "notes": "Tool calls are made and returned within a single turn; no autonomous execution between turns. Audit coverage stated for enterprise plans. Source URLs were not recorded for this entry and should be filled on the next verification pass."
     },
     {
       "id": "anthropic:cowork-interactive",
