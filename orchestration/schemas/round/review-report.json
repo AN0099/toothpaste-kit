@@ -208,7 +208,7 @@
       "pattern": "^(?!/)(?!(.*/)?\\.\\.(/|$))[^\\\\]+$"
     },
     "role": {
-      "description": "Kept in step with the four roles in orchestration/ROLES.md.",
+      "description": "Kept in step with the four roles in orchestration/roles.md.",
       "enum": [
         "operator",
         "lead",

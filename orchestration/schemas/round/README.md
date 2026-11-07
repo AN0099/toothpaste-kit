@@ -36,10 +36,10 @@ material because of the label. Public fixtures hold synthetic content only.
 
 Revisions and commits are full Git object names (40 or 64 hexadecimal characters), so two
 revisions compare exactly. Paths are repository-relative: no leading `/`, no `\`, no `..` segment.
-Role values are the four roles of `orchestration/ROLES.md` in lower case: `operator`, `lead`,
+Role values are the four roles of `orchestration/roles.md` in lower case: `operator`, `lead`,
 `aide`, `minion`. The list is written out in four places: each schema's `role` definition and `ROLES` in
-`scripts/round-check.py`. A role added to or removed from `ROLES.md` must be changed in all four by
-hand; `round-check.py --selftest`, which gate 18 runs, fails until the four agree with `ROLES.md`.
+`scripts/round-check.py`. A role added to or removed from `roles.md` must be changed in all four by
+hand; `round-check.py --selftest`, which gate 18 runs, fails until the four agree with `roles.md`.
 
 ## ReviewRound
 

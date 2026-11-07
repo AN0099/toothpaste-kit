@@ -140,9 +140,9 @@ skill lives in that skill's own `CHANGELOG.md`.
   `gates.sh`. Each new case kills a mutant the old selftest let through.
   `check-hooks.py` now reports a `pattern:` or `operator:` line that comes
   before any `- field:` as a finding, where it used to drop the line.
-- `orchestration/ingestion/VENDOR-AGNOSTIC-DIGEST-SPEC.md` (pull request #60):
+- `orchestration/ingestion/vendor-agnostic-digest-spec.md` (pull request #60):
   one spec, its duplicate sections merged, with
-  `CONVERSATION-EXTRACTION-PACKET.md` linked as a fast first pass.
+  `conversation-extraction-packet.md` linked as a fast first pass.
 - The branch-name hook (pull request #61) sees `push` behind quoted and
   separate-word global options, and lists the forms it still does not catch.
 - The frontmatter gate (pull request #63) checks each skill `description` for
@@ -163,16 +163,22 @@ skill lives in that skill's own `CHANGELOG.md`.
   except the release itself.
 - `skills/document-standards/references/structural-patterns.md` allows the
   passive in three stated cases, and the table of fixes stands for the rest.
+- `orchestration/`: four files take lowercase names under the repository's
+  naming rule: `roles.md`, `changelog.md`, and in `ingestion/`
+  `conversation-extraction-packet.md` and `vendor-agnostic-digest-spec.md`.
+  Every link, schema description and `scripts/round-check.py` path follows;
+  released entries keep the names the files had then. A skill's own
+  `CHANGELOG.md` keeps its name.
 
 ### Fixed
 
 - `orchestration/`: stale claims and text specific to one installation.
-  The README indexes `ROLES.md`; links to documents the repository does
+  The README indexes `roles.md`; links to documents the repository does
   not hold now name ones it does; the three event schemas carry
   `$id` values with their `schemas/` directory, and a human agent no
   longer needs `capability` or `regime`; usage quotas, a past incident,
   dated adoption notes and one setup's worked examples are gone from
-  `routing-threshold.md`, `ROLES.md` and the ingestion specs; and
+  `routing-threshold.md`, `roles.md` and the ingestion specs; and
   `rounds.md` gives its mail channel and context thresholds as examples
   an installation sets.
 - `scripts/gates.sh`: changes to the kit root, found from its own path

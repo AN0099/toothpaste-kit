@@ -3,7 +3,7 @@
 A round is the unit in which the lead hands work to other seats, collects what comes back, has it
 checked by someone other than its author, and puts the result in front of the operator. It gives
 every delegation the same shape, and ties each step to the operator's decision, the only point in
-the loop where a person decides. Roles are defined in [`ROLES.md`](ROLES.md).
+the loop where a person decides. Roles are defined in [`roles.md`](roles.md).
 
 Notes travel as files over a channel each installation chooses. For example, each seat has its own
 branch in one shared repository, and a seat writes to the other seat's inbox directory on its own
@@ -35,7 +35,7 @@ report**, never a new round.
 decides what is fixed, and the lead re-dispatches; the loop runs until the close condition holds.
 
 **Authority comes from a seat's own operator**, never from the lead's note alone
-([`ROLES.md`](ROLES.md)). The note carries the task; the seat's operator approving it is what lets the
+([`roles.md`](roles.md)). The note carries the task; the seat's operator approving it is what lets the
 seat act.
 
 **A finding that touches a [control](../docs/control-layers.md) outranks everything else in the

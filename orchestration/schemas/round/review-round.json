@@ -29,7 +29,7 @@
     "roles": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Roles from orchestration/ROLES.md. A role records authority and responsibility, not a routable agent.",
+      "description": "Roles from orchestration/roles.md. A role records authority and responsibility, not a routable agent.",
       "required": ["reviewer", "verifier", "decisionMaker"],
       "properties": {
         "reviewer": { "$ref": "#/definitions/roleRef" },
@@ -122,7 +122,7 @@
       "pattern": "^(?!/)(?!(.*/)?\\.\\.(/|$))[^\\\\]+$"
     },
     "role": {
-      "description": "Kept in step with the four roles in orchestration/ROLES.md.",
+      "description": "Kept in step with the four roles in orchestration/roles.md.",
       "enum": ["operator", "lead", "aide", "minion"]
     },
     "roleRef": {

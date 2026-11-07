@@ -189,7 +189,7 @@ def validate(inst, schema, root, path, errors):
 # Field paths follow orchestration/schemas/round/. The decision's verification
 # entries name their finding with findingId; the alignment status values are
 # matched, mismatched and unresolved.
-# A copy of the roles orchestration/ROLES.md defines; --selftest compares them.
+# A copy of the roles orchestration/roles.md defines; --selftest compares them.
 ROLES = ("operator", "lead", "aide", "minion")
 CHECK_STATUSES = ("passed", "failed", "not-run", "blocked")
 NORMAL_DECISIONS = ("accept", "reject", "request-revision")
@@ -343,7 +343,7 @@ def cross_check(docs):
         bad("all", "shared-round-id",
             "metadata.roundId differs: " + ", ".join(f"{k}={v}" for k, v in sorted(ids.items())))
 
-    # Roles come from ROLES.md. ROLES above is a copy, as is each schema's
+    # Roles come from roles.md. ROLES above is a copy, as is each schema's
     # role enum; --selftest (selftest_roles) fails if any copy differs.
     role_paths = {"review-round": ("roles.reviewer.role", "roles.verifier.role", "roles.decisionMaker.role"),
                   "review-report": ("reviewer.role",),
@@ -1185,7 +1185,7 @@ def valid_trio():
 
 
 def roles_md_names(text):
-    """The role headings under "## The four" in ROLES.md, lower case, with
+    """The role headings under "## The four" in roles.md, lower case, with
     a plural heading ("Minions") read as its role ("minion")."""
     names, inside = [], False
     for line in text.splitlines():
@@ -1198,16 +1198,16 @@ def roles_md_names(text):
 
 
 def role_list_problems(roles_md_text, schemas):
-    """Every copy of the role list must equal the roles ROLES.md defines:
+    """Every copy of the role list must equal the roles roles.md defines:
     ROLES here and each schema's role enum."""
     want = roles_md_names(roles_md_text)
     out = []
     if sorted(want) != sorted(ROLES):
-        out.append(f"ROLES.md defines {want}; round-check.py ROLES is {list(ROLES)}")
+        out.append(f"roles.md defines {want}; round-check.py ROLES is {list(ROLES)}")
     for kind, schema in sorted(schemas.items()):
         enum = schema.get("definitions", {}).get("role", {}).get("enum")
         if enum is None or sorted(enum) != sorted(want):
-            out.append(f"{kind}.json role enum is {enum}; ROLES.md defines {want}")
+            out.append(f"{kind}.json role enum is {enum}; roles.md defines {want}")
     return out
 
 
@@ -1301,11 +1301,11 @@ def selftest_repo():
 
 
 def selftest_roles():
-    """The four copies of the role list agree with orchestration/ROLES.md,
-    and a fifth role planted in ROLES.md is caught."""
-    path = os.path.join(REPO_ROOT, "orchestration", "ROLES.md")
+    """The four copies of the role list agree with orchestration/roles.md,
+    and a fifth role planted in roles.md is caught."""
+    path = os.path.join(REPO_ROOT, "orchestration", "roles.md")
     if not os.path.exists(path):
-        print("selftest skip: no orchestration/ROLES.md in this tree, so the role lists are not compared")
+        print("selftest skip: no orchestration/roles.md in this tree, so the role lists are not compared")
         return 0, 0
     with open(path, encoding="utf-8") as f:
         text = f.read()
@@ -1313,11 +1313,11 @@ def selftest_roles():
     failed = 0
     problems = role_list_problems(text, schemas)
     if problems:
-        print(f"selftest FAIL: role lists disagree with ROLES.md: {problems}; update all four by hand")
+        print(f"selftest FAIL: role lists disagree with roles.md: {problems}; update all four by hand")
         failed += 1
     planted = text.replace("## How authority moves", "### Auditor\n\n## How authority moves", 1)
     if planted == text or not role_list_problems(planted, schemas):
-        print("selftest FAIL: a fifth role planted in ROLES.md was not caught")
+        print("selftest FAIL: a fifth role planted in roles.md was not caught")
         failed += 1
     return failed, 2
 
