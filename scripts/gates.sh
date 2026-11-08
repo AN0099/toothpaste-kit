@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These twenty-one gates cover: the em dash ban, the private task ID ban,
+# check. These twenty-two gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency (including every vendor
 # file's shape against surface-descriptor.schema.json, checked by
 # scripts/schema-check.py, which fails loudly on any schema keyword it does
@@ -55,7 +55,9 @@
 # blog builder's selftest in scripts/blog.py, which plants each page and feed
 # check it makes, and the CI timeout tuner's selftest in
 # scripts/auto-qa-tuner.py, which plants each workflow shape it reads or
-# refuses and each proposal rule. They
+# refuses and each proposal rule, and BCP 14 keywords via scripts/bcp14-check.py:
+# a Markdown file using one in capitals must name BCP 14, and that script states
+# its own coverage. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -488,6 +490,17 @@ gate_qa_tuner() {
   fi
 }
 
+# ---------------------------------------------------------------- 22
+gate_bcp14() {
+  gate_start "BCP 14 keywords"
+  if out=$(python3 -I scripts/bcp14-check.py --selftest 2>&1); then
+    gate_ok "BCP 14 keywords"
+  else
+    printf '%s\n' "$out" | grep -vE '^PLANT ok' | sed 's/^/  /'
+    gate_bad "BCP 14 keywords"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -510,7 +523,8 @@ run_all() {
   gate_sbom
   gate_blog
   gate_qa_tuner
-  printf '\n%s of 21 gates passed\n' "$pass_n"
+  gate_bcp14
+  printf '\n%s of 22 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -518,8 +532,8 @@ run_all() {
 
 # A gate that has never returned a hit has not been shown capable of
 # returning one, so each of the first five, and the eighth, is run against a
-# planted positive in a scratch tree, as are 12, 13, 14, 15, 16, 17 and 18. Gates 6, 9, 10, 11
-# and 21 run their tools' own selftests, which carry their own planted cases, and
+# planted positive in a scratch tree, as are 12, 13, 14, 15, 16, 17, 18 and 22. Gates 6, 9, 10, 11,
+# 21 and 22 run their tools' own selftests, which carry their own planted cases, and
 # gate 7 plants one positive per rule below.
 run_selftest() {
   tmp=$(mktemp -d) || return 1
@@ -867,6 +881,17 @@ PY
   bad=$?
   sh "$tmp/bn-ok/scripts/check-branch-name" --selftest >/dev/null 2>&1
   plant_rejected $bad $? "branch name gate, prefix drift"
+  # And when --tag-new no longer compares a tag with the existing ones.
+  sed 's/    if ! version_gt /    if false \&\& version_gt /' scripts/check-branch-name > "$tmp/bn-bad/scripts/check-branch-name"
+  cp .github/rulesets/branch-names.json "$tmp/bn-bad/.github/rulesets/"
+  if cmp -s scripts/check-branch-name "$tmp/bn-bad/scripts/check-branch-name"; then
+    echo "PLANT FAIL  branch name gate, tag comparison removed: the plant did not apply"; plant_fail=1
+  else
+    sh "$tmp/bn-bad/scripts/check-branch-name" --selftest >/dev/null 2>&1
+    bad=$?
+    sh "$tmp/bn-ok/scripts/check-branch-name" --selftest >/dev/null 2>&1
+    plant_rejected $bad $? "branch name gate, tag comparison removed"
+  fi
 
   # Gate 14: a copy of the hook missing one trailer must fail its cases.
   sed 's/Assisted-by/Assisted-xx/' .githooks/commit-msg > "$tmp/commit-msg-weak"
@@ -1024,6 +1049,27 @@ PY
   bad=$?
   python3 -I scripts/auto-qa-tuner.py --selftest >/dev/null 2>&1
   plant_rejected $bad $? "auto-qa-tuner gate, timeout doubling removed"
+
+  # Gate 22: a copy of the BCP 14 check whose keyword pattern matches nothing
+  # must fail its own selftest, and a tree with an unstated keyword must fail
+  # the check as installed.
+  mkdir -p "$tmp/bc/scripts" && sed "s/^KEYWORD = re.compile($/KEYWORD = re.compile(r'(?!)') or re.compile(/" scripts/bcp14-check.py > "$tmp/bc/scripts/bcp14-check.py"
+  if cmp -s scripts/bcp14-check.py "$tmp/bc/scripts/bcp14-check.py"; then
+    echo "PLANT FAIL  BCP 14 gate, keyword pattern emptied: the plant did not apply"; plant_fail=1
+  else
+    python3 -I "$tmp/bc/scripts/bcp14-check.py" --selftest >/dev/null 2>&1
+    bad=$?
+    python3 -I scripts/bcp14-check.py --selftest >/dev/null 2>&1
+    plant_rejected $bad $? "BCP 14 gate, keyword pattern emptied"
+  fi
+  mkdir -p "$tmp/bt-bad/scripts" "$tmp/bt-ok/scripts"
+  cp scripts/bcp14-check.py "$tmp/bt-bad/scripts/" && cp scripts/bcp14-check.py "$tmp/bt-ok/scripts/"
+  printf 'A reader MUST check.\n' > "$tmp/bt-bad/a.md"
+  printf 'Keywords are BCP 14.\n\nA reader MUST check.\n' > "$tmp/bt-ok/a.md"
+  python3 -I "$tmp/bt-bad/scripts/bcp14-check.py" >/dev/null 2>&1
+  bad=$?
+  python3 -I "$tmp/bt-ok/scripts/bcp14-check.py" >/dev/null 2>&1
+  plant_rejected $bad $? "BCP 14 gate, an unstated keyword"
   # gates.sh from another directory: two copies of the kit, each in a fresh
   # repository of one commit (the sbom gate reads the index and HEAD), run
   # from a third directory. The one whose cd to the kit root is removed must

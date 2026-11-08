@@ -45,9 +45,9 @@ jobs:
   # selftests the rule; this checks the name being merged, which a local run
   # cannot see. By now the name is already public, so this is the backstop:
   # the pre-push hook and the ruleset in .github/rulesets/ stop a name before
-  # it is published, and this keeps such a branch from merging. Tags are left
-  # to the hook and the tag-names ruleset, since this workflow does not run
-  # on a tag push.
+  # it is published, and this keeps such a branch from merging. Tags are
+  # checked by the hook, the tag rulesets and .github/workflows/tags.yml,
+  # since this workflow does not run on a tag push.
   branch-name:
     if: github.event_name == 'pull_request'
     timeout-minutes: 5

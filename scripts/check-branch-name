@@ -23,11 +23,20 @@
 #   <prefix>/<words>   prefix from the list below; words are lowercase a-z
 #                      and 0-9, joined by single hyphens or dots (dots so a
 #                      version reads as one, release/0.4.0); 40 characters total
-#   v<major>.<minor>.<patch> for tags, checked with --tag
+#   v<major>.<minor>.<patch> for tags, checked with --tag: each number 0 or
+#                      without a leading zero, as Semantic Versioning 2.0.0
+#                      item 2 requires, at most 9 digits so the shell can
+#                      compare it, and no pre-release or build part
 #
-# Usage: scripts/check-branch-name NAME          exit 0 if allowed, 1 if not
-#        scripts/check-branch-name --tag NAME    the same, for a tag
-#        scripts/check-branch-name --selftest    prove the rule both ways
+# --tag-new also requires the tag to be greater than every other v tag in the
+# clone, so run it after a fetch of all tags. .github/workflows/tags.yml runs
+# it at the forge on every newly created tag.
+#
+# Usage: scripts/check-branch-name NAME            exit 0 if allowed, 1 if not
+#        scripts/check-branch-name --tag NAME      the same, for a tag
+#        scripts/check-branch-name --tag-new NAME  a tag, above every other tag;
+#                                                  exit 2 if the tags cannot be read
+#        scripts/check-branch-name --selftest      prove the rule both ways
 
 set -u
 
@@ -57,9 +66,37 @@ check_branch() {
 }
 
 check_tag() {
-  if printf '%s\n' "$1" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then return 0; fi
-  echo "tag name rejected: '$1' must look like v1.2.3" >&2
+  if printf '%s\n' "$1" | grep -Eq '^v(0|[1-9][0-9]{0,8})\.(0|[1-9][0-9]{0,8})\.(0|[1-9][0-9]{0,8})$'; then return 0; fi
+  echo "tag name rejected: '$1' must look like v1.2.3, with no leading zeros and at most 9 digits a number" >&2
   return 1
+}
+
+# version_gt A B: exit 0 if version A is greater than version B, both v1.2.3.
+version_gt() {
+  set -- "${1#v}" "${2#v}"
+  a1=${1%%.*}; a3=${1##*.}; a2=${1#*.}; a2=${a2%.*}
+  b1=${2%%.*}; b3=${2##*.}; b2=${2#*.}; b2=${b2%.*}
+  [ "$a1" -ne "$b1" ] && { [ "$a1" -gt "$b1" ]; return; }
+  [ "$a2" -ne "$b2" ] && { [ "$a2" -gt "$b2" ]; return; }
+  [ "$a3" -gt "$b3" ]
+}
+
+# check_tag_new NAME: a well-formed tag, greater than every other v tag in
+# the clone. A v tag that is not well formed is skipped, since it cannot be
+# compared; it fails on its own push. Exit 2, not 1, when git cannot list the
+# tags, so a caller can tell a broken run from a refused tag.
+check_tag_new() {
+  check_tag "$1" || return 1
+  tags=$(git tag -l 'v*') || { echo "tag rejected: git tag could not list the tags" >&2; return 2; }
+  for t in $tags; do
+    [ "$t" = "$1" ] && continue
+    check_tag "$t" 2>/dev/null || continue
+    if ! version_gt "$1" "$t"; then
+      echo "tag rejected: '$1' is not greater than the existing tag '$t'" >&2
+      return 1
+    fi
+  done
+  return 0
 }
 
 selftest() {
@@ -86,9 +123,41 @@ selftest() {
            HEAD Main; do
     expect 1 branch "$n"
   done
-  expect 0 tag v1.2.3
-  expect 1 tag v1.2
-  expect 1 tag release-notes
+  for n in v1.2.3 v0.0.0 v0.10.0 v10.20.30 v999999999.0.0; do expect 0 tag "$n"; done
+  for n in v1234567890.0.0 v0.0.99999999999999999999 v1.2 release-notes v01.2.3 v1.02.3 v1.2.03 v00.1.0 1.2.3 v1.2.3-rc.1 v1.2.3+b1 V1.2.3; do
+    expect 1 tag "$n"
+  done
+  gt() { # $1 want (0 or 1), $2 A, $3 B: is A greater than B
+    version_gt "$2" "$3"; got=$?
+    if [ "$got" -ne "$1" ]; then echo "FAIL  '$2' greater than '$3': wanted exit $1, got $got"; fail=1; fi
+  }
+  gt 0 v0.10.0 v0.9.0; gt 0 v1.0.0 v0.99.99; gt 0 v0.5.1 v0.5.0; gt 0 v0.6.0 v0.5.9
+  gt 1 v0.5.0 v0.5.0; gt 1 v0.4.9 v0.5.0; gt 1 v0.9.0 v0.10.0; gt 1 v0.99.99 v1.0.0
+  # --tag-new in a scratch repository holding v0.5.0, v0.6.0, a v tag of
+  # another shape, and the tag under test.
+  if r=$(mktemp -d) && ( cd "$r" && export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null &&
+      git init -q && git -c user.name=t -c user.email=t@invalid commit -q --allow-empty -m t &&
+      git tag v0.5.0 && git tag v0.6.0 && git tag v0.4.0-old-shape ) ; then
+    for c in '0 v0.7.0' '0 v0.6.1' '1 v0.6.0x' '1 v0.5.9' '1 v0.05.0'; do
+      want=${c%% *}; t=${c#* }
+      ( cd "$r" && git tag "$t" && check_tag_new "$t" 2>/dev/null ); got=$?
+      ( cd "$r" && git tag -d "$t" >/dev/null )
+      if [ "$got" -ne "$want" ]; then echo "FAIL  --tag-new '$t' with v0.6.0 the highest: wanted exit $want, got $got"; fail=1; fi
+    done
+    # The tag under test is in the clone too, and is skipped, not compared.
+    ( cd "$r" && git tag v0.9.0 && check_tag_new v0.9.0 2>/dev/null ) || { echo "FAIL  --tag-new compared a tag with itself"; fail=1; }
+    rm -rf "$r"
+  else
+    echo "FAIL  --tag-new: the scratch repository could not be made"; fail=1
+  fi
+  # Outside any repository git cannot list the tags: exit 2, never 1.
+  if e=$(mktemp -d); then
+    ( cd "$e" && GIT_CEILING_DIRECTORIES=$(dirname "$e") check_tag_new v1.0.0 2>/dev/null ); got=$?
+    rmdir "$e"
+    if [ "$got" -ne 2 ]; then echo "FAIL  --tag-new outside a repository: wanted exit 2, got $got"; fail=1; fi
+  else
+    echo "FAIL  --tag-new: the scratch directory could not be made"; fail=1
+  fi
   # The ruleset repeats PREFIXES because GitHub cannot call this script.
   # Fail if the two lists have drifted apart.
   ruleset="$(dirname "$0")/../.github/rulesets/branch-names.json"
@@ -117,6 +186,7 @@ selftest() {
 case "${1:-}" in
   --selftest) selftest; exit $? ;;
   --tag) [ $# -eq 2 ] || { echo "usage: $0 --tag NAME" >&2; exit 2; }; check_tag "$2"; exit $? ;;
-  ''|-*) echo "usage: $0 NAME | --tag NAME | --selftest" >&2; exit 2 ;;
+  --tag-new) [ $# -eq 2 ] || { echo "usage: $0 --tag-new NAME" >&2; exit 2; }; check_tag_new "$2"; exit $? ;;
+  ''|-*) echo "usage: $0 NAME | --tag NAME | --tag-new NAME | --selftest" >&2; exit 2 ;;
   *) [ $# -eq 1 ] || { echo "usage: $0 NAME" >&2; exit 2; }; check_branch "$1"; exit $? ;;
 esac

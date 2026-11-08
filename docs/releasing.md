@@ -125,7 +125,9 @@ falls on every second Tuesday from that date.
 a permanent Zenodo version DOI, so a review that finds nothing coherent to
 archive defers. **A PATCH release may land between reviews** only for a
 material defect in a published release: a broken primary workflow, a security
-or safety correction, or wrong citation, licence or DOI metadata.
+or safety correction, or wrong citation, licence or DOI metadata. It is a
+patch on the newest line only: a tag must be greater than every other tag
+(`.github/workflows/tags.yml`), so once `v0.5.0` exists a `v0.4.1` is refused.
 
 Two weeks suits a pre-alpha project with one maintainer, where momentum
 matters more than ceremony. The cadence is itself reviewed as the project
@@ -190,6 +192,14 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
 
    Without `allowedSignersFile`, `git tag -v` reports that it cannot check the
    signature, which is not the same as a bad signature.
+
+   **Check the `tags` workflow run on the tag.** It fails the run on a tag
+   that breaks the rule and deletes nothing, so a refused tag stays public
+   until you remove it. The `release-tags` ruleset refuses deleting a `v` tag,
+   and it has no bypass list, so removing one takes three steps: set the
+   ruleset's enforcement to Disabled in the repository settings, run
+   `git push origin :refs/tags/<tag>`, and set it back to Active. Remove only
+   a tag no release was made from; its name stays in public push records.
 
    **Expect exactly one commit per release that does not verify locally, and
    expect it to be the merge.** Merging through the web interface produces a

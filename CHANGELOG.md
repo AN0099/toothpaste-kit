@@ -7,6 +7,17 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `scripts/bcp14-check.py`, gate 22: a Markdown file that uses a BCP 14
+  keyword in capitals must name BCP 14, outside code, or be listed as quoting.
+  The one file that did not, this changelog, now writes the word in lowercase.
+- `.github/workflows/tags.yml`: on every newly created tag, runs
+  `scripts/check-branch-name --tag-new`, which requires the full `v1.2.3`
+  shape with no leading zeros and a tag greater than every other `v` tag, and
+  fails the run on a tag that fails or was moved. It never deletes a tag; the
+  maintainer removes a refused one. `--tag` now refuses a leading zero, and a
+  number over 9 digits.
+- `.github/rulesets/release-tags.json`: refuses moving or deleting a `v` tag,
+  binding once applied to the repository.
 - `scripts/schemas.sh`: validates `security-insights.yml` against Security
   Insights 2.2.0 and `CITATION.cff` against Citation File Format 1.2.0. The
   verification image downloads both schemas from the commit each release tag
@@ -245,7 +256,7 @@ skill is added and no skill revision is BREAKING.
 
 - `docs/document-layers.md`, exception 5: a filed reflection entry may be
   reformatted where no word changes (line wrapping or whitespace, or markup
-  a new gate requires), and a markup change MUST NOT change what a line
+  a new gate requires), and a markup change must not change what a line
   means; a change to any word needs a superseding entry. The maintainer's
   decision of 2026-10-20, made for ACMM compatibility.
 - `docs/risk-tiers.md`, "Per-tool instruction files": every per-tool
