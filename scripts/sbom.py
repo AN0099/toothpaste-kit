@@ -52,7 +52,6 @@ PACKAGE_NAME = "toothpaste-kit"
 # entry names where it is recorded. A tag pin not listed here fails; the list
 # is meant to shrink, and a new entry needs the same kind of record.
 KNOWN_TAG_PINS = {
-    "actions/checkout@v7": "docs/security-posture.md row 3.7 (Actions pinned by digest: Not done)",
 }
 
 # The tag patterns are not this file's own tags, so REUSE skips them.
@@ -520,7 +519,7 @@ def selftest():
         ("an action pinned by a short SHA", step("actions/setup-python@1111111"), "is not pinned"),
         ("an action pinned by branch", step("actions/setup-python@main"), "is not pinned"),
         ("an action with no ref", step("actions/setup-python"), "is not pinned"),
-        ("the known tag pin's action at another tag", step("actions/checkout@v8"), "actions/checkout@v8 is not pinned"),
+        ("checkout by tag, the exception row 3.7 closed", step("actions/checkout@v7"), "actions/checkout@v7 is not pinned"),
         ("a quoted tag pin", step('"actions/setup-python@v5"'), "is not pinned"),
         ("a docker action by tag", step("docker://alpine:3.20"), "docker://alpine:3.20 is not pinned"),
     ]
@@ -546,8 +545,10 @@ def selftest():
         ("`*` does not cross a directory", lambda t: (t.__setitem__("data/sub/e.json", "{}\n"), toml_add(
             'path = "data/*.json"\nprecedence = "override"\nSPDX-FileCopyrightText = "2026 Top"\nSPDX-License-Identifier = "Apache-2.0"\n')(t)),
          "data/sub/e.json", ["2026 T"], ["Apache-2.0"]),
-        ("the known tag pin", step("actions/checkout@v7"), "a.py", ["2026 T"], ["Apache-2.0"]),
+        ("checkout by commit SHA", step("actions/checkout@" + "3" * 40), "a.py", ["2026 T"], ["Apache-2.0"]),
         ("a docker action by digest", step("docker://alpine@sha256:" + "a" * 64), "a.py", ["2026 T"], ["Apache-2.0"]),
+        ("a tag pin KNOWN_TAG_PINS records", lambda t: (KNOWN_TAG_PINS.__setitem__("example/known@v1", "test record"),
+                                                        step("example/known@v1")(t)), "a.py", ["2026 T"], ["Apache-2.0"]),
     ]
 
     def make(edit):

@@ -81,8 +81,7 @@ skill lives in that skill's own `CHANGELOG.md`.
   tree, with every REUSE-covered file's copyright and licence and every
   workflow action by its pinned ref. It exits 1 on a file with no licence or
   copyright, a licence with no text under `LICENSES/`, or an action not pinned
-  by commit SHA, except `actions/checkout@v7`, recorded in
-  `docs/security-posture.md` row 3.7. `scripts/gates.sh` runs its selftest
+  by commit SHA. `scripts/gates.sh` runs its selftest
   and then the script on the tree as gate 19.
 - `security-insights.yml` (pull request #76): an OpenSSF Security Insights
   file at the kit root, following schema version 2.2.0, that describes the
@@ -102,6 +101,10 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- Every workflow pins `actions/checkout` by the commit SHA of its v7.0.1 tag
+  instead of the `v7` tag, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty,
+  so gate 19 now fails any action pinned by tag.
+  `docs/security-posture.md` row 3.7 is closed, with sections 3, 5 and 8 updated.
 - `docs/acmm.md` cites the paper that defines the model, separates the three
   sets of level names in use, and states level 5 as the kit's ceiling, since a
   person merges every pull request.

@@ -122,7 +122,7 @@ whether the tests pass on more than one system, and a record of each session.
   issue #42.
 
 Changed alongside: [security posture](security-posture.md#3-build-release-and-provenance) row 3.7
-now covers `ci.yml` among the workflows that pin `actions/checkout` by tag, and `scripts/reorient`
+then covered `ci.yml` among the workflows that pin `actions/checkout` by tag, and `scripts/reorient`
 now parses under bash 3.2.
 
 ## L4: the first change
