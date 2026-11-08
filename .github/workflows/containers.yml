@@ -14,7 +14,7 @@ name: containers
 # times slower. Docker builds here because both runner images ship it; the
 # Containerfile in each directory is the one podman builds locally.
 #
-# The verification image also runs compliance and a CodeQL scan. The scan
+# The verification image also runs compliance, the schema checks and a CodeQL scan. The scan
 # exits 1 when it finds any alert, and main carries dismissed alerts, so the
 # step passes on 0 or 1 with both per-language counts printed, and fails on
 # 2, an analysis that did not finish. Comparing alerts is CodeQL's own job
@@ -60,12 +60,13 @@ jobs:
       - name: Build the verification image
         run: docker build -t kit-verify -f containers/verify/Containerfile containers/verify
 
-      - name: Gates and compliance selftests in the verification image
+      - name: Gates, compliance and schema selftests in the verification image
         run: |
           docker run --rm --network=none -v "$PWD:/src:ro" kit-verify \
             sh -c 'uname -m && codeql version --format=terse \
               && cp -a /src /tmp/work && cd /tmp/work \
-              && ./scripts/gates.sh --selftest && ./scripts/compliance.sh --require --selftest'
+              && ./scripts/gates.sh --selftest && ./scripts/compliance.sh --require --selftest \
+              && ./scripts/schemas.sh --selftest'
 
       - name: Coverage floors in the verification image
         run: |

@@ -30,10 +30,10 @@ that a reader can go and form one.
 | 2.3 Code of conduct | Present | `CODE_OF_CONDUCT.md`, with a real reporting address. States plainly that there is one maintainer and no independent escalation body, and asks a reporter to name an acceptable third party if the report concerns the maintainer |
 | 2.4 Contribution guide | Present | `CONTRIBUTING.md`, which names the script that enforces its own mechanical rules |
 | 2.5 Governance, decision process, roles | Present | `GOVERNANCE.md`. One maintainer, bus factor one stated as a known risk, merges and tags and pushes not delegated |
-| 2.6 Citation metadata | Present | `CITATION.cff`, with `version` and `date-released` set in each release's tagged tree by `docs/releasing.md` step 3 |
+| 2.6 Citation metadata | Present, validated | `CITATION.cff`, with `version` and `date-released` set in each release's tagged tree by `docs/releasing.md` step 3. `scripts/schemas.sh` validates it against the Citation File Format 1.2.0 schema, pinned by digest in the verification image, on every pull request (`.github/workflows/containers.yml`) |
 | 2.7 Issue templates | Present | Four files under `.github/ISSUE_TEMPLATE/` |
 | 2.8 Project state, current | Present | `docs/project-state.md`, which carries its own last-updated date so a reader can judge staleness |
-| 2.9 Security Insights file | Present, fields checked by hand | `security-insights.yml` at the repository root, following OpenSSF Security Insights schema version 2.2.0. Every value is taken from a file in this tree or is a link to a file in it, except the header dates and schema version, which describe the file, and `bug-bounty-available: false`, which the maintainer states; an optional field with nothing behind it is left out. No tool validates it against the schema, and no gate reads it |
+| 2.9 Security Insights file | Present, validated against the schema | `security-insights.yml` at the repository root, following OpenSSF Security Insights schema version 2.2.0. Every value is taken from a file in this tree or is a link to a file in it, except the header dates and schema version, which describe the file, and `bug-bounty-available: false`, which the maintainer states; an optional field with nothing behind it is left out. `scripts/schemas.sh` validates it against the published 2.2.0 schema (CUE, pinned by digest in the verification image) on every pull request, closed, so an undefined field fails. That checks structure and patterns, not that a value is true |
 
 ## 3. Build, release and provenance
 

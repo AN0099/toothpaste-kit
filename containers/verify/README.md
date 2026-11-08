@@ -23,6 +23,8 @@ that each tool reports the version pinned for it.
 | actionlint | 1.7.12 | Release binary, by digest | The newest release at least 14 days old on 2026-10-31 |
 | check-jsonschema | 0.38.2 | pip, by hash | The newest release at least 14 days old on 2026-10-31 |
 | CUE | 0.17.1 | Release binary, by digest | The newest release at least 14 days old on 2026-10-31 |
+| Security Insights schema | 2.2.0 | `spec/schema.cue` from the commit tag `v2.2.0` points at, by digest, in `/opt/schemas/` | The schema version `security-insights.yml` declares; upstream publishes CUE only |
+| Citation File Format schema | 1.2.0 | `schema.json` from the commit tag `1.2.0` points at, by digest, in `/opt/schemas/` | The `cff-version` `CITATION.cff` declares |
 
 Only reuse has a version CI also pins. CodeQL follows the version GitHub runs instead, because a
 different release reports different alerts on the same tree: 2.27.2 missed a `py/xml-bomb` alert
