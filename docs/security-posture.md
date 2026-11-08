@@ -47,7 +47,7 @@ that a reader can go and form one.
 | 3.4 Signed releases | Present, and signed by two parties | SSH commit and tag signing, with a signing key held separately from the authentication key. `commit.gpgsign` and `tag.gpgsign` are both true. The default branch ruleset carries `required_signatures`, so an unsigned commit is rejected at the remote rather than merely discouraged; twelve commits were rejected on the first push attempt for exactly this reason. The `v0.1.0` tag verifies locally as a good ED25519 signature and the API reports `verified=true, reason=valid`. **Every authored commit in the 0.1.0 set verifies locally. The merge commit does not, and this row previously claimed otherwise.** `91959631` was produced by merging through the web interface, so it carries GitHub's signature rather than the maintainer's: `git log --format=%G?` reports `E`, cannot check, because that key is not in the local allowed signers file, while the API reports `verified=true`. Both statements are correct and they are about different signers. `E` here means an unknown signer and not a bad signature, which is the same distinction `docs/releasing.md` step 5 draws for tags. The trust anchor for that one commit is the forge, not the maintainer |
 | 3.5 Reproducible build | Not applicable | The kit ships documents and the scripts in `scripts/`, all shell or Python, with their test fixtures and data. There is no build |
 | 3.6 Dependency declaration | Present, and small by nature | `.github/dependabot.yml`, github-actions only. The repository ships no package manifest, so the surface is this small |
-| 3.7 Actions pinned by digest | **Not done** | Every workflow that checks out the tree uses `actions/checkout@v7`, a tag rather than a digest. `labeler.yml` checks nothing out and pins `actions/labeler` by digest; `ai-fix.yml` uses no action. The two older ones were raised from v4 by Dependabot on 2026-09-19 after Node 20 was deprecated for actions, and `ci.yml` was written at v7. Tag pinning is mutable, and a version bump does not change that: v7 is as mutable as v4 was. Resolving it needs the current digest, which has to be read from the upstream repository rather than guessed. **`v0.1.0` shipped with v4**, since the bump landed after the release merge and the tag deliberately points at that merge rather than at the tip |
+| 3.7 Actions pinned by digest | Present | Every workflow that checks out the tree pins `actions/checkout` by the full commit SHA of its v7.0.1 tag, `3d3c42e5aac5ba805825da76410c181273ba90b1`, read from the upstream repository, with the version as a comment that Dependabot updates with the SHA. `labeler.yml` checks nothing out and pins `actions/labeler` by digest; `ai-fix.yml` uses no action. Gate 19 fails any action not pinned by a full commit SHA, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty. **`v0.1.0` shipped with `actions/checkout@v4`** and releases up to this change with `@v7`, both tags |
 
 ### The software bill of materials
 
@@ -58,10 +58,9 @@ file's own tags, a `.license` sidecar, or an annotation in `REUSE.toml`. It
 also lists every action a workflow in `.github/workflows/` uses, by the ref it
 is pinned to. Gate 19 runs it on the tree, so a file with no licence or no
 copyright, a licence with no text under `LICENSES/`, or an action not pinned
-by a full commit SHA fails CI. The one exception is `KNOWN_TAG_PINS` in the
-script, which holds `actions/checkout@v7` and points at row 3.7. Closing row
-3.7 means pinning the digest and deleting that entry, and the gate then fails
-any tag pin. Before printing, the script checks its output's shape
+by a full commit SHA fails CI. `KNOWN_TAG_PINS` in the script is where a
+recorded exception would go, and it is empty since row 3.7 closed, so the gate
+fails any tag pin. Before printing, the script checks its output's shape
 against the SPDX 3.0.1 model: types, required and allowed properties, unique
 IDs, references, vocabularies and package URLs. It does not expand the JSON-LD
 context, run the model's SHACL shapes, check a licence id against the SPDX
@@ -121,7 +120,7 @@ link destination is a defect in `mdlint.py` and is not fixed here.
   lines it reaches, so there is no coverage figure for a badge to report.
 - **An OpenSSF Scorecard badge.** Scorecard measures branch protection, pinned
   dependencies and signed releases among others. Row 3.7, Actions pinned by
-  digest, is still open. The badge is worth adding once it closes, not before.
+  digest, has closed, so the badge is now worth adding; it is not added yet.
 - **A maintenance or activity badge.** `GOVERNANCE.md` states one maintainer
   and a bus factor of one, which is the same fact without the implication that
   a project's health is a colour.
@@ -192,10 +191,11 @@ is missing is the mapping, and inventing criterion IDs from memory would produce
 a document that looks authoritative and cites nothing real. That is the failure
 mode this project names most often.
 
-**What is already true regardless of the mapping:** one blocker is left,
-actions pinned by tag rather than digest (row 3.7), and it needs an upstream
-digest read. The other two are closed: row 3.2 records a tagged release, and
-row 4.6 records which checks bind on the default branch.
+**What is already true regardless of the mapping:** rows 3.7, 3.2 and 4.6
+leave no blocker. Row 3.7 pins every action by commit SHA, row 3.2 records a
+tagged release, and row 4.6 records which checks bind on the default branch.
+The Best Practices Badge still has two criteria short, recorded in
+[project state](project-state.md) as TK-071.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
