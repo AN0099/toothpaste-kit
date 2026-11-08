@@ -7,6 +7,13 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `scripts/schemas.sh`: validates `security-insights.yml` against Security
+  Insights 2.2.0 and `CITATION.cff` against Citation File Format 1.2.0. The
+  verification image downloads both schemas from the commit each release tag
+  points at, checked by digest, and the script checks the digests again. Its
+  selftest rejects planted bad files, a schema with the wrong digest and a
+  missing tool, each only when its own rejection message appears. `.github/workflows/containers.yml` runs it on linux/amd64 and
+  linux/arm64. The image is now `localhost/kit-verify:v6`.
 - `.github/workflows/scorecard.yml` and an OpenSSF Scorecard badge in
   `README.md`. Scorecard runs weekly and on pushes to `main`, publishes its
   result for the badge and uploads it to code scanning. Both new actions are
