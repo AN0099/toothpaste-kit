@@ -47,7 +47,7 @@ that a reader can go and form one.
 | 3.4 Signed releases | Present, and signed by two parties | SSH commit and tag signing, with a signing key held separately from the authentication key. `commit.gpgsign` and `tag.gpgsign` are both true. The default branch ruleset carries `required_signatures`, so an unsigned commit is rejected at the remote rather than merely discouraged; twelve commits were rejected on the first push attempt for exactly this reason. The `v0.1.0` tag verifies locally as a good ED25519 signature and the API reports `verified=true, reason=valid`. **Every authored commit in the 0.1.0 set verifies locally. The merge commit does not, and this row previously claimed otherwise.** `91959631` was produced by merging through the web interface, so it carries GitHub's signature rather than the maintainer's: `git log --format=%G?` reports `E`, cannot check, because that key is not in the local allowed signers file, while the API reports `verified=true`. Both statements are correct and they are about different signers. `E` here means an unknown signer and not a bad signature, which is the same distinction `docs/releasing.md` step 5 draws for tags. The trust anchor for that one commit is the forge, not the maintainer |
 | 3.5 Reproducible build | Not applicable | The kit ships documents and the scripts in `scripts/`, all shell or Python, with their test fixtures and data. There is no build |
 | 3.6 Dependency declaration | Present, and small by nature | `.github/dependabot.yml`, github-actions only. The repository ships no package manifest, so the surface is this small |
-| 3.7 Actions pinned by digest | Present | Every workflow that checks out the tree pins `actions/checkout` by the full commit SHA of its v7.0.1 tag, `3d3c42e5aac5ba805825da76410c181273ba90b1`, read from the upstream repository, with the version as a comment that Dependabot updates with the SHA. `labeler.yml` checks nothing out and pins `actions/labeler` by digest; `ai-fix.yml` uses no action. Gate 19 fails any action not pinned by a full commit SHA, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty. **`v0.1.0` shipped with `actions/checkout@v4`** and releases up to this change with `@v7`, both tags |
+| 3.7 Actions pinned by digest | Present | Every workflow that checks out the tree pins `actions/checkout` by the full commit SHA of its v7.0.1 tag, `3d3c42e5aac5ba805825da76410c181273ba90b1`, read from the upstream repository, with the version as a comment that Dependabot updates with the SHA. `labeler.yml` checks nothing out and pins `actions/labeler` by digest; `scorecard.yml` pins `ossf/scorecard-action` and `github/codeql-action/upload-sarif` the same way; `ai-fix.yml` uses no action. Gate 19 fails any action not pinned by a full commit SHA, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty. **`v0.1.0` shipped with `actions/checkout@v4`** and releases up to this change with `@v7`, both tags |
 
 ### The software bill of materials
 
@@ -99,6 +99,7 @@ that says more than the badge does.
 | 5.5 Software Heritage archive | That an archived snapshot of this origin exists | Which commit was archived, and when. The badge tracks the origin rather than any tag, so it can be green while the archived snapshot predates the newest release |
 | 5.6 OpenSSF Best Practices | That the questionnaire has been answered and what level those answers reach | That the answers were checked by anyone other than this project. The questionnaire is self assessed, and the rows in section 3 of this document are where a reader can disagree with it |
 | 5.7 REUSE status | That the REUSE service found a copyright and a licence declared for every file when it last checked this repository | That the current tree still passes, which `.github/workflows/compliance.yml` checks with `reuse lint` on every pull request and every push to `main`, or anything about who holds the copyright, which `CITATION.cff` names |
+| 5.8 OpenSSF Scorecard | The score Scorecard last published for the default branch, from `.github/workflows/scorecard.yml` | That the checks behind it are the ones a reader cares about, or that a low check is a defect: Code-Review, for one, scores a single-maintainer project low by design (row 6.2). The per-check results are in the linked viewer and in code scanning |
 
 Alt text on a status badge names the indicator rather than its value, because
 the image is served by a third party and changes while the text in the
@@ -118,9 +119,6 @@ link destination is a defect in `mdlint.py` and is not fixed here.
 - **A coverage badge.** The test suite is `scripts/gates.sh --selftest`, per
   `tests/README.md`. It shows each gate able to fire rather than measuring the
   lines it reaches, so there is no coverage figure for a badge to report.
-- **An OpenSSF Scorecard badge.** Scorecard measures branch protection, pinned
-  dependencies and signed releases among others. Row 3.7, Actions pinned by
-  digest, has closed, so the badge is now worth adding; it is not added yet.
 - **A maintenance or activity badge.** `GOVERNANCE.md` states one maintainer
   and a bus factor of one, which is the same fact without the implication that
   a project's health is a colour.

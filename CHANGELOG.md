@@ -7,6 +7,11 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `.github/workflows/scorecard.yml` and an OpenSSF Scorecard badge in
+  `README.md`. Scorecard runs weekly and on pushes to `main`, publishes its
+  result for the badge and uploads it to code scanning. Both new actions are
+  pinned by commit SHA, which row 3.7 of `docs/security-posture.md` needed
+  first; section 5 no longer lists the badge as absent.
 - `orchestration/protocol.md` and `orchestration/templates/relay-message.md`:
   a faculty-consultation format. A Claude-tier agent consulting a faculty
   gets a reply under eight plain Markdown headers (Task, Output status, Key
