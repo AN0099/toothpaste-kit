@@ -327,7 +327,8 @@ def build(repo, files, actions):
 # nothing is fetched), the model's SHACL shapes as such (rules here are
 # restated from the model, not read from its shape file), whether a licence
 # expression parses or its ids are on the SPDX licence list, and anything a
-# type outside this script's output would need.
+# type outside this script's output would need. scripts/sbom-shapes.py runs the
+# shapes and checks the ids, in the verification image.
 ELEMENT_PROPS = {"type", "spdxId", "creationInfo", "name", "comment", "description", "summary"}
 SHAPES = {
     # type: (required beyond the element core, optional)

@@ -23,8 +23,11 @@ that each tool reports the version pinned for it.
 | actionlint | 1.7.12 | Release binary, by digest | The newest release at least 14 days old on 2026-10-31 |
 | check-jsonschema | 0.38.2 | pip, by hash | The newest release at least 14 days old on 2026-10-31 |
 | CUE | 0.17.1 | Release binary, by digest | The newest release at least 14 days old on 2026-10-31 |
+| pyshacl | 0.40.1, with rdflib 7.6.0 | pip, by hash | The newest release at least 14 days old on 2026-11-08 |
 | Security Insights schema | 2.2.0 | `spec/schema.cue` from the commit tag `v2.2.0` points at, by digest, in `/opt/schemas/` | The schema version `security-insights.yml` declares; upstream publishes CUE only |
 | Citation File Format schema | 1.2.0 | `schema.json` from the commit tag `1.2.0` points at, by digest, in `/opt/schemas/` | The `cff-version` `CITATION.cff` declares |
+| SPDX model and JSON-LD context | 3.0.1 | `spdx-model.ttl` and `spdx-context.jsonld` from `spdx.org/rdf/3.0.1/`, by digest, in `/opt/schemas/` | The version `scripts/sbom.py` emits |
+| SPDX licence list | 3.29.0 | `json/licenses.json` and `json/exceptions.json` from the commit tag `v3.29.0` points at, by digest, in `/opt/schemas/` | The newest release at least 14 days old on 2026-11-08 |
 
 Only reuse has a version CI also pins. CodeQL follows the version GitHub runs instead, because a
 different release reports different alerts on the same tree: 2.27.2 missed a `py/xml-bomb` alert

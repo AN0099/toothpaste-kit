@@ -75,6 +75,7 @@ RUN codeql version --format=terse | grep -qx '2.27.4' \
  && reuse --version | grep -q '6.2.0' \
  && yamllint --version | grep -qx 'yamllint 1.38.0' \
  && check-jsonschema --version | grep -q '0.38.2' \
+ && python3 -c 'import pyshacl, sys; sys.exit(pyshacl.__version__ != "0.40.1")' \
  && codeql resolve packs | grep -E 'codeql/(python|actions)-queries' > /opt/codeql-packs.txt
 
 # The published schemas scripts/schemas.sh validates against, each from the
@@ -84,6 +85,14 @@ RUN codeql version --format=terse | grep -qx '2.27.4' \
 # before it uses them.
 ADD --checksum=sha256:4e4b61470b5484fc8969f2a8a77ffbe0712a7c8a870c2079188f246c14cd58b1 https://raw.githubusercontent.com/ossf/security-insights/701ac2a02ef17fc8b316f5df685428773c51372a/spec/schema.cue /opt/schemas/security-insights-2.2.0.cue
 ADD --checksum=sha256:0b8d22140da702d766df318dcff3a91af2f39521298dcf36d76315fd99cc169b https://raw.githubusercontent.com/citation-file-format/citation-file-format/396f738fb025b1d8acdb02a56ffc923f95dc8999/schema.json /opt/schemas/cff-1.2.0.json
+# The SPDX 3.0.1 model and context scripts/sbom-shapes.py validates against,
+# from the versioned URLs SPDX publishes them at, and the licence list from the
+# commit its release tag points at, each checked by digest. They hold no code and
+# are the same on every architecture.
+ADD --checksum=sha256:30ebb4af2d70a9809044ef46f44cc3dc5125226d70f818a50ed2e1d5f404c593 https://spdx.org/rdf/3.0.1/spdx-model.ttl /opt/schemas/spdx-3.0.1-model.ttl
+ADD --checksum=sha256:c72b0928f094c83e5c127784edb1ebca2af74a104fcacc007c332b23cbc788bd https://spdx.org/rdf/3.0.1/spdx-context.jsonld /opt/schemas/spdx-3.0.1-context.jsonld
+ADD --checksum=sha256:47d1cc681abe31166b342b6cc4aab13a6ba8ea5c48794697fe3bf8b1dbaf509a https://raw.githubusercontent.com/spdx/license-list-data/31ba1a50e5397e00a304dbadc76531740e89ee48/json/licenses.json /opt/schemas/spdx-licenses-3.29.0.json
+ADD --checksum=sha256:59ee7c150de521d635cbf9367b8cf543b8da6781ea3ac1c073d305524f84ada2 https://raw.githubusercontent.com/spdx/license-list-data/31ba1a50e5397e00a304dbadc76531740e89ee48/json/exceptions.json /opt/schemas/spdx-exceptions-3.29.0.json
 RUN chmod 0755 /opt/schemas && chmod 0644 /opt/schemas/*
 
 COPY codeql-scan /usr/local/bin/codeql-scan
