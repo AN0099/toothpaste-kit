@@ -3,7 +3,13 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
-## Unreleased
+## 0.6.0 (2026-11-10)
+
+A MINOR release under `docs/releasing.md`. Review rounds, a bill of materials,
+SPDX provenance, a Security Insights file, the kit blog and two
+multi-architecture containers arrive; `scripts/gates.sh` goes from fourteen
+gates to twenty-one; and each Python script the gates selftest runs now holds
+a coverage floor. No skill is added and no skill revision is BREAKING.
 
 ### Added
 
@@ -88,8 +94,7 @@ skill lives in that skill's own `CHANGELOG.md`.
   file at the kit root, following schema version 2.2.0, that describes the
   kit's security arrangements in a form tools read. `docs/security-posture.md`
   row 2.9 records where each value comes from.
-
-- Review rounds (TK-081): three JSON schemas in `orchestration/schemas/round/`
+- Review rounds (pull request #80): three JSON schemas in `orchestration/schemas/round/`
   for a round's packet, the reviewer's report and the operator's decision;
   `scripts/round-check.py`, which validates a round directory against them and
   checks the invariants that span the records (a reviewer never verifies their
@@ -154,7 +159,8 @@ skill lives in that skill's own `CHANGELOG.md`.
 - The `pr-body`, `dco` and `commit-attribution` jobs (pull request #72) report
   under those names. All three reported as `check` before, so a required
   `check` was met by whichever ran; each can now be required on its own.
-
+- `docs/security-posture.md` records the seven required checks the ruleset
+  binds (pull request #75).
 - The pull request template's "Drafted with an agent?" section is one box,
   ticked, or replaced by a "No." line. The unticked Yes or No box had
   counted as an open task, so every merged pull request showed one task
@@ -189,16 +195,43 @@ skill lives in that skill's own `CHANGELOG.md`.
   did. The `finding-id-unique` plant now differs from the finding it
   duplicates, and the report's ids are kept as a set, which removes a mutant
   the selftest could not tell apart.
+- Stale claims corrected in 26 documents, skills and hook rules (pull
+  request #82), after sweeps of the security posture, `README.md`,
+  `CONTRIBUTING.md` and `GOVERNANCE.md` (pull requests #77 to #79).
 - `containers/verify/requirements.txt`: certifi 2026.10.18, whose CA bundle drops
   the emSign roots with compromised intermediate keys (Dependabot alert 1). The
   image runs with no network, so its checks made no TLS connection through the
   old bundle. The image is now `localhost/kit-verify:v4`.
 
+### Known accessibility limitations
+
+- `docs/accessibility.md` is a working draft and a research position. The tooling in its sections 2
+  to 4 is not a deployed configuration.
+- The accessibility of produced artifacts beyond this repository's own Markdown, PDF/UA and the
+  document pipeline included, is not covered.
+- The blog's generated HTML and RSS feed have had no separate accessibility check.
+- This release makes no accessibility conformance or certification claim.
+
 ### Skill revisions
 
-- `orient` v4, `session-log` v4, `session-close` v7 (pull request #65): each
-  points at the kit's shipped `examples/workspace/CLAUDE.md`, and `orient`
-  names `scripts/` and `bin/` where a tree has no justfile.
+- `commands` v3 to v4.
+- `daily-dashboard` v1 to v2.
+- `daily-review` v4 to v5.
+- `document-standards` v5 to v6.
+- `jot` v1 to v2.
+- `merge-proxy` v1 to v2.
+- `monthly-review` v2 to v3.
+- `orient` v3 to v4.
+- `redaction-gate` v3 to v4.
+- `session-close` v6 to v7.
+- `session-log` v3 to v4.
+- `skill-creation` v2 to v3.
+- `skill-discovery` v1 to v2.
+- `surface-regimes` v4 to v5.
+- `technical-documents` v3 to v4.
+- `touch` v1 to v2.
+- `weekly-review` v2 to v3.
+- `working-preferences` v6 to v7.
 
 ## 0.5.0 (2026-10-27)
 

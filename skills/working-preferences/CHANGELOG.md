@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v7
+
+The frontmatter description is shortened to fit the description gate (pull request #63). No change
+to when the skill fires or to its procedure.
+
+`dl` joins the list of lowercase forms that take an argument (pull request #82).
+
 ## v6
 
 One line points to `skill-creation` for making a skill and `skill-discovery` for deciding

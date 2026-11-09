@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v4
+
+The frontmatter description is shortened to fit the description gate (pull request #63). No change
+to when the skill fires or to its procedure.
+
 ## v3 (was v2.1)
 
 Restored the Step 4 rule on load-bearing content, which was absent from the

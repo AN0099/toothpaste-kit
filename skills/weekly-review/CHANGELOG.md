@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v3
+
+The frontmatter description is shortened to fit the description gate (pull request #63). No change
+to when the skill fires or to its procedure.
+
 ## v2
 
 The Scope Pointer names `monthly-review` as part of the kit, now that it ships. No change to the

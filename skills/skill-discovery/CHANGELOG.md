@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2
+
+The frontmatter description is shortened to fit the description gate (pull request #63). No change
+to when the skill fires or to its procedure.
+
+The family's size is read from the `skills/` tables in `README.md` in place of a stale count (pull
+request #82).
+
 ## v1 (initial generation)
 
 Built alongside `skill-creation`. That skill governs the shape of a new skill file; this one
