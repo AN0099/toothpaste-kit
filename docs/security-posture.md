@@ -63,9 +63,11 @@ recorded exception would go, and it is empty since row 3.7 closed, so the gate
 fails any tag pin. Before printing, the script checks its output's shape
 against the SPDX 3.0.1 model: types, required and allowed properties, unique
 IDs, references, vocabularies and package URLs. It does not expand the JSON-LD
-context, run the model's SHACL shapes, check a licence id against the SPDX
-licence list, or compare the files with what REUSE itself reports, which
-`scripts/compliance.sh` does.
+context or compare the files with what REUSE itself reports, which
+`scripts/compliance.sh` does. `scripts/sbom-shapes.py` then runs the published
+SPDX 3.0.1 SHACL shapes on the document and checks each licence id against the
+SPDX licence list, both pinned by digest in the verification image, on every
+pull request (`.github/workflows/containers.yml`).
 
 ## 4. Automated checks
 

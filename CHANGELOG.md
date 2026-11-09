@@ -7,6 +7,14 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `scripts/sbom-shapes.py`: validates the bill of materials against the
+  published SPDX 3.0.1 SHACL shapes with pyshacl, and each licence id against
+  the SPDX licence list 3.29.0. The verification image downloads the model,
+  context and list, checked by digest, and the script checks the digests again.
+  Its selftest rejects planted documents, files with the wrong digest and a
+  missing tool, each only when the message its plant names appears.
+  `.github/workflows/containers.yml` runs it on linux/amd64 and linux/arm64.
+  The image is now `localhost/kit-verify:v7`.
 - `scripts/bcp14-check.py`, gate 22: a Markdown file that uses a BCP 14
   keyword in capitals must name BCP 14, outside code, or be listed as quoting.
   The one file that did not, this changelog, now writes the word in lowercase.

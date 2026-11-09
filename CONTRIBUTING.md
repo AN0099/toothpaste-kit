@@ -70,6 +70,8 @@ Today it runs `reuse lint`, which checks that every file declares a copyright an
 
 The two metadata files that declare a published schema, `security-insights.yml` and `CITATION.cff`, are validated against it by `./scripts/schemas.sh`. The schemas are in the verification image, not this tree, so run it there: `containers/verify/verify . ./scripts/schemas.sh --selftest`.
 
+The bill of materials is validated against the published SPDX 3.0.1 SHACL shapes, and its licence ids against the SPDX licence list, by `./scripts/sbom-shapes.py`, also in the verification image: `containers/verify/verify . ./scripts/sbom-shapes.py --selftest`.
+
 ## Skills
 
 One directory per skill under `skills/`, containing `SKILL.md` and an optional `references/`. Frontmatter requires `name` and `description`.
