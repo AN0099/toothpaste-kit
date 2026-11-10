@@ -176,26 +176,108 @@ surface that was already open.
 sensitivity is governed elsewhere by a stricter rule that is not published
 here, and this document does not describe it.
 
-## 8. The gap between this document and a certification
+## 8. Criterion IDs
 
-This document is organised by control area rather than by criterion ID. The
-criterion lists for both targets have not been transcribed from their published
-source, and inventing IDs from recall would produce a document that looks
-authoritative and cites nothing.
+The two targets' published criteria, mapped onto this document. Each table is keyed
+by criterion so that one with no evidence shows as a row saying so; a column on the
+tables above could not show it. A script compared both tables' IDs with the published
+lists on 2026-11-09, and nothing in CI repeats that; the script is not in this tree.
+States are this project's own reading, checked by nobody outside it.
 
-**What is needed next, and it is one task:** take the current published criteria
-for the two targets, the OpenSSF Project Security Baseline at the maturity level
-being sought and the OpenSSF Best Practices Badge questionnaire, and add a
-criterion ID column to the tables above. The evidence is already gathered; what
-is missing is the mapping, and inventing criterion IDs from memory would produce
-a document that looks authoritative and cites nothing real. That is the failure
-mode this project names most often.
+### OpenSSF Project Security Baseline
 
-**What is already true regardless of the mapping:** rows 3.7, 3.2 and 4.6
-leave no blocker. Row 3.7 pins every action by commit SHA, row 3.2 records a
-tagged release, and row 4.6 records which checks bind on the default branch.
-The Best Practices Badge still has two criteria short, recorded in
-[project state](project-state.md) as TK-071.
+Target: **Level 2**, from release v2026.08.28 of `ossf/security-baseline`, commit
+`a26a7963f6fd098c1e82829322ec9e1196a4f294`. Level 3 is out of reach as governed:
+OSPS-QA-07.01 requires a non-author human's approval before a commit reaches the
+primary branch, and `GOVERNANCE.md` states one maintainer. The table holds every
+requirement that applies at Level 1 or Level 2: 24 at Level 1 and 19 added at Level 2.
+OSPS-BR-07.01 and OSPS-VM-02.01 list Level 1 only upstream and are kept as standing at Level 2.
+OSPS-BR-01.02, retired upstream, is left out. Settings were read from the API on
+2026-11-08. The questionnaire's own Baseline series on bestpractices.dev is unanswered,
+so its Baseline figure stays 0 percent.
+
+| Requirement | Level | State | Evidence |
+|---|---|---|---|
+| OSPS-AC-01.01 | 1 | Not verifiable from the tree | Row 6.4, an account setting |
+| OSPS-AC-02.01 | 1 | Not applicable today | Row 6.5, no collaborators. What the forge gives a new collaborator by default was not checked |
+| OSPS-AC-03.01 | 1 | Met, by reading | Row 6.1, from one refused push of a commit with no CodeQL results. A push of a commit already holding passing checks was not tried, and the ruleset has no `pull_request` rule |
+| OSPS-AC-03.02 | 1 | Met | Row 6.1: the ruleset carries a `deletion` rule, read from the API |
+| OSPS-AC-04.01 | 2 | Met | Row 4.4; the repository's default workflow permission reads `read`, from the API |
+| OSPS-BR-01.01 | 1 | Met, by reading | Workflows pass event fields through `env:`, never into a `run:` line; `scripts/check-branch-name` checks the head ref in `gates.yml` |
+| OSPS-BR-01.03 | 1 | Met, by reading | Only `labeler.yml` runs on `pull_request_target`, and it never checks out the pull request's code (its header) |
+| OSPS-BR-02.01 | 2 | Met | Row 3.1 |
+| OSPS-BR-03.01 | 1 | Met | Every channel `security-insights.yml` lists is `https` |
+| OSPS-BR-03.02 | 1 | Met | Git and releases over GitHub's TLS and SSH; row 3.4 for signatures |
+| OSPS-BR-04.01 | 2 | Met | Row 3.3 |
+| OSPS-BR-05.01 | 2 | Met | `pip --require-hashes` in `containers/verify/`; `npx` at a pinned version in `gates.yml`; actions pinned by digest, row 3.7 |
+| OSPS-BR-06.01 | 2 | Met | Row 3.4: the release is a signed tag and carries no separate assets |
+| OSPS-BR-07.01 | 1 | Met | Secret scanning and push protection read enabled from the API |
+| OSPS-DO-01.01 | 1 | Met | `docs/quickstart.md`, `docs/installing.md` |
+| OSPS-DO-02.01 | 1 | Met | Row 2.7, `CONTRIBUTING.md` |
+| OSPS-DO-06.01 | 2 | Met, by reading | `containers/verify/README.md` and section 7. `scorecard.yml` uses `ossf/scorecard-action`, which section 7's rule against a third party action does not allow |
+| OSPS-DO-07.01 | 2 | Not applicable | Row 3.5, there is no build; `docs/installing.md` covers setup |
+| OSPS-GV-01.01 | 2 | Met | Row 2.5, one maintainer |
+| OSPS-GV-01.02 | 2 | Met | Row 2.5 |
+| OSPS-GV-02.01 | 1 | Met | Issues and discussions read enabled from the API |
+| OSPS-GV-03.01 | 1 | Met | Row 2.4 |
+| OSPS-GV-03.02 | 2 | Met | Row 2.4 |
+| OSPS-LE-01.01 | 2 | Met | Rows 4.3 and 4.6: `dco` is a required check; bot accounts are exempt |
+| OSPS-LE-02.01 | 1 | Met | Row 2.1 |
+| OSPS-LE-02.02 | 1 | Met | Row 2.1 |
+| OSPS-LE-03.01 | 1 | Met | Row 2.1, `LICENSES/` |
+| OSPS-LE-03.02 | 1 | Met | Row 2.1: a release is the source tree |
+| OSPS-QA-01.01 | 1 | Met | The repository is public at a static URL |
+| OSPS-QA-01.02 | 1 | Met | The public git history |
+| OSPS-QA-02.01 | 1 | Met, by reading | `containers/verify/requirements.txt` for the image's Python tools; `.github/dependabot.yml` tracks the actions only. `markdownlint-cli2`, pinned in `gates.yml`, is in no dependency file |
+| OSPS-QA-03.01 | 2 | Met, by reading | Row 4.6 for the required contexts, eight as read from the API. A job outside them can fail and block nothing; merging past it is read as the manual bypass the text allows |
+| OSPS-QA-04.01 | 1 | Not applicable | One repository |
+| OSPS-QA-05.01 | 1 | Met | All 279 tracked files at `2398909` read as text or JSON by `file --mime-type`, which reads a planted binary as binary |
+| OSPS-QA-05.02 | 1 | Met | As OSPS-QA-05.01 |
+| OSPS-QA-06.01 | 2 | Met | Rows 4.1 and 4.6 |
+| OSPS-SA-01.01 | 2 | **Not met** | `docs/control-layers.md`, a working draft, and `orchestration/` describe actors; nothing demonstrates all actions and actors |
+| OSPS-SA-02.01 | 2 | **Not met** | `docs/interface-contract.md` covers three surfaces, states it is not normative and describes nothing in `scripts/` |
+| OSPS-SA-03.01 | 2 | **Not met** | The tree records no assessment of the most likely and impactful problems. `security-insights.yml` lists this document under `security.assessments.self`; a table of controls is not that assessment |
+| OSPS-VM-01.01 | 2 | Met | Row 2.2, seven days |
+| OSPS-VM-02.01 | 1 | Met | Row 2.2 |
+| OSPS-VM-03.01 | 2 | Met | Row 2.2; private reporting reads enabled from the API |
+| OSPS-VM-04.01 | 2 | Met as a commitment | `SECURITY.md`: an accepted report goes into the affected `CHANGELOG.md`. None has yet; `skills/redaction-gate/CHANGELOG.md` records the v3 fix `SECURITY.md` names as its worked example |
+
+**OSPS-SA-01.01, OSPS-SA-02.01 and OSPS-SA-03.01 are why the target is not reached.**
+OSPS-AC-01.01 is a Level 1 requirement whose state the tree cannot show, so Level 1 is
+not shown met either.
+
+### OpenSSF Best Practices Badge
+
+Project 14726, passing level, the 67 criteria of `criteria/criteria.yml` at
+`coreinfrastructure/best-practices-badge` commit `868e1677339a3fdb48851b0c2ae8862c553115eb`.
+The questionnaire, last updated 2026-09-20 and read 2026-11-08, answers 46 Met,
+16 N/A and 5 Unmet. Those answers are the maintainer's own, per row 5.6.
+They describe the tree of that date and predate 0.5.0: `floss_license` still answers MIT,
+where row 2.1 says Apache 2.0.
+The table names the row holding each criterion's evidence, in whole or in part, and `No row` means the
+questionnaire's justification is the only record.
+
+| Posture row | Criteria |
+|---|---|
+| 2.1 | `floss_license`, `floss_license_osi`, `license_location` |
+| 2.2 | `vulnerability_report_process`, `vulnerability_report_private`, `vulnerability_report_response` |
+| 2.4 | `contribution`, `contribution_requirements` |
+| 2.7 | `report_process`, `report_tracker` |
+| 2.8 | `maintained` |
+| 3.1 | `version_unique`, `version_semver`, `version_tags` |
+| 3.3 | `release_notes`, `release_notes_vulns` |
+| 3.5 | `build`, `build_common_tools`, `build_floss_tools` |
+| 4.1 | `test`, `test_invocation`, `test_continuous_integration`, `warnings`, `warnings_fixed`, `warnings_strict` |
+| 4.2 | `tests_are_added` |
+| 4.5 | `static_analysis`, `static_analysis_common_vulnerabilities`, `static_analysis_often` |
+| 4.9 | `static_analysis_fixed` |
+| 4.10 | `vulnerabilities_fixed_60_days` |
+| 6.1 | `repo_interim` |
+| No row | `report_responses`, `enhancement_responses`, `report_archive`, `delivery_mitm`, `delivery_unsigned`, `description_good`, `interact`, `documentation_basics`, `documentation_interface`, `sites_https`, `discussion`, `english`, `repo_public`, `repo_track`, `repo_distributed`, `test_most`, `test_policy`, `tests_documented_added`, `know_secure_design`, `know_common_errors`, `crypto_published`, `crypto_call`, `crypto_floss`, `crypto_keylength`, `crypto_working`, `crypto_weaknesses`, `crypto_pfs`, `crypto_password_storage`, `crypto_random`, `vulnerabilities_critical_fixed`, `no_leaked_credentials`, `dynamic_analysis`, `dynamic_analysis_unsafe`, `dynamic_analysis_enable_assertions`, `dynamic_analysis_fixed` |
+
+Unmet: `know_secure_design` and `know_common_errors`, both required, are the two criteria
+short of passing, recorded in [project state](project-state.md) as TK-071; `test_most`,
+`dynamic_analysis` and `dynamic_analysis_enable_assertions` are suggested only.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

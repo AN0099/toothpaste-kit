@@ -7,6 +7,10 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `docs/security-posture.md` section 8 now maps the OpenSSF Project Security
+  Baseline, Level 2 named as the target, and the Best Practices Badge's passing
+  criteria by ID, from the published lists at stated commits. OSPS-SA-01.01,
+  OSPS-SA-02.01 and OSPS-SA-03.01 are not met.
 - `scripts/sbom-shapes.py`: validates the bill of materials against the
   published SPDX 3.0.1 SHACL shapes with pyshacl, and each licence id against
   the SPDX licence list 3.29.0. The verification image downloads the model,
