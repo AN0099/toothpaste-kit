@@ -1057,9 +1057,15 @@ PY
   # Gate 20: a tree whose 0.6.0 post has the autolink that failed pages.yml
   # on main at #119 and #120 must fail the gate's build of its posts.
   mkdir -p "$tmp/bp/scripts" && cp scripts/blog.py "$tmp/bp/scripts/" && cp -r blog "$tmp/bp/"
-  sed -i 's|\[kit.bridleworks.org\](https://kit.bridleworks.org/)|<https://kit.bridleworks.org/>|' "$tmp/bp/blog/posts/2026-11-10-v0.6.0.md"
-  (cd "$tmp/bp" && blog_check >/dev/null 2>&1)
-  bad=$?
+  post="$tmp/bp/blog/posts/2026-11-10-v0.6.0.md"
+  sed 's|\[kit.bridleworks.org\](https://kit.bridleworks.org/)|<https://kit.bridleworks.org/>|' blog/posts/2026-11-10-v0.6.0.md > "$post"
+  # A plant that changed nothing would be a clean tree, which proves nothing.
+  if grep -q '<https://kit.bridleworks.org/>' "$post"; then
+    (cd "$tmp/bp" && blog_check >/dev/null 2>&1)
+    bad=$?
+  else
+    bad=0
+  fi
   blog_check >/dev/null 2>&1
   plant_rejected $bad $? "blog gate, a post the builder refuses"
 
