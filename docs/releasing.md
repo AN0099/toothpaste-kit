@@ -283,7 +283,9 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
   The 0.4.0 version DOI is `10.5281/zenodo.23354409`.
 - **0.5.0, cut 2026-10-27.** MINOR, because it adds gates, scripts and
   workflows and changes no interface. It is the first release under Apache 2.0;
-  0.1.0 to 0.4.0 stay MIT.
+  0.1.0 to 0.4.0 stay MIT. The 0.5.0 version DOI is `10.5281/zenodo.23716901`.
+- **0.6.0, cut 2026-11-10.** MINOR, because it adds gates, scripts, workflows
+  and two containers, and no skill revision is BREAKING.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

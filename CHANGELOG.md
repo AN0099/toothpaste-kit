@@ -38,6 +38,46 @@ skill lives in that skill's own `CHANGELOG.md`.
   result for the badge and uploads it to code scanning. Both new actions are
   pinned by commit SHA, which row 3.7 of `docs/security-posture.md` needed
   first; section 5 no longer lists the badge as absent.
+
+### Changed
+
+- Every workflow pins `actions/checkout` by the commit SHA of its v7.0.1 tag
+  instead of the `v7` tag, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty,
+  so gate 19 now fails any action pinned by tag.
+  `docs/security-posture.md` row 3.7 is closed, with sections 3, 5 and 8 updated.
+- `orchestration/`: four files take lowercase names under the repository's
+  naming rule: `roles.md`, `changelog.md`, and in `ingestion/`
+  `conversation-extraction-packet.md` and `vendor-agnostic-digest-spec.md`.
+  Every link, schema description and `scripts/round-check.py` path follows;
+  released entries keep the names the files had then. A skill's own
+  `CHANGELOG.md` keeps its name.
+
+### Fixed
+
+- `orchestration/`: stale claims and text specific to one installation.
+  The README indexes `roles.md`; links to documents the repository does
+  not hold now name ones it does; the three event schemas carry
+  `$id` values with their `schemas/` directory, and a human agent no
+  longer needs `capability` or `regime`; usage quotas, a past incident,
+  dated adoption notes and one setup's worked examples are gone from
+  `routing-threshold.md`, `roles.md` and the ingestion specs; and
+  `rounds.md` gives its mail channel and context thresholds as examples
+  an installation sets.
+- `containers/verify/`: the CodeQL 2.27.4 bundle, the version GitHub's default
+  setup now runs, so a local scan reports the alerts CI reports. The bundle is
+  pinned by digest for linux/amd64 and linux/arm64. The image is now
+  `localhost/kit-verify:v5`.
+
+## 0.6.0 (2026-11-10)
+
+A MINOR release under `docs/releasing.md`. Review rounds, a bill of materials,
+SPDX provenance, a Security Insights file, the kit blog and two
+multi-architecture containers arrive; `scripts/gates.sh` goes from fourteen
+gates to twenty-one; and each Python script the gates selftest runs now holds
+a coverage floor. No skill is added and no skill revision is BREAKING.
+
+### Added
+
 - `orchestration/protocol.md` and `orchestration/templates/relay-message.md`:
   a faculty-consultation format. A Claude-tier agent consulting a faculty
   gets a reply under eight plain Markdown headers (Task, Output status, Key
@@ -112,14 +152,14 @@ skill lives in that skill's own `CHANGELOG.md`.
   tree, with every REUSE-covered file's copyright and licence and every
   workflow action by its pinned ref. It exits 1 on a file with no licence or
   copyright, a licence with no text under `LICENSES/`, or an action not pinned
-  by commit SHA. `scripts/gates.sh` runs its selftest
+  by commit SHA, except `actions/checkout@v7`, recorded in
+  `docs/security-posture.md` row 3.7. `scripts/gates.sh` runs its selftest
   and then the script on the tree as gate 19.
 - `security-insights.yml` (pull request #76): an OpenSSF Security Insights
   file at the kit root, following schema version 2.2.0, that describes the
   kit's security arrangements in a form tools read. `docs/security-posture.md`
   row 2.9 records where each value comes from.
-
-- Review rounds (TK-081): three JSON schemas in `orchestration/schemas/round/`
+- Review rounds (pull request #80): three JSON schemas in `orchestration/schemas/round/`
   for a round's packet, the reviewer's report and the operator's decision;
   `scripts/round-check.py`, which validates a round directory against them and
   checks the invariants that span the records (a reviewer never verifies their
@@ -132,10 +172,6 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
-- Every workflow pins `actions/checkout` by the commit SHA of its v7.0.1 tag
-  instead of the `v7` tag, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty,
-  so gate 19 now fails any action pinned by tag.
-  `docs/security-posture.md` row 3.7 is closed, with sections 3, 5 and 8 updated.
 - `docs/acmm.md` cites the paper that defines the model, separates the three
   sets of level names in use, and states level 5 as the kit's ceiling, since a
   person merges every pull request.
@@ -174,9 +210,9 @@ skill lives in that skill's own `CHANGELOG.md`.
   `gates.sh`. Each new case kills a mutant the old selftest let through.
   `check-hooks.py` now reports a `pattern:` or `operator:` line that comes
   before any `- field:` as a finding, where it used to drop the line.
-- `orchestration/ingestion/vendor-agnostic-digest-spec.md` (pull request #60):
+- `orchestration/ingestion/VENDOR-AGNOSTIC-DIGEST-SPEC.md` (pull request #60):
   one spec, its duplicate sections merged, with
-  `conversation-extraction-packet.md` linked as a fast first pass.
+  `CONVERSATION-EXTRACTION-PACKET.md` linked as a fast first pass.
 - The branch-name hook (pull request #61) sees `push` behind quoted and
   separate-word global options, and lists the forms it still does not catch.
 - The frontmatter gate (pull request #63) checks each skill `description` for
@@ -188,7 +224,8 @@ skill lives in that skill's own `CHANGELOG.md`.
 - The `pr-body`, `dco` and `commit-attribution` jobs (pull request #72) report
   under those names. All three reported as `check` before, so a required
   `check` was met by whichever ran; each can now be required on its own.
-
+- `docs/security-posture.md` records the seven required checks the ruleset
+  binds (pull request #75).
 - The pull request template's "Drafted with an agent?" section is one box,
   ticked, or replaced by a "No." line. The unticked Yes or No box had
   counted as an open task, so every merged pull request showed one task
@@ -197,24 +234,9 @@ skill lives in that skill's own `CHANGELOG.md`.
   except the release itself.
 - `skills/document-standards/references/structural-patterns.md` allows the
   passive in three stated cases, and the table of fixes stands for the rest.
-- `orchestration/`: four files take lowercase names under the repository's
-  naming rule: `roles.md`, `changelog.md`, and in `ingestion/`
-  `conversation-extraction-packet.md` and `vendor-agnostic-digest-spec.md`.
-  Every link, schema description and `scripts/round-check.py` path follows;
-  released entries keep the names the files had then. A skill's own
-  `CHANGELOG.md` keeps its name.
 
 ### Fixed
 
-- `orchestration/`: stale claims and text specific to one installation.
-  The README indexes `roles.md`; links to documents the repository does
-  not hold now name ones it does; the three event schemas carry
-  `$id` values with their `schemas/` directory, and a human agent no
-  longer needs `capability` or `regime`; usage quotas, a past incident,
-  dated adoption notes and one setup's worked examples are gone from
-  `routing-threshold.md`, `roles.md` and the ingestion specs; and
-  `rounds.md` gives its mail channel and context thresholds as examples
-  an installation sets.
 - `scripts/gates.sh`: changes to the kit root, found from its own path
   rather than from git, before any gate runs. Run from another directory,
   `--selftest` had failed 9 plants with messages about the gates ("rejected
@@ -238,20 +260,43 @@ skill lives in that skill's own `CHANGELOG.md`.
   did. The `finding-id-unique` plant now differs from the finding it
   duplicates, and the report's ids are kept as a set, which removes a mutant
   the selftest could not tell apart.
+- Stale claims corrected in 26 documents, skills and hook rules (pull
+  request #82), after sweeps of the security posture, `README.md`,
+  `CONTRIBUTING.md` and `GOVERNANCE.md` (pull requests #77 to #79).
 - `containers/verify/requirements.txt`: certifi 2026.10.18, whose CA bundle drops
   the emSign roots with compromised intermediate keys (Dependabot alert 1). The
   image runs with no network, so its checks made no TLS connection through the
   old bundle. The image is now `localhost/kit-verify:v4`.
-- `containers/verify/`: the CodeQL 2.27.4 bundle, the version GitHub's default
-  setup now runs, so a local scan reports the alerts CI reports. The bundle is
-  pinned by digest for linux/amd64 and linux/arm64. The image is now
-  `localhost/kit-verify:v5`.
+
+### Known accessibility limitations
+
+- `docs/accessibility.md` is a working draft and a research position. The tooling in its sections 2
+  to 4 is not a deployed configuration.
+- The accessibility of produced artifacts beyond this repository's own Markdown, PDF/UA and the
+  document pipeline included, is not covered.
+- The blog's generated HTML and RSS feed have had no separate accessibility check.
+- This release makes no accessibility conformance or certification claim.
 
 ### Skill revisions
 
-- `orient` v4, `session-log` v4, `session-close` v7 (pull request #65): each
-  points at the kit's shipped `examples/workspace/CLAUDE.md`, and `orient`
-  names `scripts/` and `bin/` where a tree has no justfile.
+- `commands` v3 to v4.
+- `daily-dashboard` v1 to v2.
+- `daily-review` v4 to v5.
+- `document-standards` v5 to v6.
+- `jot` v1 to v2.
+- `merge-proxy` v1 to v2.
+- `monthly-review` v2 to v3.
+- `orient` v3 to v4.
+- `redaction-gate` v3 to v4.
+- `session-close` v6 to v7.
+- `session-log` v3 to v4.
+- `skill-creation` v2 to v3.
+- `skill-discovery` v1 to v2.
+- `surface-regimes` v4 to v5.
+- `technical-documents` v3 to v4.
+- `touch` v1 to v2.
+- `weekly-review` v2 to v3.
+- `working-preferences` v6 to v7.
 
 ## 0.5.0 (2026-10-27)
 

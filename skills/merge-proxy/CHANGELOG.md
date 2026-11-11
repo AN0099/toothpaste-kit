@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2
+
+The frontmatter description is shortened to fit the description gate (pull request #63). No change
+to when the skill fires or to its procedure.
+
 ## v1 (initial)
 
 A session-scoped grant that lets an agent run and push a merge into a trunk on a repository whose
