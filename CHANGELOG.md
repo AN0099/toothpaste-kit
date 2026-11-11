@@ -3,6 +3,71 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
+## Unreleased
+
+### Added
+
+- `scripts/sbom-shapes.py`: validates the bill of materials against the
+  published SPDX 3.0.1 SHACL shapes with pyshacl, and each licence id against
+  the SPDX licence list 3.29.0. The verification image downloads the model,
+  context and list, checked by digest, and the script checks the digests again.
+  Its selftest rejects planted documents, files with the wrong digest and a
+  missing tool, each only when the message its plant names appears.
+  `.github/workflows/containers.yml` runs it on linux/amd64 and linux/arm64.
+  The image is now `localhost/kit-verify:v7`.
+- `scripts/bcp14-check.py`, gate 22: a Markdown file that uses a BCP 14
+  keyword in capitals must name BCP 14, outside code, or be listed as quoting.
+  The one file that did not, this changelog, now writes the word in lowercase.
+- `.github/workflows/tags.yml`: on every newly created tag, runs
+  `scripts/check-branch-name --tag-new`, which requires the full `v1.2.3`
+  shape with no leading zeros and a tag greater than every other `v` tag, and
+  fails the run on a tag that fails or was moved. It never deletes a tag; the
+  maintainer removes a refused one. `--tag` now refuses a leading zero, and a
+  number over 9 digits.
+- `.github/rulesets/release-tags.json`: refuses moving or deleting a `v` tag,
+  binding once applied to the repository.
+- `scripts/schemas.sh`: validates `security-insights.yml` against Security
+  Insights 2.2.0 and `CITATION.cff` against Citation File Format 1.2.0. The
+  verification image downloads both schemas from the commit each release tag
+  points at, checked by digest, and the script checks the digests again. Its
+  selftest rejects planted bad files, a schema with the wrong digest and a
+  missing tool, each only when its own rejection message appears. `.github/workflows/containers.yml` runs it on linux/amd64 and
+  linux/arm64. The image is now `localhost/kit-verify:v6`.
+- `.github/workflows/scorecard.yml` and an OpenSSF Scorecard badge in
+  `README.md`. Scorecard runs weekly and on pushes to `main`, publishes its
+  result for the badge and uploads it to code scanning. Both new actions are
+  pinned by commit SHA, which row 3.7 of `docs/security-posture.md` needed
+  first; section 5 no longer lists the badge as absent.
+
+### Changed
+
+- Every workflow pins `actions/checkout` by the commit SHA of its v7.0.1 tag
+  instead of the `v7` tag, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty,
+  so gate 19 now fails any action pinned by tag.
+  `docs/security-posture.md` row 3.7 is closed, with sections 3, 5 and 8 updated.
+- `orchestration/`: four files take lowercase names under the repository's
+  naming rule: `roles.md`, `changelog.md`, and in `ingestion/`
+  `conversation-extraction-packet.md` and `vendor-agnostic-digest-spec.md`.
+  Every link, schema description and `scripts/round-check.py` path follows;
+  released entries keep the names the files had then. A skill's own
+  `CHANGELOG.md` keeps its name.
+
+### Fixed
+
+- `orchestration/`: stale claims and text specific to one installation.
+  The README indexes `roles.md`; links to documents the repository does
+  not hold now name ones it does; the three event schemas carry
+  `$id` values with their `schemas/` directory, and a human agent no
+  longer needs `capability` or `regime`; usage quotas, a past incident,
+  dated adoption notes and one setup's worked examples are gone from
+  `routing-threshold.md`, `roles.md` and the ingestion specs; and
+  `rounds.md` gives its mail channel and context thresholds as examples
+  an installation sets.
+- `containers/verify/`: the CodeQL 2.27.4 bundle, the version GitHub's default
+  setup now runs, so a local scan reports the alerts CI reports. The bundle is
+  pinned by digest for linux/amd64 and linux/arm64. The image is now
+  `localhost/kit-verify:v5`.
+
 ## 0.6.0 (2026-11-10)
 
 A MINOR release under `docs/releasing.md`. Review rounds, a bill of materials,
@@ -244,7 +309,7 @@ skill is added and no skill revision is BREAKING.
 
 - `docs/document-layers.md`, exception 5: a filed reflection entry may be
   reformatted where no word changes (line wrapping or whitespace, or markup
-  a new gate requires), and a markup change MUST NOT change what a line
+  a new gate requires), and a markup change must not change what a line
   means; a change to any word needs a superseding entry. The maintainer's
   decision of 2026-10-20, made for ACMM compatibility.
 - `docs/risk-tiers.md`, "Per-tool instruction files": every per-tool

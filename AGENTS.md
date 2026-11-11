@@ -7,7 +7,9 @@ rules; nothing here adds one.
 - **Terms of art:** `docs/glossary.md`, each term with the file that defines it.
 - **Checks:** `./scripts/gates.sh --selftest`, the same command CI runs, also run by `tests/run`. Its
   header states what each gate covers. Checks that need an installed tool, REUSE among them, are
-  `./scripts/compliance.sh --selftest`.
+  `./scripts/compliance.sh --selftest`; `./scripts/schemas.sh --selftest` validates the two schema-declaring
+  metadata files and `./scripts/sbom-shapes.py --selftest` the bill of materials against the
+  SPDX 3.0.1 shapes and licence list, both in the verification container.
 - **Skills:** read `skills/skill-creation/SKILL.md` before changing one.
 - **Branch names:** `CONTRIBUTING.md`, "Branch and tag names", checked by `scripts/check-branch-name`.
 - **Commits:** `CONTRIBUTING.md`, "Commits and pull requests": provenance as `Assisted-by:` and

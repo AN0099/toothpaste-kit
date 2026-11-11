@@ -1,0 +1,67 @@
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: tags
+
+# The tag rule at the forge, on every newly created tag: the full v1.2.3 shape
+# with no leading zeros, and greater than every other v tag
+# (scripts/check-branch-name --tag-new). The local .githooks/pre-push checks
+# the shape only, is opt-in, and --no-verify skips it; the tag-names ruleset
+# refuses a tag outside v*, and the release-tags ruleset refuses moving or
+# deleting a v tag.
+#
+# A workflow on a tag push runs after the tag exists, so it cannot refuse one.
+# It reports: a refused tag fails the run and stays until the maintainer
+# removes it, as docs/releasing.md says. This version never deletes or moves a
+# tag and holds no write token, so no run of it can remove a release.
+# A moved tag (a push that did not create the ref) fails the run. A re-run
+# compares against the tags of its own day, so a release that was accepted can
+# fail a re-run once a higher tag exists; the failure is the only effect.
+#
+# Not checked: a tag on a commit that changes this file or the script runs
+# the version on that commit, and a tag on a commit older than this file runs
+# nothing. GitHub creates no event when more than three tags are pushed at
+# once, so none of them is checked. Two tags pushed together each see the
+# other, so the lower one fails. Push one tag at a time.
+
+on:
+  push:
+    tags: ['**']
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    # A deleted tag also sends a push event; there is nothing to check.
+    if: ${{ !github.event.deleted }}
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      # All history and tags, so the comparison sees every existing tag.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      # The name reaches the script through env, never pasted into the
+      # command, so a crafted tag name cannot inject shell.
+      - name: Check the tag
+        env:
+          TAG: ${{ github.ref_name }}
+          CREATED: ${{ github.event.created }}
+        run: |
+          if [ "$CREATED" != true ]; then
+            echo "::error::tag $TAG already existed and was moved; it is not checked"
+            exit 1
+          fi
+          rc=0
+          ./scripts/check-branch-name --tag-new "$TAG" || rc=$?
+          case $rc in
+            0) echo "tag $TAG accepted"; exit 0 ;;
+            1) echo "::error::tag $TAG failed the check; nothing was deleted. A new tag stays until the maintainer removes it (docs/releasing.md); on a re-run, the tag may have passed against the tags of its own day" ;;
+            *) echo "::error::the check could not run on tag $TAG (exit $rc)" ;;
+          esac
+          exit 1

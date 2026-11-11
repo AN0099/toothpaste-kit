@@ -1,6 +1,7 @@
 {
   "scripts": {
     "scripts/auto-qa-tuner.py": 96,
+    "scripts/bcp14-check.py": 95,
     "scripts/blog.py": 91,
     "scripts/check-hooks.py": 92,
     "scripts/check-pr-body": 99,

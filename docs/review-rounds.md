@@ -11,7 +11,7 @@ This page is the specification as the kit implements it. The steps to run one ar
 **A review round is not a [round](../orchestration/rounds.md).** A round is one task with its
 dispatches and replies between seats. A review round is narrower: one change, one review of it,
 the verification of that review, and one decision. The two share the rule that a finding is a
-claim, and the roles in [`ROLES.md`](../orchestration/ROLES.md).
+claim, and the roles in [`roles.md`](../orchestration/roles.md).
 
 ## The rule it exists for
 
@@ -71,7 +71,7 @@ nobody checks. Field names below are paths into the document.
 | `handling.redaction` | `none`, `sanitized` or `pending-review` |
 | `provenance.artifactPath` | Where this record lives, relative to the root of the repository the round is committed in, which is not the kit unless the round is committed there. The validator checks only that it is relative, not that the file is there |
 
-Roles are always lower case: `operator`, `lead`, `aide` or `minion`, the four in `ROLES.md`.
+Roles are always lower case: `operator`, `lead`, `aide` or `minion`, the four in `roles.md`.
 
 Every id, such as `metadata.roundId`, a check's `id` or a finding's `id`, uses only lower-case
 letters, digits, `.` and `-`, and starts with a letter or digit (`^[a-z0-9][a-z0-9.-]*$`): `f1`,

@@ -30,16 +30,16 @@ that a reader can go and form one.
 | 2.3 Code of conduct | Present | `CODE_OF_CONDUCT.md`, with a real reporting address. States plainly that there is one maintainer and no independent escalation body, and asks a reporter to name an acceptable third party if the report concerns the maintainer |
 | 2.4 Contribution guide | Present | `CONTRIBUTING.md`, which names the script that enforces its own mechanical rules |
 | 2.5 Governance, decision process, roles | Present | `GOVERNANCE.md`. One maintainer, bus factor one stated as a known risk, merges and tags and pushes not delegated |
-| 2.6 Citation metadata | Present | `CITATION.cff`, with `version` and `date-released` set in each release's tagged tree by `docs/releasing.md` step 3 |
+| 2.6 Citation metadata | Present, validated | `CITATION.cff`, with `version` and `date-released` set in each release's tagged tree by `docs/releasing.md` step 3. `scripts/schemas.sh` validates it against the Citation File Format 1.2.0 schema, pinned by digest in the verification image, on every pull request (`.github/workflows/containers.yml`) |
 | 2.7 Issue templates | Present | Four files under `.github/ISSUE_TEMPLATE/` |
 | 2.8 Project state, current | Present | `docs/project-state.md`, which carries its own last-updated date so a reader can judge staleness |
-| 2.9 Security Insights file | Present, fields checked by hand | `security-insights.yml` at the repository root, following OpenSSF Security Insights schema version 2.2.0. Every value is taken from a file in this tree or is a link to a file in it, except the header dates and schema version, which describe the file, and `bug-bounty-available: false`, which the maintainer states; an optional field with nothing behind it is left out. No tool validates it against the schema, and no gate reads it |
+| 2.9 Security Insights file | Present, validated against the schema | `security-insights.yml` at the repository root, following OpenSSF Security Insights schema version 2.2.0. Every value is taken from a file in this tree or is a link to a file in it, except the header dates and schema version, which describe the file, and `bug-bounty-available: false`, which the maintainer states; an optional field with nothing behind it is left out. `scripts/schemas.sh` validates it against the published 2.2.0 schema (CUE, pinned by digest in the verification image) on every pull request, closed, so an undefined field fails. That checks structure and patterns, not that a value is true |
 
 ## 3. Build, release and provenance
 
 | Control | State | Evidence |
 |---|---|---|
-| 3.1 Versioning scheme | Defined and applied | `docs/releasing.md`: repo-wide semver, annotated tags. First application is `v0.1.0`, 2026-09-19 |
+| 3.1 Versioning scheme | Defined, applied and checked at the forge | `docs/releasing.md`: repo-wide semver, annotated tags. First application is `v0.1.0`, 2026-09-19. `.github/workflows/tags.yml` runs `scripts/check-branch-name --tag-new` on every newly created tag: the full `v1.2.3` shape with no leading zeros (Semantic Versioning 2.0.0 item 2), and greater than every other `v` tag. It runs after the tag exists, so it reports rather than refuses: a failing or moved tag fails the run, and it never deletes a tag, so no run or re-run can remove a release; the maintainer removes a refused tag (`docs/releasing.md`). `.github/rulesets/release-tags.json` refuses moving or deleting a `v` tag, binding once applied (row 4.11). Not checked: a tag on a commit older than the workflow, or on one that changes the workflow or the script, runs that commit's version or none; more than three tags in one push create no event; two tags pushed together each see the other, so the lower fails. A patch on an older line, `v0.4.1` once `v0.5.0` exists, fails (`docs/releasing.md`) |
 | 3.2 Tagged release | Present | `v0.1.0`, tag object `af16f7f`, annotated and signed, pointing at merge commit `91959631`. It points at the release merge rather than at the tip of `main`, because the `actions/checkout` bump in row 3.7 landed afterwards and row 3.7 would otherwise be false inside its own release |
 | 3.2a The tagged tree differs from `main`, deliberately | Known and bounded | Three files diverge and each divergence is a correction made after the tag: `CHANGELOG.md` and `CITATION.cff` carry `2026-09-18` in the tag and `2026-09-19` on `main`, the real release date, having been written the day before a release that slipped; and the tag's `CHANGELOG.md` `Known` section describes a `README.md` sentence ending mid-clause that commit `56609d8` had already fixed, verified by searching the tagged tree and finding zero hits with a control proving the search works. The tag was not moved, because rewriting a published tag to correct a date is a worse trade than recording the difference. Named here rather than left for a reader to discover |
 | 3.2b The DOI's date matches neither document | Measured, not predicted | This row previously predicted the DOI would inherit `2026-09-18` from the tagged `CITATION.cff`. **That prediction was wrong and is corrected here rather than removed.** Zenodo records `publication_date: 2026-09-20`, which is neither the date in the tag nor the date on `main`. The record was created at `2026-09-19T22:16:18Z`, so the most likely cause is that Zenodo stamps in its own timezone rather than UTC, which puts it past midnight. **Not confirmed**, since one observation cannot distinguish that from any other rule Zenodo applies, and the next release is the trial that would settle it. The practical consequence is that `date-released` in this repository does not drive the DOI's date at all, so keeping the two in agreement is a matter of this project's own consistency and not of controlling the citation record |
@@ -47,7 +47,7 @@ that a reader can go and form one.
 | 3.4 Signed releases | Present, and signed by two parties | SSH commit and tag signing, with a signing key held separately from the authentication key. `commit.gpgsign` and `tag.gpgsign` are both true. The default branch ruleset carries `required_signatures`, so an unsigned commit is rejected at the remote rather than merely discouraged; twelve commits were rejected on the first push attempt for exactly this reason. The `v0.1.0` tag verifies locally as a good ED25519 signature and the API reports `verified=true, reason=valid`. **Every authored commit in the 0.1.0 set verifies locally. The merge commit does not, and this row previously claimed otherwise.** `91959631` was produced by merging through the web interface, so it carries GitHub's signature rather than the maintainer's: `git log --format=%G?` reports `E`, cannot check, because that key is not in the local allowed signers file, while the API reports `verified=true`. Both statements are correct and they are about different signers. `E` here means an unknown signer and not a bad signature, which is the same distinction `docs/releasing.md` step 5 draws for tags. The trust anchor for that one commit is the forge, not the maintainer |
 | 3.5 Reproducible build | Not applicable | The kit ships documents and the scripts in `scripts/`, all shell or Python, with their test fixtures and data. There is no build |
 | 3.6 Dependency declaration | Present, and small by nature | `.github/dependabot.yml`, github-actions only. The repository ships no package manifest, so the surface is this small |
-| 3.7 Actions pinned by digest | **Not done** | Every workflow that checks out the tree uses `actions/checkout@v7`, a tag rather than a digest. `labeler.yml` checks nothing out and pins `actions/labeler` by digest; `ai-fix.yml` uses no action. The two older ones were raised from v4 by Dependabot on 2026-09-19 after Node 20 was deprecated for actions, and `ci.yml` was written at v7. Tag pinning is mutable, and a version bump does not change that: v7 is as mutable as v4 was. Resolving it needs the current digest, which has to be read from the upstream repository rather than guessed. **`v0.1.0` shipped with v4**, since the bump landed after the release merge and the tag deliberately points at that merge rather than at the tip |
+| 3.7 Actions pinned by digest | Present | Every workflow that checks out the tree pins `actions/checkout` by the full commit SHA of its v7.0.1 tag, `3d3c42e5aac5ba805825da76410c181273ba90b1`, read from the upstream repository, with the version as a comment that Dependabot updates with the SHA. `labeler.yml` checks nothing out and pins `actions/labeler` by digest; `scorecard.yml` pins `ossf/scorecard-action` and `github/codeql-action/upload-sarif` the same way; `ai-fix.yml` uses no action. Gate 19 fails any action not pinned by a full commit SHA, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty. **`v0.1.0` shipped with `actions/checkout@v4`** and releases up to this change with `@v7`, both tags |
 
 ### The software bill of materials
 
@@ -58,15 +58,16 @@ file's own tags, a `.license` sidecar, or an annotation in `REUSE.toml`. It
 also lists every action a workflow in `.github/workflows/` uses, by the ref it
 is pinned to. Gate 19 runs it on the tree, so a file with no licence or no
 copyright, a licence with no text under `LICENSES/`, or an action not pinned
-by a full commit SHA fails CI. The one exception is `KNOWN_TAG_PINS` in the
-script, which holds `actions/checkout@v7` and points at row 3.7. Closing row
-3.7 means pinning the digest and deleting that entry, and the gate then fails
-any tag pin. Before printing, the script checks its output's shape
+by a full commit SHA fails CI. `KNOWN_TAG_PINS` in the script is where a
+recorded exception would go, and it is empty since row 3.7 closed, so the gate
+fails any tag pin. Before printing, the script checks its output's shape
 against the SPDX 3.0.1 model: types, required and allowed properties, unique
 IDs, references, vocabularies and package URLs. It does not expand the JSON-LD
-context, run the model's SHACL shapes, check a licence id against the SPDX
-licence list, or compare the files with what REUSE itself reports, which
-`scripts/compliance.sh` does.
+context or compare the files with what REUSE itself reports, which
+`scripts/compliance.sh` does. `scripts/sbom-shapes.py` then runs the published
+SPDX 3.0.1 SHACL shapes on the document and checks each licence id against the
+SPDX licence list, both pinned by digest in the verification image, on every
+pull request (`.github/workflows/containers.yml`).
 
 ## 4. Automated checks
 
@@ -81,7 +82,7 @@ licence list, or compare the files with what REUSE itself reports, which
 | 4.7 Second party check on the markdown gate | Present, and it has caught two defects | `markdownlint-cli2` runs the real tool against the same rule IDs as `scripts/mdlint.py`. On its first run, 2026-09-18, it found `MD034` at `CODE_OF_CONDUCT.md` line 52 where `mdlint.py` reported the file clean: our rule fired on a whitespace delimited bare URL and not on one inside parentheses, and its only planted positive used the delimited shape, so the selftest proved the rule could fire rather than that it covered its field. Both are fixed, and MD034 now carries two differently shaped plants. The second defect is in the row below |
 | 4.8 The second party check on `skills/` | **Never ran, from the day it was added until 2026-09-18** | The job's second step passed `--config .markdownlint-cli2-skills.jsonc`, a filename `markdownlint-cli2` 0.14.0 refuses, so the step failed before reading any markdown. Correcting the name was not sufficient, because `--config` carries rules and not globs: the file's own `skills/**/*.md` was discarded and the root options file's `!skills/**` then excluded every file the step existed to check. Both were invisible because the step above it was failing on the bare URL in the row above. Now a directory-level options file run with `skills/` as the working directory, verified at the desk on the pinned version: 28 files linted, a planted bare URL reported, and a second top level heading correctly not reported |
 | 4.9 Code scanning alerts triaged with a recorded reason | Present | First CodeQL analysis, 2026-09-18, returned three alerts on the default branch. `actions/missing-workflow-permissions` was fixed. Two `py/path-injection` alerts in `scripts/reflow-md.py`, on the two `open()` calls in its `main()` function, were dismissed as false positives: the flagged flow is an argparse positional reaching `open()`, so the path is operator input rather than untrusted data, and no containment check exists that would not also break the intended use |
-| 4.11 Branch and tag names refused at the forge | Defined in the repository, binding once applied | `.github/rulesets/branch-names.json` and `tag-names.json` refuse to create a branch outside the allowed prefixes in `scripts/check-branch-name`, or a tag not starting `v`; case, characters and length are left to the hook and the job. The Dependabot app (app id 29110) bypasses the branch ruleset for any name. They bind only once the maintainer applies them to the repository, a setting outside the tree. Before the forge, `.githooks/pre-push` runs the same script, and after it the `branch-name` job in `gates.yml` reports a bad name; it blocks a merge only once it is a required status check, and row 4.6 records that it is not one. Gate 13 fails if the ruleset's prefix list drifts from the script's |
+| 4.11 Branch and tag names refused at the forge | Defined in the repository, binding once applied | `.github/rulesets/branch-names.json` and `tag-names.json` refuse to create a branch outside the allowed prefixes in `scripts/check-branch-name`, or a tag not starting `v`; case, characters and length are left to the hook and the job. The Dependabot app (app id 29110) bypasses the branch ruleset for any name. They bind only once the maintainer applies them to the repository, a setting outside the tree. Before the forge, `.githooks/pre-push` runs the same script, and after it the `branch-name` job in `gates.yml` reports a bad name; it blocks a merge only once it is a required status check, and row 4.6 records that it is not one. Gate 13 fails if the ruleset's prefix list drifts from the script's. For tags, `.github/workflows/tags.yml` also runs the full rule after the push and fails the run on a tag that fails, and `release-tags.json` refuses moving or deleting a `v` tag, binding once applied (row 3.1) |
 | 4.10 Alerts outstanding on the release branch | **Nine dismissed with a recorded reason, one fixed by the commit carrying this row** | Ten high security severity alerts in `scripts/mdlint.py`, from the first analysis to run against the release commits. The three `py/path-injection` alerts were dismissed as false positives on 2026-09-18, on the same reasoning as the `reflow-md.py` pair: `sys.argv` paths reach `os.walk` and `open`, so the path is operator input rather than untrusted data. Of the seven `py/polynomial-redos`, six were dismissed as `won't fix` on 2026-09-19 and the seventh is fixed by this commit. The reason string is deliberate and is not interchangeable with the one above: these six are real quadratic patterns rather than false positives. Four of them were independently reproduced on a second host at 15x to 16x scaling when the input quadruples, against a known-quadratic control at 11x and a known-linear control at 2.8x, on inputs no more exotic than a long run of `[` characters. What bounds them is `MAX_LINE`, a 2000 character limit whose guard precedes every affected call site and which reports `MDLINT001` rather than skipping a long line silently. **That bound is per line and not per file.** A worst case line costs roughly 29 ms, and nothing limits how many such lines one contributed file may hold, so the residual is a required check made slow by hostile input rather than one that hangs. Recorded here because the dismissals do not state it and a reader checking them would otherwise have to derive it |
 
 ## 5. What the README's badges claim
@@ -100,6 +101,7 @@ that says more than the badge does.
 | 5.5 Software Heritage archive | That an archived snapshot of this origin exists | Which commit was archived, and when. The badge tracks the origin rather than any tag, so it can be green while the archived snapshot predates the newest release |
 | 5.6 OpenSSF Best Practices | That the questionnaire has been answered and what level those answers reach | That the answers were checked by anyone other than this project. The questionnaire is self assessed, and the rows in section 3 of this document are where a reader can disagree with it |
 | 5.7 REUSE status | That the REUSE service found a copyright and a licence declared for every file when it last checked this repository | That the current tree still passes, which `.github/workflows/compliance.yml` checks with `reuse lint` on every pull request and every push to `main`, or anything about who holds the copyright, which `CITATION.cff` names |
+| 5.8 OpenSSF Scorecard | The score Scorecard last published for the default branch, from `.github/workflows/scorecard.yml` | That the checks behind it are the ones a reader cares about, or that a low check is a defect: Code-Review, for one, scores a single-maintainer project low by design (row 6.2). The per-check results are in the linked viewer and in code scanning |
 
 Alt text on a status badge names the indicator rather than its value, because
 the image is served by a third party and changes while the text in the
@@ -119,9 +121,6 @@ link destination is a defect in `mdlint.py` and is not fixed here.
 - **A coverage badge.** The test suite is `scripts/gates.sh --selftest`, per
   `tests/README.md`. It shows each gate able to fire rather than measuring the
   lines it reaches, so there is no coverage figure for a badge to report.
-- **An OpenSSF Scorecard badge.** Scorecard measures branch protection, pinned
-  dependencies and signed releases among others. Row 3.7, Actions pinned by
-  digest, is still open. The badge is worth adding once it closes, not before.
 - **A maintenance or activity badge.** `GOVERNANCE.md` states one maintainer
   and a bus factor of one, which is the same fact without the implication that
   a project's health is a colour.
@@ -168,7 +167,7 @@ surface that was already open.
 |---|---|---|---|
 | 7.1 Local core | `scripts/mdlint.py` | Yes, it is this project's code | Standard library only, nothing installed |
 | 7.2 Local core | `markdownlint-cli2` at the desk | No | Fetches from a registry at run time, and adds a package manifest to a repository that ships none |
-| 7.3 Local core | WCAG technique IDs, RFC keyword usage | Yes | Published standards, readable at the source |
+| 7.3 Local core | WCAG technique IDs, RFC keyword usage | Yes | Published standards, readable at the source. Gate 22 (`scripts/bcp14-check.py`) fails a Markdown file using a BCP 14 keyword in capitals that never names BCP 14 |
 | 7.4 Runner | `markdownlint-cli2` pinned in a workflow step | Yes | Disposable container, no token, exact version |
 | 7.5 Runner | A third party marketplace action | No | Runs with the workflow's token |
 | 7.6 Runner | `actions/checkout` | Yes, with the pin recorded above | First party, and unavoidable |
@@ -192,10 +191,11 @@ is missing is the mapping, and inventing criterion IDs from memory would produce
 a document that looks authoritative and cites nothing real. That is the failure
 mode this project names most often.
 
-**What is already true regardless of the mapping:** one blocker is left,
-actions pinned by tag rather than digest (row 3.7), and it needs an upstream
-digest read. The other two are closed: row 3.2 records a tagged release, and
-row 4.6 records which checks bind on the default branch.
+**What is already true regardless of the mapping:** rows 3.7, 3.2 and 4.6
+leave no blocker. Row 3.7 pins every action by commit SHA, row 3.2 records a
+tagged release, and row 4.6 records which checks bind on the default branch.
+The Best Practices Badge still has two criteria short, recorded in
+[project state](project-state.md) as TK-071.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

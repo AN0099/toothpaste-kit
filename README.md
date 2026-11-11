@@ -4,7 +4,7 @@ A skill library, an agent relay protocol, and a set of mechanical gates for runn
 
 **Status: work in progress, pre-alpha.** The skills are in daily use and the interfaces still change.
 
-[![gates workflow status](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml/badge.svg?branch=main)](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml) [![licence: Apache 2.0](https://img.shields.io/badge/licence-Apache%202.0-blue.svg)](LICENSE) [![concept DOI, resolves to the newest version](https://zenodo.org/badge/DOI/10.5281/zenodo.22850481.svg)](https://doi.org/10.5281/zenodo.22850481) [![latest tagged release](https://img.shields.io/github/v/release/AN0099/toothpaste-kit?label=release)](https://github.com/AN0099/toothpaste-kit/releases) [![Software Heritage archive status](https://archive.softwareheritage.org/badge/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/)](https://archive.softwareheritage.org/browse/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/) [![OpenSSF Best Practices level](https://www.bestpractices.dev/projects/14726/badge)](https://www.bestpractices.dev/projects/14726) [![REUSE status](https://api.reuse.software/badge/github.com/AN0099/toothpaste-kit)](https://api.reuse.software/info/github.com/AN0099/toothpaste-kit)
+[![gates workflow status](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml/badge.svg?branch=main)](https://github.com/AN0099/toothpaste-kit/actions/workflows/gates.yml) [![licence: Apache 2.0](https://img.shields.io/badge/licence-Apache%202.0-blue.svg)](LICENSE) [![concept DOI, resolves to the newest version](https://zenodo.org/badge/DOI/10.5281/zenodo.22850481.svg)](https://doi.org/10.5281/zenodo.22850481) [![latest tagged release](https://img.shields.io/github/v/release/AN0099/toothpaste-kit?label=release)](https://github.com/AN0099/toothpaste-kit/releases) [![Software Heritage archive status](https://archive.softwareheritage.org/badge/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/)](https://archive.softwareheritage.org/browse/origin/https%3A%2F%2Fgithub.com%2FAN0099%2Ftoothpaste-kit/) [![OpenSSF Best Practices level](https://www.bestpractices.dev/projects/14726/badge)](https://www.bestpractices.dev/projects/14726) [![REUSE status](https://api.reuse.software/badge/github.com/AN0099/toothpaste-kit)](https://api.reuse.software/info/github.com/AN0099/toothpaste-kit) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/AN0099/toothpaste-kit/badge)](https://scorecard.dev/viewer/?uri=github.com/AN0099/toothpaste-kit)
 
 **Accessibility is a requirement here, not an afterthought.** The documents this repository ships are authored against [WCAG techniques for Markdown, with the technique IDs stated](docs/document-accessibility.md), and `scripts/mdlint.py` enforces the mechanically checkable half of them. The other side, [the accessibility of the interface this work is done through](docs/accessibility.md), is documented with it.
 
@@ -131,10 +131,10 @@ The protocol for passing work between agents on different surfaces.
 | `orchestration/README.md` | What the system is for, and where to start |
 | `orchestration/protocol.md` | The relay protocol itself |
 | `orchestration/taxonomy.md` | Role and surface definitions |
-| `orchestration/ROLES.md` | The operator, lead, aide and minion roles |
+| `orchestration/roles.md` | The operator, lead, aide and minion roles |
 | `orchestration/rounds.md` | Rounds: delegated work, checked and decided |
 | `orchestration/routing-threshold.md` | When work goes to a local model and when to a vendor |
-| `orchestration/CHANGELOG.md` | The decision log for the protocol's own design |
+| `orchestration/changelog.md` | The decision log for the protocol's own design |
 | `orchestration/schemas/request.json` | Request message schema |
 | `orchestration/schemas/response.json` | Response message schema |
 | `orchestration/schemas/event-base.json` | Shared event envelope |

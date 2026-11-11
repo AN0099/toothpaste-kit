@@ -15,14 +15,19 @@ that each tool reports the version pinned for it.
 | python | 3.13-slim, by digest | The base image | The v0 image |
 | libmagic1, git, xz-utils | The base image's Debian packages | `apt-get` | reuse's file-type detection, as on the CI runner; xz-utils unpacks shellcheck |
 | reuse | 6.2.0 | pip, by hash, built from its sdist (no python 3.13 wheel) with poetry-core 2.5.0 from [`build-requirements.txt`](build-requirements.txt) | `.github/workflows/compliance.yml` |
-| CodeQL CLI | 2.27.3 | The CodeQL bundle, by digest | The version GitHub's default setup ran on main on 2026-11-01 |
-| codeql/python-queries, codeql/actions-queries | The versions in the 2.27.3 bundle | The CodeQL bundle | The bundle; the build writes the resolved packs to `/opt/codeql-packs.txt` |
+| CodeQL CLI | 2.27.4 | The CodeQL bundle, by digest | The version GitHub's default setup ran on pull requests on 2026-11-07 |
+| codeql/python-queries, codeql/actions-queries | The versions in the 2.27.4 bundle | The CodeQL bundle | The bundle; the build writes the resolved packs to `/opt/codeql-packs.txt` |
 | coverage.py | 7.16.2 | pip, by hash, one per architecture, with a startup hook in `site-packages` | The newest release at least 14 days old on 2026-11-02; `scripts/coverage-check.py` uses it |
 | yamllint | 1.38.0 | pip, by hash | The newest release at least 14 days old on 2026-10-31 |
 | shellcheck | 0.11.0 | Release binary, by digest | The newest release at least 14 days old on 2026-10-31 |
 | actionlint | 1.7.12 | Release binary, by digest | The newest release at least 14 days old on 2026-10-31 |
 | check-jsonschema | 0.38.2 | pip, by hash | The newest release at least 14 days old on 2026-10-31 |
 | CUE | 0.17.1 | Release binary, by digest | The newest release at least 14 days old on 2026-10-31 |
+| pyshacl | 0.40.1, with rdflib 7.6.0 | pip, by hash | The newest release at least 14 days old on 2026-11-08 |
+| Security Insights schema | 2.2.0 | `spec/schema.cue` from the commit tag `v2.2.0` points at, by digest, in `/opt/schemas/` | The schema version `security-insights.yml` declares; upstream publishes CUE only |
+| Citation File Format schema | 1.2.0 | `schema.json` from the commit tag `1.2.0` points at, by digest, in `/opt/schemas/` | The `cff-version` `CITATION.cff` declares |
+| SPDX model and JSON-LD context | 3.0.1 | `spdx-model.ttl` and `spdx-context.jsonld` from `spdx.org/rdf/3.0.1/`, by digest, in `/opt/schemas/` | The version `scripts/sbom.py` emits |
+| SPDX licence list | 3.29.0 | `json/licenses.json` and `json/exceptions.json` from the commit tag `v3.29.0` points at, by digest, in `/opt/schemas/` | The newest release at least 14 days old on 2026-11-08 |
 
 Only reuse has a version CI also pins. CodeQL follows the version GitHub runs instead, because a
 different release reports different alerts on the same tree: 2.27.2 missed a `py/xml-bomb` alert

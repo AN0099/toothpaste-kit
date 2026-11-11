@@ -35,7 +35,7 @@ its own; see [Practising on the fixture](#practising-on-the-fixture).
 2. **[person]** Decide what is to be reviewed: the base and target commits, the paths in scope,
    what the change is meant to do, the checks the reviewer must run, and the round's network,
    secrets and remote-access posture. Name the reviewer's and the verifier's roles; they must
-   differ. A role is one of the four in `orchestration/ROLES.md`: `operator`, `lead`, `aide` or
+   differ. A role is one of the four in `orchestration/roles.md`: `operator`, `lead`, `aide` or
    `minion`, and the validator rejects any other name. The decision maker is always `operator`.
    The practice round uses `aide` for the reviewer and `lead` for the verifier, and its packet is
    already written: see [Practising on the fixture](#practising-on-the-fixture).

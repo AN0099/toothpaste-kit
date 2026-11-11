@@ -74,7 +74,7 @@ The changes up to 0.1.0. Each later release has its own section below, newest fi
   with `surface: human-relay`. Every registry entry carries `confidence`, `verified_on`, and
   `sources`, so a capability claim about a product that ships weekly has its own expiry date.
   `anthropic.json` holds eight surfaces; `openai.json`, `google.json`, and `local.json` are empty and
-  are the intended first-contribution surface. Reasoning in `orchestration/CHANGELOG.md`.
+  are the intended first-contribution surface. Reasoning in `orchestration/changelog.md`.
 - `surface-regimes` went to v3, deriving regime from the capability profile and re-keying its
   activation table from seven product-name rows to three regime rows. No activation decision changed
   for any of the seven original rows. The Failure-Mode Note carried forward verbatim.
@@ -378,7 +378,7 @@ unverifiable clean result this project's own conventions reject.
 
 ## In v0.2.0
 
-- **`orchestration/ROLES.md`.** Defines operator, lead, aide and minions as an
+- **`orchestration/roles.md`.** Defines operator, lead, aide and minions as an
   axis of authority over a decision, explicitly separate from the three axes
   the kit already had: clearance, working surface, and reach. It also states
   that persona is not role, and leaves persona unbuilt.

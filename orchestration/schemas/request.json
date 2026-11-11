@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "orchestration/request.json",
+  "$id": "orchestration/schemas/request.json",
   "title": "RequestEvent",
   "allOf": [
     { "$ref": "event-base.json" },

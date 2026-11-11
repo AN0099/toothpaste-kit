@@ -30,10 +30,10 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
-      # Pinned by tag, not by digest. Digest pinning is the stricter
-      # practice and is tracked in docs/security-posture.md rather than
-      # guessed at here.
-      - uses: actions/checkout@v7
+      # Pinned by commit SHA, read from the upstream v7.0.1 tag
+      # (docs/security-posture.md row 3.7); Dependabot moves the SHA and
+      # the version comment together.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # --selftest proves each gate can fail against a planted positive
       # before the clean result is trusted. A gate that has never returned a
@@ -45,15 +45,15 @@ jobs:
   # selftests the rule; this checks the name being merged, which a local run
   # cannot see. By now the name is already public, so this is the backstop:
   # the pre-push hook and the ruleset in .github/rulesets/ stop a name before
-  # it is published, and this keeps such a branch from merging. Tags are left
-  # to the hook and the tag-names ruleset, since this workflow does not run
-  # on a tag push.
+  # it is published, and this keeps such a branch from merging. Tags are
+  # checked by the hook, the tag rulesets and .github/workflows/tags.yml,
+  # since this workflow does not run on a tag push.
   branch-name:
     if: github.event_name == 'pull_request'
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -87,7 +87,7 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # An exact version, and no third party action: an action runs with the
       # workflow's token, a pinned package in a throwaway runner does not.

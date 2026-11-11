@@ -36,10 +36,10 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
-      # checkout is pinned by tag, as in every workflow here
-      # (docs/security-posture.md row 3.7); the Pages actions are new, so
-      # they are pinned by full commit SHA, which the sbom gate requires.
-      - uses: actions/checkout@v7
+      # checkout and the Pages actions are pinned by full commit SHA, as in
+      # every workflow here (docs/security-posture.md row 3.7), which the
+      # sbom gate requires.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: python3 scripts/blog.py --selftest
       - run: python3 scripts/blog.py build _site
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

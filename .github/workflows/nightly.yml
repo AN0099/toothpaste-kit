@@ -32,9 +32,9 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      # Pinned by tag, not by digest, as in gates.yml. See
+      # Pinned by commit SHA, as in gates.yml. See
       # docs/security-posture.md, row 3.7.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # The gate script is the test suite, and it plants a positive for each
       # gate before the clean result is trusted.

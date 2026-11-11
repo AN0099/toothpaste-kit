@@ -34,12 +34,12 @@ JSON definition is `schemas/event-base.json#/definitions/capability_profile`.
 | `egress` | `local`, `operator-hosted`, `vendor-cloud` | where content goes when processed |
 | `audit` | `none`, `local-only`, `vendor-attested`, `operator-attested`, `unknown` | who attests to a record |
 
-`egress` is the join key for any sensitivity gate. A routing rule that must decide whether content
-may reach a given faculty reads this field rather than depending on an operator remembering which
-faculties are cloud-hosted.
+`egress` is recorded for audit: it states where content goes when processed, as a field rather than
+an operator's memory of which faculties are cloud-hosted.
 
-`tool_execution` is the join key for a tool-call trust exclusion. A faculty with `none` cannot be
-handed a task that writes to a repository, regardless of how capable it is at drafting.
+`tool_execution` is recorded for audit: it states whether a surface can execute tools and whether
+that reaches the host filesystem. A faculty with `none` cannot be handed a task that writes to a
+repository, regardless of how capable it is at drafting.
 
 ## Deriving the regime
 

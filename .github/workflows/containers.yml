@@ -14,7 +14,7 @@ name: containers
 # times slower. Docker builds here because both runner images ship it; the
 # Containerfile in each directory is the one podman builds locally.
 #
-# The verification image also runs compliance and a CodeQL scan. The scan
+# The verification image also runs compliance, the schema and SBOM checks and a CodeQL scan. The scan
 # exits 1 when it finds any alert, and main carries dismissed alerts, so the
 # step passes on 0 or 1 with both per-language counts printed, and fails on
 # 2, an analysis that did not finish. Comparing alerts is CodeQL's own job
@@ -43,9 +43,9 @@ jobs:
         runner: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.runner }}
     steps:
-      # Pinned by tag, not by digest, as in gates.yml. See
+      # Pinned by commit SHA, as in gates.yml. See
       # docs/security-posture.md, row 3.7.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Build the starter image
         run: docker build -t kit-starter -f containers/starter/Containerfile containers/starter
@@ -60,12 +60,13 @@ jobs:
       - name: Build the verification image
         run: docker build -t kit-verify -f containers/verify/Containerfile containers/verify
 
-      - name: Gates and compliance selftests in the verification image
+      - name: Gates, compliance, schema and SBOM selftests in the verification image
         run: |
           docker run --rm --network=none -v "$PWD:/src:ro" kit-verify \
             sh -c 'uname -m && codeql version --format=terse \
               && cp -a /src /tmp/work && cd /tmp/work \
-              && ./scripts/gates.sh --selftest && ./scripts/compliance.sh --require --selftest'
+              && ./scripts/gates.sh --selftest && ./scripts/compliance.sh --require --selftest \
+              && ./scripts/schemas.sh --selftest && ./scripts/sbom-shapes.py --selftest'
 
       - name: Coverage floors in the verification image
         run: |
