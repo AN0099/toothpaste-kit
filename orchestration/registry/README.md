@@ -15,7 +15,8 @@ gating decision consults, and product names are the part that changes without wa
   sources), then calls `scripts/schema-check.py`, which validates every vendor file against this
   schema using a standard-library-only checker. That checker implements exactly the keywords this
   schema and the `capability_profile` definition it references use, and fails, naming the keyword,
-  on any it does not, so a keyword added here cannot pass unchecked.
+  on any it does not, so a keyword added here cannot pass unchecked. `scripts/schemas.sh` repeats
+  the check with a full draft-07 validator in the verification image.
 - `anthropic.json`, `openai.json`, `google.json`, `local.json`: one file per vendor namespace.
   Three of those are empty and waiting for someone who uses them.
 

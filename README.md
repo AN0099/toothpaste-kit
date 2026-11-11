@@ -112,6 +112,8 @@ The gates call these, and each runs on its own as well:
 - `reorient`: prints where a workspace stands in one screen, for the start of a session and after a compaction; the observing half of the `orient` skill
 - `round-check.py`: validates review-round documents against their schemas in `orchestration/schemas/round/`
 
+`schemas.sh` runs outside the gates suite, in the verification image: it validates `security-insights.yml`, `CITATION.cff`, this tree's JSON Schema files and the documents they govern with full validators.
+
 `auto-qa-tuner.py` proposes CI job timeouts from the repository's own run history.
 
 `link-skills.sh` symlinks `skills/` into your Claude skills directory instead of copying, so `git pull` updates them in place. Targets are relative where `ln -r` exists, so the links survive the tree being moved, and absolute otherwise; the script reports which it used.
