@@ -53,7 +53,8 @@
 # tracked file with no licence or copyright, a licence with no text under
 # LICENSES/, or a workflow action not pinned by commit SHA fails, and the
 # blog builder's selftest in scripts/blog.py, which plants each page and feed
-# check it makes, and the CI timeout tuner's selftest in
+# check it makes, then a build of blog/posts, so a post the builder refuses
+# fails here and not at deploy, and the CI timeout tuner's selftest in
 # scripts/auto-qa-tuner.py, which plants each workflow shape it reads or
 # refuses and each proposal rule, and BCP 14 keywords via scripts/bcp14-check.py:
 # a Markdown file using one in capitals must name BCP 14, and that script states
@@ -469,9 +470,20 @@ gate_sbom() {
 }
 
 # ---------------------------------------------------------------- 20
+# The selftest, then a build of blog/posts itself into a scratch directory,
+# since pages.yml deploys only what builds and the selftest reads no post.
+blog_check() {
+  python3 scripts/blog.py --selftest 2>&1 || return 1
+  site=$(mktemp -d) || return 1
+  python3 scripts/blog.py build "$site/out" 2>&1
+  rc=$?
+  rm -rf "${site:?}"
+  return $rc
+}
+
 gate_blog() {
   gate_start "blog"
-  if out=$(python3 scripts/blog.py --selftest 2>&1); then
+  if out=$(blog_check); then
     gate_ok "blog"
   else
     printf '%s\n' "$out" | grep -E '^FAIL|failure' || printf '%s\n' "$out" | tail -5
@@ -1041,6 +1053,15 @@ PY
   bad=$?
   python3 scripts/blog.py --selftest >/dev/null 2>&1
   plant_rejected $bad $? "blog gate, bad-character check matches nothing"
+
+  # Gate 20: a tree whose 0.6.0 post has the autolink that failed pages.yml
+  # on main at #119 and #120 must fail the gate's build of its posts.
+  mkdir -p "$tmp/bp/scripts" && cp scripts/blog.py "$tmp/bp/scripts/" && cp -r blog "$tmp/bp/"
+  sed -i 's|\[kit.bridleworks.org\](https://kit.bridleworks.org/)|<https://kit.bridleworks.org/>|' "$tmp/bp/blog/posts/2026-11-10-v0.6.0.md"
+  (cd "$tmp/bp" && blog_check >/dev/null 2>&1)
+  bad=$?
+  blog_check >/dev/null 2>&1
+  plant_rejected $bad $? "blog gate, a post the builder refuses"
 
   # Gate 21: a copy of the CI timeout tuner that never doubles a timeout a
   # run ended at must fail its own selftest.

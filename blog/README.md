@@ -17,6 +17,7 @@ The posts so far, each with its `.license` sidecar:
 - [`posts/2026-09-29-v0.3.0.md`](posts/2026-09-29-v0.3.0.md): toothpaste-kit 0.3.0
 - [`posts/2026-10-13-v0.4.0.md`](posts/2026-10-13-v0.4.0.md): toothpaste-kit 0.4.0
 - [`posts/2026-10-27-v0.5.0.md`](posts/2026-10-27-v0.5.0.md): toothpaste-kit 0.5.0
+- [`posts/2026-11-10-v0.6.0.md`](posts/2026-11-10-v0.6.0.md): toothpaste-kit 0.6.0
 
 ## What a post must be
 
