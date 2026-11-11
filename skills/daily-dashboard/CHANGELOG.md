@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2
+
+The frontmatter description is shortened to fit the description gate (pull request #63). No change
+to when the skill fires or to its procedure.
+
 ## v1 (initial)
 
 Start-of-session orientation. Reads the standing files, verifies carry-over work

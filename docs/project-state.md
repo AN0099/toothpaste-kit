@@ -3,7 +3,7 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-11-02.
+Last updated 2026-11-10.
 
 ## Live
 
@@ -52,8 +52,8 @@ Two skill families are specced and not yet built:
 
 ## Recent changes
 
-The changes up to 0.1.0. Each later release has its own section below, newest first, starting
-with Unreleased; `CHANGELOG.md` is the full log.
+The changes up to 0.1.0. Each later release has its own section below, newest first;
+`CHANGELOG.md` is the full log.
 
 - **0.1.0 release preparation.** `docs/releasing.md` added, holding the versioning scheme and a
   signed-tag procedure that separates a GitHub signing key from an authentication key.
@@ -203,9 +203,7 @@ The plan, once the target tier is fixed, belongs in its own document with one ro
 a pointer to the evidence, because a posture claim without per-criterion evidence is the same
 unverifiable clean result this project's own conventions reject.
 
-## Unreleased
-
-Merged to `main` after 0.5.0, listed under Unreleased in `CHANGELOG.md`.
+## In v0.6.0
 
 - **Orchestration digest (pull request #60).** One digest spec, with the extraction packet linked
   from it.
@@ -275,6 +273,20 @@ Merged to `main` after 0.5.0, listed under Unreleased in `CHANGELOG.md`.
   coverage.py in the verification image and holds each of the 13 Python scripts it runs at its floor in
   `.coverage-thresholds.json` (77 to 99%); `containers.yml` runs it on linux/amd64 and linux/arm64.
   Closes #27.
+- **Faculty consultation (pull request #101).** `orchestration/protocol.md` and the relay template
+  gain a reply format of eight plain Markdown headers for a Claude-tier agent consulting a faculty.
+- **Fork updates (pull request #102).** `docs/installing.md` covers updating a fork: the sync, own
+  commits already on `main`, rebase conflicts and skipped releases.
+- **Cutoff line (pull request #103).** `docs/releasing.md`: between the cutoff and the tag, nothing
+  merges into `main` except the release itself.
+- **Routing threshold (pull request #104).** `orchestration/routing-threshold.md` takes its
+  lowercase name and states roles in place of one desk's seat names.
+- **certifi (pull request #105).** The verification image moves to certifi 2026.10.18 and is now
+  `localhost/kit-verify:v4`.
+- **ACMM source (pull request #106).** `docs/acmm.md` cites the paper that defines the model,
+  separates the three sets of level names and states level 5 as the kit's ceiling.
+- **Passive voice (pull request #107).** `document-standards` allows the passive in three stated
+  cases.
 
 ## In v0.5.0
 

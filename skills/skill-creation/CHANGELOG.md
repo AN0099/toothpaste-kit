@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v3
+
+The frontmatter description is shortened to fit the description gate (pull request #63). No change
+to when the skill fires or to its procedure.
+
 ## v2 (single-verb exception for boundary procedures)
 
 The naming convention asked for a noun phrase of two or three words. `orient`, `jot` and `touch`,
