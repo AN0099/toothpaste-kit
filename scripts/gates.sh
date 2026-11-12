@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These twenty-two gates cover: the em dash ban, the private task ID ban,
+# check. These twenty-three gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency (including every vendor
 # file's shape against surface-descriptor.schema.json, checked by
 # scripts/schema-check.py, which fails loudly on any schema keyword it does
@@ -58,7 +58,9 @@
 # scripts/auto-qa-tuner.py, which plants each workflow shape it reads or
 # refuses and each proposal rule, and BCP 14 keywords via scripts/bcp14-check.py:
 # a Markdown file using one in capitals must name BCP 14, and that script states
-# its own coverage. They
+# its own coverage, and the standards in docs/standards/ via scripts/style-check,
+# its selftest first, then every file there with no SHALL finding; the script
+# states its own coverage. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -513,6 +515,20 @@ gate_bcp14() {
   fi
 }
 
+# ---------------------------------------------------------------- 23
+gate_standards() {
+  gate_start "standards style-check"
+  if ! out=$(python3 -I scripts/style-check --selftest 2>&1); then
+    printf '%s\n' "$out" | grep -E '^PLANT FAIL' | sed 's/^/  /'
+    gate_bad "standards style-check, selftest"
+  elif ! out=$(python3 -I scripts/style-check docs/standards/*.md 2>&1); then
+    printf '%s\n' "$out" | grep -E '^FAIL' | sed 's/^/  /'
+    gate_bad "standards style-check"
+  else
+    gate_ok "standards style-check"
+  fi
+}
+
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -536,7 +552,8 @@ run_all() {
   gate_blog
   gate_qa_tuner
   gate_bcp14
-  printf '\n%s of 22 gates passed\n' "$pass_n"
+  gate_standards
+  printf '\n%s of 23 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -544,8 +561,8 @@ run_all() {
 
 # A gate that has never returned a hit has not been shown capable of
 # returning one, so each of the first five, and the eighth, is run against a
-# planted positive in a scratch tree, as are 12, 13, 14, 15, 16, 17, 18 and 22. Gates 6, 9, 10, 11,
-# 21 and 22 run their tools' own selftests, which carry their own planted cases, and
+# planted positive in a scratch tree, as are 12, 13, 14, 15, 16, 17, 18, 22 and 23. Gates 6, 9, 10, 11,
+# 21, 22 and 23 run their tools' own selftests, which carry their own planted cases, and
 # gate 7 plants one positive per rule below.
 run_selftest() {
   tmp=$(mktemp -d) || return 1
@@ -1097,6 +1114,17 @@ PY
   bad=$?
   python3 -I "$tmp/bt-ok/scripts/bcp14-check.py" >/dev/null 2>&1
   plant_rejected $bad $? "BCP 14 gate, an unstated keyword"
+  # Gate 23: a standard with a contraction, a SHALL finding, must fail the
+  # check as installed, and the same standard without it must pass.
+  mkdir -p "$tmp/sc-bad/standards" "$tmp/sc-ok/standards"
+  printf '# T\n\n(a) It isn'"'"'t optional.\n' > "$tmp/sc-bad/standards/a.md"
+  printf '# T\n\n(a) It is required.\n' > "$tmp/sc-ok/standards/a.md"
+  # Run from each scratch tree, since style-check opens only files under the working directory.
+  sc=$PWD/scripts/style-check
+  (cd "$tmp/sc-bad" && python3 -I "$sc" standards/a.md >/dev/null 2>&1)
+  bad=$?
+  (cd "$tmp/sc-ok" && python3 -I "$sc" standards/a.md >/dev/null 2>&1)
+  plant_rejected $bad $? "standards gate, a contraction in a standard"
   # gates.sh from another directory: two copies of the kit, each in a fresh
   # repository of one commit (the sbom gate reads the index and HEAD), run
   # from a third directory. The one whose cd to the kit root is removed must

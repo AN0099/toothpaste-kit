@@ -7,6 +7,13 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `docs/standards/`: eight standards for writing and publishing, each as
+  numbered requirements with BCP 14 keywords and a conformance table naming the
+  check for every requirement: style, technical writing, plaintext messages,
+  data display, records, continuity, risk and editorial policy.
+  `scripts/style-check`, gate 23, holds the mechanical checks; the gate runs
+  its selftest, then every file in `docs/standards/`, and fails on any SHALL
+  finding.
 - `docs/security-posture.md` section 8 now maps the OpenSSF Project Security
   Baseline, Level 2 named as the target, and the Best Practices Badge's passing
   criteria by ID, from the published lists at stated commits. OSPS-SA-01.01,
