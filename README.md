@@ -112,7 +112,7 @@ The gates call these, and each runs on its own as well:
 - `reorient`: prints where a workspace stands in one screen, for the start of a session and after a compaction; the observing half of the `orient` skill
 - `round-check.py`: validates review-round documents against their schemas in `orchestration/schemas/round/`
 
-`schemas.sh` runs outside the gates suite, in the verification image: it validates `security-insights.yml`, `CITATION.cff`, this tree's JSON Schema files and the documents they govern with full validators.
+`schemas.sh` runs outside the gates suite, in the verification image: it validates `security-insights.yml`, `CITATION.cff`, this tree's JSON Schema files and the documents they govern with `check-jsonschema`, a standard tool that understands the whole JSON Schema format.
 
 `auto-qa-tuner.py` proposes CI job timeouts from the repository's own run history.
 
