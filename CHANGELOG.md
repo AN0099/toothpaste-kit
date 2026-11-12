@@ -13,7 +13,7 @@ skill lives in that skill's own `CHANGELOG.md`.
   data display, records, continuity, risk and editorial policy.
   `scripts/style-check`, gate 23, holds the mechanical checks; the gate runs
   its selftest, then every file in `docs/standards/`, and fails on any SHALL
-  finding.
+  finding. Its coverage floor in `.coverage-thresholds.json` is 98%.
 - `docs/security-posture.md` section 8 now maps the OpenSSF Project Security
   Baseline, Level 2 named as the target, and the Best Practices Badge's passing
   criteria by ID, from the published lists at stated commits. OSPS-SA-01.01,
