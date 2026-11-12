@@ -159,7 +159,7 @@ claimed.
 | 5(c) | SHALL NOT | mechanical, review | `T5c` n't, 're, 've, 'll, 'm, and 'd, and 's after 13 listed words, outside quotes, and any other 's and quoted text by review |
 | 5(e), 5(f)(1) | SHOULD | judgment | noun length and currency in the field |
 | 5(f)(2), 5(g) | SHALL NOT, SHALL | review | slang, nouns as verbs, one name per item |
-| 5(i) | SHALL NOT | mechanical, review | `T5i` semicolon, U+037E, or U+FF1B outside code, quotes, entities that do not render one, and URLs opening on http, https, or www., and quoted text by review |
+| 5(i) | SHALL NOT | mechanical, review | `T5i` semicolon, U+037E, or U+FF1B outside code, quotes, entities that do not render one, and URLs opening on `http`, `https`, or `www.`, and quoted text by review |
 | 5(j) | SHALL | mechanical, review | `T5j` eight gendered pronouns outside quotes, and quoted text, a pronoun a person states, and other gendered wording by review |
 | 6(a), 6(b), 6(c) | SHALL | review | person answers, sources checked, tier rules kept |
 | 7(a), 7(b) | none | judgment | exclusions |
