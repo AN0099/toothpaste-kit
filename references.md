@@ -126,7 +126,7 @@ depends on them yet, and listing them here is not a claim that it does.
 - **[DWBP]** "Data on the Web Best Practices", W3C.
 - **[HTML-DATA]** "HTML Data Guide", W3C.
 
-## What is deliberately not here
+## What is not here
 
 Design reasoning, decision history and the record of how any of the above came
 to be adopted. That material is provenance and lives outside this repository,

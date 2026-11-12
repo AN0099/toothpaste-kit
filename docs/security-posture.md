@@ -116,7 +116,7 @@ written down because an encoded URL reads as a mistake, and the obvious
 correction reintroduces the finding. The rule over firing on a URL nested in a
 link destination is a defect in `mdlint.py` and is not fixed here.
 
-**Absent on purpose:**
+**Badges not shown:**
 
 - **A coverage badge.** The test suite is `scripts/gates.sh --selftest`, per
   `tests/README.md`. It shows each gate able to fire rather than measuring the

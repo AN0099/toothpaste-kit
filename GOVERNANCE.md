@@ -46,7 +46,7 @@ reviewing their own agent's output is not verification, and a review that only
 re-reads the diff is not verification either. Where a change claims a check
 passes, the reviewer runs it.
 
-## What is deliberately not delegated
+## What is not delegated
 
 - **Merges into the default branch.** A commit records what was done; a merge
   says this is now shared truth, which is a decision.
@@ -58,10 +58,9 @@ passes, the reviewer runs it.
   own update branches under `.github/dependabot.yml` and opens a pull request
   for each; a person merges each of those pull requests.
 
-That last one is not a style preference. This project is developed with AI
-agents doing a large share of the editing, and the boundary between an agent
-preparing a change and a person publishing it is the main control that keeps
-review meaningful.
+This project is developed with AI agents doing a large share of the editing.
+The boundary between an agent preparing a change and a person publishing it is
+the main control that keeps review meaningful.
 
 ## Succession
 
