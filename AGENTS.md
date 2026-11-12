@@ -10,7 +10,9 @@ rules; nothing here adds one.
   `./scripts/compliance.sh --selftest`; `./scripts/schemas.sh --selftest` validates the two schema-declaring
   metadata files and this tree's JSON Schema files with the documents they govern, and `./scripts/sbom-shapes.py --selftest` the bill of materials against the
   SPDX 3.0.1 shapes and licence list, both in the verification container.
-- **Skills:** read `skills/skill-creation/SKILL.md` before changing one.
+- **Skills:** read `skills/skill-creation/SKILL.md` before changing one. `./scripts/skills-spec.sh --selftest`
+  checks every skill against the Agent Skills specification, the published format for a skill file, in the
+  verification container.
 - **Branch names:** `CONTRIBUTING.md`, "Branch and tag names", checked by `scripts/check-branch-name`.
 - **Commits:** `CONTRIBUTING.md`, "Commits and pull requests": provenance as `Assisted-by:` and
   `Agent-Effort:` trailers with values read from the tool, never a co-author line, session link or

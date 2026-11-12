@@ -24,6 +24,7 @@ that each tool reports the version pinned for it.
 | check-jsonschema | 0.38.2 | pip, by hash | The newest release at least 14 days old on 2026-10-31 |
 | CUE | 0.17.1 | Release binary, by digest | The newest release at least 14 days old on 2026-10-31 |
 | pyshacl | 0.40.1, with rdflib 7.6.0 | pip, by hash | The newest release at least 14 days old on 2026-11-08 |
+| skills-ref | 0.1.1 | pip, by hash | The checker the Agent Skills specification's authors publish; the newest release at least 14 days old on 2026-11-09 |
 | Security Insights schema | 2.2.0 | `spec/schema.cue` from the commit tag `v2.2.0` points at, by digest, in `/opt/schemas/` | The schema version `security-insights.yml` declares; upstream publishes CUE only |
 | Citation File Format schema | 1.2.0 | `schema.json` from the commit tag `1.2.0` points at, by digest, in `/opt/schemas/` | The `cff-version` `CITATION.cff` declares |
 | SPDX model and JSON-LD context | 3.0.1 | `spdx-model.ttl` and `spdx-context.jsonld` from `spdx.org/rdf/3.0.1/`, by digest, in `/opt/schemas/` | The version `scripts/sbom.py` emits |

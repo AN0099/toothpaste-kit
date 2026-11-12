@@ -8,7 +8,9 @@
 # .github/workflows/compliance.yml installs. Resolved for python 3.13 on
 # linux/amd64 and linux/arm64 from files uploaded before 2026-10-17,
 # except certifi, taken from 2026-10-18 for its CA fix, and pyshacl and the
-# packages only it needs, from files uploaded before 2026-10-25; a package with compiled code carries one hash per architecture. reuse 6.2.0
+# packages only it needs, from files uploaded before 2026-10-25, and
+# skills-ref and the packages only it needs, from files uploaded before
+# 2026-10-26; a package with compiled code carries one hash per architecture. reuse 6.2.0
 # has no python 3.13 wheel, so it is built from its sdist with the backend
 # pinned in build-requirements.txt.
 attrs==26.1.0 \
@@ -54,6 +56,8 @@ pyparsing==3.3.3 \
     --hash=sha256:ece8c00a69cf01b45d0b1dedabb469c90d8caf996d4fda40f147627a122849a4
 pyshacl==0.40.1 \
     --hash=sha256:27dd58c8ddfa103303b4a8c40b2c666332ffc912dbcd3137f7adc7b7bc5e6bda
+python-dateutil==3.0.0 \
+    --hash=sha256:3c79630202e4152c6add678446984236efe4f57e84d8e892aab0637bab82e9fd
 python-debian==1.1.1 \
     --hash=sha256:f98ae013e8e5310e49041cc3860a7105df73af73d4ff1d8afb474770d328a6ad
 python-magic==0.4.27 \
@@ -77,8 +81,16 @@ rpds-py==2026.9.1 \
     --hash=sha256:457866b85daf5034296666168b84a69e0b2e89dc4f1af102b46f6448a60b9063
 ruamel-yaml==0.19.1 \
     --hash=sha256:27592957fedf6e0b62f281e96effd28043345e0e66001f97683aa9a40c667c93
+six==1.17.0 \
+    --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274
+skills-ref==0.1.1 \
+    --hash=sha256:d35db5bb8de71ae301daf5ca9cb71f8a555e8c6f83a6d40e46a5bc09f8f461b5
+strictyaml==1.7.3 \
+    --hash=sha256:fb5c8a4edb43bebb765959e420f9b3978d7f1af88c80606c03fb420888f5d1c7
 tomlkit==0.15.2 \
     --hash=sha256:05562412163a3037b94497385fb7f9204c637bc605af7a48199e41cf2272f437
+tzdata==2026.5 \
+    --hash=sha256:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac
 urllib3==2.8.0 \
     --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3
 wcwidth==0.9.4 \
