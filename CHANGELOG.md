@@ -73,6 +73,14 @@ skill lives in that skill's own `CHANGELOG.md`.
   Every link, schema description and `scripts/round-check.py` path follows;
   released entries keep the names the files had then. A skill's own
   `CHANGELOG.md` keeps its name.
+- Four scope statements say what is out of scope without calling it a past
+  choice; what each one covers is unchanged:
+  - `GOVERNANCE.md`: "What is not delegated", and its closing paragraph drops
+    "That last one is not a style preference." The two references to the
+    heading in `SECURITY-AI.md` follow it.
+  - `references.md`: "What is not here".
+  - `docs/security-posture.md` section 5: "Badges not shown".
+  - `docs/review-rounds.md`: the lead-in to the list outside version 0.1.
 
 ### Fixed
 

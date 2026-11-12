@@ -10,7 +10,7 @@ for every change".
 ## An agent may
 
 - Edit files and prepare a change for a person to review. Source: `docs/security-posture.md`, row
-  2.5, and `GOVERNANCE.md`, "What is deliberately not delegated".
+  2.5, and `GOVERNANCE.md`, "What is not delegated".
 - Run the checks the way CI runs them, with `./scripts/gates.sh --selftest`. Source:
   `CONTRIBUTING.md`, "Run the checks the way CI runs them".
 - Raise a finding in the issue or pull request when something looks wrong or inconsistent. Source:
@@ -20,7 +20,7 @@ for every change".
 
 - Commit, merge, tag or push. These are not delegated: an agent edits and stages, and a person
   commits and pushes. Source: `docs/security-posture.md`, row 2.5, and `GOVERNANCE.md`, "What is
-  deliberately not delegated".
+  not delegated".
 - Report its own work as verified. A completion claim is confirmed by a party other than the one
   making it; an agent auditing its own work does not satisfy this. Source: `CONTRIBUTING.md`,
   "Verify completion claims before repeating them".

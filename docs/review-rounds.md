@@ -247,7 +247,7 @@ does not do that.
 
 ## Not in version 0.1
 
-These are left out on purpose. Do not read their absence as a gap to fill in this workflow:
+These are outside version 0.1. Their absence is not a gap to fill in this workflow:
 
 - A dispatch record, an acknowledgement record, a standalone collection record and a close or
   handoff record. Collection is part of the decision record in 0.1.
