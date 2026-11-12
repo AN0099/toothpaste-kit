@@ -1,0 +1,1322 @@
+#!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2026 Aidan Naveja
+#
+# SPDX-License-Identifier: Apache-2.0
+
+"""Mechanical checks for docs/standards/style-guide.md, technical-writing.md,
+plaintext-messages.md and data-display.md.
+
+Usage: style-check [--standard] [--formal] [--technical] [--plaintext] [--svg] FILE...
+       style-check --selftest
+
+Each check is named by the section of the numbered style guide it enforces (S8a
+is section 8, requirement (a)); a T check is named by the section of the
+numbered technical-writing standard (T5i is section 5, requirement (i)); a P check
+by the section of the numbered plaintext-messages standard; a D check by the section
+of the numbered data-display standard (D4b1 is 4(b)(1)). A SHALL
+hit prints FAIL and the run exits 1; a SHOULD hit prints WARN and does not
+change the exit. S3h warns on a file whose average sentence is greater than 20
+words, at line 1, and every run prints the average as INFO. An unknown option
+prints an error and exits 2, as does an --svg file that does not parse. S8a
+reads the em dash and U+2015, the horizontal bar, which looks the same.
+
+Coverage: Markdown prose only. Before every check except S8a, which reads every
+character, these are removed: fenced code blocks (backtick or tilde), indented
+code blocks (four spaces or a tab after a blank line, outside a list), HTML
+comments, single or multi-line, and inline code spans, each span left as the
+word "code". The line checks (S8h, S8i, S9d) read every remaining line, headings
+and table rows included. The word checks (S7b, S7c, S6b, S6c, S9a, S9e) read
+each paragraph or list item joined across its line breaks, and each heading and
+table row on its own. Of these, S7b, S7c, S6b, S6c and S9a skip text inside
+straight double or single quotes, so a term the standard names in quotes is not
+a use of it. A single quote counts only after a non-word and before one, so an
+apostrophe inside a word is never a quote; it spans one to three words and never
+opens on a digit, so "'90s" does not pair with "users'". A letter-led elision
+("'em") can still pair with a plural possessive within three words and hide
+them. A longer single-quoted span is read as text. S9e reads quotes. The
+sentence checks (S3l, S7f, S9b, S9c) and S6g read paragraphs and list items
+only, and first strip a leading label such as "(a)" or "(g)(1)", so they read
+the sentence behind it; the S3h average reads the same and counts no label as a
+word. S7f also skips quotes. A sentence ends at . ? or ! before a capital or a
+digit, never after a listed abbreviation (chs., Ed., Rev., approx., Nov. and the
+like) or an initialism (U.S., e.g.), so a sentence that ends on one is read with
+the next. a.m. and p.m. end a sentence before a capital and join one before a
+digit. S9c passes a sentence opening with an ISO date or a requirement reference
+such as 3(h). S3i counts a source line as one line per 100 characters. S3g reads
+loose lists (blank lines between items) as one list, checks each nesting level,
+and starts a new list at a change of marker. S8i is any character whose Unicode
+name holds ARROW. S8h is U+2018 to U+201F.
+
+--standard turns on the checks that bind a standard (S7b, S7c, S7f, and S9a with
+them); a file inside a directory named standards turns them on by itself.
+--formal turns on S9a alone. --technical turns on the T checks, for text
+technical-writing.md governs; no path turns them on. T3c and T3e read sentences
+as the sentence checks do. T5c is the S9a pattern, and a technical run reports a
+contraction once, as T5c, never also as S9a. The pattern reads n't, 're, 've,
+'ll, 'm and 'd after any word, and 's only after it, that, there, what, here,
+let, who, where, how, when, why, he and she, since any other 's reads the same
+as a possessive. T5c, T5i and T5j read as the word checks do, skipping quotes.
+T5i reads the semicolon, U+037E and U+FF1B. It skips an HTML entity, unless HTML
+does not decode it ("R&D;") or it decodes to a semicolon ("&#59;"), and a URL
+opening on http, https or www. at a word start, in angle brackets or bare up to
+any trailing punctuation. A numeric entity of more than seven decimal or six hex
+digits (&#00000059;) is read, as Markdown shows it as text. T5j reads eight
+pronouns. Every other requirement is a review item or a judgment and is not read
+here; the conformance table in each numbered standard names which.
+
+--plaintext turns on the P checks, for a message sent where Markdown does not
+render; no path turns them on. The P checks read the raw lines, code included,
+since nothing renders: P2a reads ** or __ closed on the same line, a backtick, a
+line opening on one to six # and a space, an = underline under a text line, and
+a line of three or more * or _ alone, spaces allowed ("***", "* * *"); a ---
+line passes, as a plain separator. Literal text of the same shape fails too
+("__init__", "# of hosts"), since the shape is all the check sees. P3a reads a
+numbered line ("1. Title", "1) Title", up to three spaces in) that is not inside
+a numbered list, with a non-blank line after it that is not another numbered
+line at any indent, so a numbered list passes, a sub-item four spaces in
+included, and a numbered title with its body under it fails. P3b reads a line
+ending in a colon with a non-blank line after it. P3c reads a non-blank line
+after a non-blank line, unless it opens a list item or the line before is one
+P3a or P3b reads, so each break is reported once. A line opens a list item when
+it starts, after any indent, with -, * or +, or a number and . or ), and follows
+a list item or a line ending in . ! ? or ), before any straight or curly closing
+quote; after other text it is a wrap ("November" / "10. Then"). An item
+continued on the next line is a hard wrap, and so is a text line right after a
+list's last item. The S checks still run on a plaintext file, reading it as
+Markdown.
+
+D2d also reads every Markdown run, raw lines included: a fenced block opened as
+mermaid whose first diagram line, past any %% line and any --- front matter, opens on
+the word pie. --svg reads each file as an SVG, parsed with expat, and runs only the D
+checks below, with no S3h average. Attributes and style="" declarations are read; a
+<style> sheet, CSS classes and dy offsets are not, so a value set only there is
+unseen. Transforms are not read either, so an element moved by one is read where its
+own attributes place it. Fill and stroke inherit from ancestors; opacity is the
+product along them, with a color's own alpha. Colors are read as hex of 3, 4, 6 or 8
+digits, rgb(), rgba(), hsl(), hsla() or a listed name, by D4b1, D4c and D6b alike.
+rgb() and hsl() take one syntax each: a comma between every channel, with % on hsl
+saturation and lightness, or spaces with / before the alpha and the % optional; a
+malformed number or mixed separators leave the color unread. D2d (SVG) reads a <path>
+with one move and only line segments and arcs, each pair after M or L, each number
+after H or V and each arc after A, its two flags read as one digit each, being one
+segment: one arc with one or two lines, or two arcs with at most two lines, of
+different radii (a donut segment) or drawn one after the other with at least one line
+(a wedge past half the disc); two same-radius arcs with no line, a circle or a lens,
+pass. A wedge whose arc is drawn with curve segments (C, S, Q, T) is unseen, as is a
+<circle> drawn as a pie with a dash array; a shape of one arc and one or two lines,
+such as a quarter disc, reads as a wedge. D2g reads the viewBox, else width and height
+in px, pt, pc, mm, cm or in; em, ex or % leaves it unread. D3b reads <rect> bars whose
+id or class, or an ancestor's, names bar, at least two, sharing a bottom edge
+(vertical) or a left edge (horizontal), and fails on a numeric <text> within 6 units
+of that baseline that is not zero and is not placed inside the bars' span on the other
+axis, where a tick label sits; a category label under or beside the bars is inside it,
+and a text with no coordinate on that axis is not. Bars in a <path>, or below the
+baseline, are unseen. D4b (shadow) reads a filter="url(#id)" whose <filter> holds
+feDropShadow, or feOffset with feGaussianBlur, with an offset other than 0,0; a 0,0
+offset is a glow, read as the blur alone. D4b (gradient) reads a fill or stroke
+referencing a linear or radial gradient, except on an element or ancestor naming
+colorbar, where the gradient measures; the exemption reads the name only, so a
+decorative gradient inside a colorbar group passes. D4b1 reads a line, path, polyline
+or rect with an ancestor or itself whose id or class names grid, and fails when its
+ink, the darkness of its stroke blended by its opacity over white times its width as
+drawn, is over 0.6. The width as drawn is the stroke width times the scale the viewBox
+is drawn at: the smaller of the <svg> width and height ratios, the larger under slice,
+or the one ratio when only one length is set; a stroke with vector-effect
+non-scaling-stroke takes no scale. Under 1 the width counts as 1, so a line under 0.4
+relative luminance fails at any width. A dark ground is not modelled. D4c reads a
+<rect> at least 0.8 of the canvas each way whose stroke is set and seen (width,
+opacity and the color's alpha above 0). D5b reads the outermost element whose id or
+class names legend. D6b counts strong colors in fill, stroke and stop-color, each
+blended by its opacity over white: HSL saturation of at least 0.5 and lightness from
+0.25 to 0.75, one per hue, a color within 20 degrees of a counted hue being a shade of
+it; a gradient's stops count. "Names" matches a part of one name in the id or class,
+split at -, _ or a lowercase to capital change, or two parts of that one name run
+together: the word, its plural, or for grid gridline(s). So "chart-legend",
+"legendBox" and "color-bar" name legend, legend and colorbar; "legendary" names no
+legend and "series-color bar" no colorbar, but "no-grid-label" still names grid. None
+of the D checks can tell an exhibit from an illustration, so --svg is for exhibits.
+
+The characters S8a, S8h and S8i look for are built with chr(), so this file
+holds none of them and passes its own check.
+
+--selftest runs each check against planted texts that must hit and clean texts
+that must not, and fails if any is wrong.
+"""
+
+import colorsys
+import functools
+import html
+import os
+import re
+import string
+import sys
+import tempfile
+import unicodedata
+from xml.parsers import expat
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from cli_path import under  # noqa: E402
+
+EM = chr(0x2014)
+BAR = chr(0x2015)
+CURLY = "".join(chr(c) for c in range(0x2018, 0x2020))
+APOS = "'" + chr(0x2019)
+NUM_WORDS = (
+    "ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|"
+    "nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand"
+)
+MONTHS = (
+    "January|February|March|April|May|June|July|August|September|October|"
+    "November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec"
+)
+BULLET = re.compile(r"^\s*([-*+]|\d+\.)\s+")
+ITEM = re.compile(r"^(\s*)([-*+]|\d+\.)\s+")
+FENCE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+LABEL = re.compile(r"^\s*(\([a-z0-9]{1,3}\)\s*)+", re.I)
+FLAGS = ("--standard", "--formal", "--technical", "--plaintext", "--svg")
+LINE_CHARS = 100
+
+
+def drop_comments(line):
+    """Remove each complete <!-- ... --> on LINE, left to right, by string search."""
+    out, pos = [], 0
+    while True:
+        a = line.find("<!--", pos)
+        b = line.find("-->", a + 4) if a >= 0 else -1
+        if b < 0:
+            return "".join(out) + line[pos:]
+        out.append(line[pos:a])
+        pos = b + 3
+
+
+SENTENCE_START = set(string.ascii_uppercase + string.digits + '"(*')
+
+
+def split_sentences(text):
+    """Split after . ? or ! and its whitespace, when a capital, a digit, a quote, ( or * follows."""
+    parts, start, i, n = [], 0, 0, len(text)
+    while i < n:
+        if text[i] in ".?!":
+            j = i + 1
+            while j < n and text[j].isspace():
+                j += 1
+            if j > i + 1 and j < n and text[j] in SENTENCE_START:
+                parts.append(text[start:i + 1])
+                start = i = j
+                continue
+        i += 1
+    parts.append(text[start:])
+    return parts
+
+
+def strip_code(lines):
+    """Lines with code blocks and comments blanked and inline code spans removed."""
+    out, fence, comment, code, in_list, prev_blank = [], None, False, False, False, True
+    for line in lines:
+        if fence:
+            if re.match(rf"^\s{{0,3}}{re.escape(fence[0])}{{{len(fence)},}}\s*$", line):
+                fence = None
+            out.append("")
+            continue
+        m = FENCE.match(line)
+        if m and not comment:
+            fence = m.group(1)
+            out.append("")
+            prev_blank = False
+            continue
+        if comment:
+            if "-->" not in line:
+                out.append("")
+                continue
+            line, comment = line.split("-->", 1)[1], False
+        line = drop_comments(line)
+        if "<!--" in line:
+            line, comment = line.split("<!--", 1)[0], True
+        blank = not line.strip()
+        indented = re.match(r"^( {4}|\t)", line)
+        if not blank and indented and (code or (prev_blank and not in_list)):
+            code = True
+            out.append("")
+            continue
+        if not blank:
+            code = False
+            if BULLET.match(line):
+                in_list = True
+            elif not line.startswith((" ", "\t")):
+                in_list = False
+        prev_blank = blank
+        # A span becomes a word, so its removal leaves no double space for S9d.
+        out.append(re.sub(r"`[^`]*`", "code", line))
+    return out
+
+
+# A single-quoted span: one to three words, each free of quotes and spaces except
+# an apostrophe before a letter ("don't"), opening on a non-digit.
+SQUOTE = r"(?<!\w)'(?!\d)(?:[^'\s]|'(?=\w))+(?: (?:[^'\s]|'(?=\w))+){0,2}'(?!\w)"
+# An entity, named or numeric; drop_refs keeps one that HTML does not decode
+# ("R&D;") or that decodes to a semicolon ("&#59;"). A URL, with a scheme or opening
+# on www., in angle brackets, or bare and stopping before trailing punctuation.
+# CommonMark decodes 1 to 7 decimal or 1 to 6 hex digits; a longer one shows as text.
+ENTITY = r"&(?:[A-Za-z][A-Za-z0-9]*|#\d{1,7}|#[xX][0-9a-fA-F]{1,6});"
+URL = r"(?:https?://|www\.)"
+REFS = rf"<{URL}[^\s>]+>|(?<![\w.]){URL}[^\s<>]*[^\s<>.,;:!?)\]'\"]"
+SEMICOLONS = f";{chr(0x37E)}{chr(0xFF1B)}"
+
+
+def blank(m):
+    return m.group()[0] + " " * (len(m.group()) - 2) + m.group()[-1]
+
+
+def drop_quotes(text):
+    """Blank text inside straight double or single quotes, keeping every offset."""
+    # A single quote opens only after a non-word and closes only before one, so an
+    # apostrophe inside a word ("don't") is never read as a quote mark. It spans one
+    # to three words and never opens on a digit, so a leading apostrophe ("'90s")
+    # does not pair with a plural possessive ("users'") and hide the text between.
+    return re.sub(SQUOTE, blank, re.sub(r'"[^"]*"', blank, text))
+
+
+def drop_refs(text):
+    """Blank HTML entities and URLs, keeping every offset."""
+    def entity(m):
+        out = html.unescape(m.group())
+        keep = out == m.group() or any(c in SEMICOLONS for c in out)
+        return m.group() if keep else " " * len(m.group())
+    return re.sub(ENTITY, entity, re.sub(REFS, lambda m: " " * len(m.group()), text))
+
+
+def body(s):
+    """A sentence with any leading requirement label removed."""
+    return LABEL.sub("", s, count=1)
+
+
+def is_prose(line):
+    s = line.strip()
+    return bool(s) and not s.startswith(("|", "#", "<!--"))
+
+
+def units(lines):
+    """(first line, text, is a list item, [(offset, line)]) per paragraph and list item."""
+    out, cur, in_list = [], [], False
+
+    def flush():
+        if cur:
+            parts, offs, pos = [], [], 0
+            for n, t in cur:
+                offs.append((pos, n))
+                parts.append(t)
+                pos += len(t) + 1
+            out.append((cur[0][0], " ".join(parts), in_list, offs))
+
+    for i, line in enumerate(lines, 1):
+        bullet = BULLET.match(line)
+        if not is_prose(line) or bullet:
+            flush()
+            cur, in_list = [], bool(bullet)
+            if bullet:
+                cur = [(i, line[bullet.end():].strip())]
+            continue
+        cur.append((i, line.strip()))
+    flush()
+    return out
+
+
+def line_at(offs, pos):
+    n = offs[0][1]
+    for start, line in offs:
+        if start <= pos:
+            n = line
+    return n
+
+
+ABBREV = re.compile(
+    r"\b(ch|chs|para|paras|p|pp|vol|no|fig|cf|e\.g|i\.e|etc|vs|art|sec|ed|rev|approx"
+    r"|jan|feb|mar|apr|jun|jul|aug|sept|sep|oct|nov|dec|(?![ap]\.m\.$)(?:[a-z]\.)+[a-z])\.$", re.I)
+TIME = re.compile(r"\b[ap]\.m\.$", re.I)
+
+
+def sentences(text):
+    """Split at . ? or ! before a capital or a digit, never after an abbreviation."""
+    out = []
+    for part in split_sentences(text):
+        # a.m. and p.m. end a sentence before a capital and join one before a digit.
+        if out and (ABBREV.search(out[-1]) or TIME.search(out[-1]) and part[:1].isdigit()):
+            out[-1] += " " + part
+        elif part.strip():
+            out.append(part)
+    return out
+
+
+def line_hits(pattern, flags=0):
+    rx = re.compile(pattern, flags)
+
+    def run(lines, raw):
+        return [(i, line.strip()[:80]) for i, line in enumerate(lines, 1)
+                if line.strip() and rx.search(line)]
+
+    return run
+
+
+def text_hits(pattern, flags=0, quotes=False, refs=False):
+    """Hits in each paragraph joined across lines, and in each heading or table row."""
+    rx = re.compile(pattern, flags)
+
+    def prep(text):
+        text = drop_refs(text) if refs else text
+        return drop_quotes(text) if quotes else text
+
+    def run(lines, raw):
+        hits = {}
+        for _, text, _, offs in units(lines):
+            for m in rx.finditer(prep(text)):
+                n = line_at(offs, m.start())
+                hits.setdefault(n, lines[n - 1].strip()[:80])
+        for i, line in enumerate(lines, 1):
+            if line.strip() and not is_prose(line):
+                if rx.search(prep(line)):
+                    hits.setdefault(i, line.strip()[:80])
+        return sorted(hits.items())
+
+    return run
+
+
+def sentence_hits(test):
+    def run(lines, raw):
+        hits = []
+        for start, text, _, offs in units(lines):
+            pos = 0
+            for s in sentences(text):
+                pos = text.find(s, pos)
+                if test(body(s)):
+                    hits.append((line_at(offs, max(pos, 0)), s[:80]))
+        return hits
+
+    return run
+
+
+def em_dash(lines, raw):
+    return [(i, l.strip()[:80]) for i, l in enumerate(raw, 1) if EM in l or BAR in l]
+
+
+def arrow(lines, raw):
+    return [(i, l.strip()[:80]) for i, l in enumerate(lines, 1)
+            if any(ord(c) > 127 and "ARROW" in unicodedata.name(c, "") for c in l)]
+
+
+def para_length(lines, raw):
+    hits, run_start, n = [], 0, 0
+    for i, line in enumerate(lines + [""], 1):
+        if is_prose(line) and not BULLET.match(line):
+            run_start = run_start or i
+            n += max(1, -(-len(line.rstrip()) // LINE_CHARS))
+            continue
+        if n > 10:
+            hits.append((run_start, f"paragraph of {n} lines"))
+        run_start, n = 0, 0
+    return hits
+
+
+def single_item_list(lines, raw):
+    """A list level with one item; a loose list is one list, a level or marker change another."""
+    hits, levels, blank = [], [], False
+
+    def close(above):
+        while levels and levels[-1][0] > above:
+            _, count, start, _ = levels.pop()
+            if count == 1:
+                hits.append((start, "a list of one item"))
+
+    for i, line in enumerate(lines + [""], 1):
+        m = ITEM.match(line)
+        if m:
+            d = len(m.group(1).expandtabs(4))
+            mark = "." if m.group(2)[-1] == "." else m.group(2)
+            close(d)
+            if levels and levels[-1][0] == d and levels[-1][3] != mark:
+                _, count, start, _ = levels.pop()
+                if count == 1:
+                    hits.append((start, "a list of one item"))
+            if levels and levels[-1][0] == d:
+                levels[-1][1] += 1
+            else:
+                levels.append([d, 1, i, mark])
+            blank = False
+        elif not line.strip():
+            blank = True
+        elif levels and line.startswith((" ", "\t")):
+            blank = False
+        else:
+            close(-1)
+            blank = False
+    close(-1)
+    return sorted(hits)
+
+
+def avg_len(lines):
+    words = sents = 0
+    for _, text, _, _ in units(lines):
+        for s in sentences(text):
+            words += len(body(s).split())
+            sents += 1
+    return words / sents if sents else 0.0
+
+
+def avg_over(lines, raw):
+    avg = avg_len(lines)
+    return [(1, f"average sentence {avg:.1f} words")] if avg > AVG_MAX else []
+
+
+NUMBERED = re.compile(r"^\s{0,3}\d+[.)]\s+\S")
+LIST_ITEM = re.compile(r"^\s*([-*+]|\d+[.)])\s")
+MARKUP = re.compile(r"(\*\*|__)\S(.*?\S)?\1|`|^\s{0,3}#{1,6}\s|^\s{0,3}([*_])(\s*\3){2,}\s*$")
+# A numbered line at any indent: a sub-item four spaces in is still inside a numbered list.
+NUMBERED_ANY = re.compile(r"^\s*\d+[.)]\s+\S")
+SETEXT = re.compile(r"^\s{0,3}=+\s*$")
+
+
+def setext(raw, i):
+    """Line i (0-based) is an = underline under a text line, a heading in Markdown."""
+    return i > 0 and bool(SETEXT.match(raw[i])) and bool(raw[i - 1].strip())
+
+
+def plain_markup(lines, raw):
+    return [(i, l.strip()[:80]) for i, l in enumerate(raw, 1)
+            if MARKUP.search(l) or setext(raw, i - 1)]
+
+
+def numbered_title(line):
+    return bool(NUMBERED.match(line))
+
+
+def list_opens(raw, i):
+    """Line i (0-based) opens a list item: item-shaped, after a break, an item or a sentence end."""
+    prev = raw[i - 1].rstrip() if i else ""
+    # A sentence may end inside a closing quote, straight or curly: 'The answer is "yes."'
+    end = prev.rstrip("\"'" + chr(0x201D) + chr(0x2019))[-1:]
+    return bool(LIST_ITEM.match(raw[i])) and (not prev or bool(LIST_ITEM.match(prev))
+                                              or (end != "" and end in ".!?)"))
+
+
+def titled(raw, i):
+    """Line i (0-based) is a numbered title: numbered, and not inside a numbered list."""
+    return numbered_title(raw[i]) and not (i and NUMBERED_ANY.match(raw[i - 1]))
+
+
+def numbered_titles(lines, raw):
+    return [(i, raw[i - 1].strip()[:80]) for i in range(1, len(raw))
+            if titled(raw, i - 1) and raw[i].strip() and not NUMBERED_ANY.match(raw[i])]
+
+
+def lead_in(line):
+    return line.rstrip().endswith(":")
+
+
+def no_blank_after(test, allow):
+    """A line that test matches, followed by a non-blank line that allow does not match."""
+    def run(lines, raw):
+        return [(i, raw[i - 1].strip()[:80]) for i in range(1, len(raw))
+                if test(raw[i - 1]) and raw[i].strip() and not allow(raw[i])]
+
+    return run
+
+
+def hard_wrap(lines, raw):
+    return [(i + 1, raw[i].strip()[:80]) for i in range(1, len(raw))
+            if raw[i].strip() and raw[i - 1].strip() and not list_opens(raw, i)
+            and not titled(raw, i - 1) and not lead_in(raw[i - 1]) and not setext(raw, i)]
+
+
+MERMAID = re.compile(r"^\s{0,3}(`{3,}|~{3,})\s*mermaid\b", re.I)
+
+
+def mermaid_pie(lines, raw):
+    hits, fence, first, front = [], None, False, False
+    for n, line in enumerate(raw, 1):
+        s = line.strip()
+        if fence is None:
+            m = MERMAID.match(line)
+            if m:
+                fence, first, front = m[1], True, False
+            continue
+        if re.match(rf"^\s{{0,3}}{re.escape(fence[0])}{{{len(fence)},}}\s*$", line):
+            fence = None
+        elif first and s == "---":
+            front = not front
+        elif first and s and not front and not s.startswith("%%"):
+            first = False
+            if re.match(r"pie\b", s, re.I):
+                hits.append((n, s))
+    return hits
+
+
+SVG_COLORS = {
+    "black": (0, 0, 0), "white": (1, 1, 1), "gray": (.5, .5, .5), "grey": (.5, .5, .5),
+    "silver": (.75, .75, .75), "lightgray": (.83, .83, .83), "lightgrey": (.83, .83, .83),
+    "darkgray": (.66, .66, .66), "darkgrey": (.66, .66, .66), "dimgray": (.41, .41, .41),
+    "dimgrey": (.41, .41, .41), "gainsboro": (.86, .86, .86), "red": (1, 0, 0),
+    "green": (0, .5, 0), "blue": (0, 0, 1), "yellow": (1, 1, 0), "orange": (1, .65, 0),
+    "purple": (.5, 0, .5), "navy": (0, 0, .5), "maroon": (.5, 0, 0), "teal": (0, .5, .5),
+    "olive": (.5, .5, 0), "lime": (0, 1, 0), "aqua": (0, 1, 1), "cyan": (0, 1, 1),
+    "fuchsia": (1, 0, 1), "magenta": (1, 0, 1), "crimson": (.86, .08, .24),
+    "firebrick": (.7, .13, .13), "darkred": (.55, 0, 0), "darkblue": (0, 0, .55),
+    "darkgreen": (0, .39, 0), "steelblue": (.27, .51, .71),
+}
+GRID_DARK = 0.4
+BOX = 0.8
+TICK_TOL = 6
+HUE_TOL = 20
+UNITS = {"px": 1, "pt": 4 / 3, "pc": 16, "mm": 96 / 25.4, "cm": 96 / 2.54, "in": 96}
+NUMERIC = re.compile("^[-+−]?[$€£]?\\d[\\d,]*(\\.\\d+)?%?$")
+
+
+class Node:
+    def __init__(self, tag, attrs, up, line):
+        self.tag, self.up, self.line, self.kids, self.text = tag, up, line, [], ""
+        self.a = {k.rsplit(":", 1)[-1]: v for k, v in attrs.items()}
+        for decl in self.a.pop("style", "").split(";"):
+            k, _, v = decl.partition(":")
+            if v.strip():
+                self.a[k.strip().lower()] = v.strip()
+
+
+@functools.lru_cache(maxsize=8)
+def svg_parse(text):
+    root = Node("#document", {}, None, 1)
+    cur = [root]
+    p = expat.ParserCreate()
+
+    def start(tag, attrs):
+        n = Node(tag.rsplit(":", 1)[-1], attrs, cur[-1], p.CurrentLineNumber)
+        cur[-1].kids.append(n)
+        cur.append(n)
+
+    def chars(data):
+        cur[-1].text += data
+
+    p.StartElementHandler, p.CharacterDataHandler = start, chars
+    p.EndElementHandler = lambda tag: cur.pop()
+    p.Parse(text, True)
+    return root
+
+
+def svg(raw):
+    return svg_parse("\n".join(raw))
+
+
+def walk(n):
+    yield n
+    for k in n.kids:
+        yield from walk(k)
+
+
+def chain(n):
+    while n is not None:
+        yield n
+        n = n.up
+
+
+def num(v, default=None):
+    m = re.match(r"\s*([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)", v or "", re.I)
+    return float(m[1]) if m else default
+
+
+def length(v):
+    """A length in px: a bare number, px, pt, pc, mm, cm or in; else None (em, ex, %)."""
+    m = re.fullmatch(r"\s*([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)\s*(px|pt|pc|mm|cm|in)?\s*", v or "", re.I)
+    return float(m[1]) * UNITS[(m[2] or "px").lower()] if m else None
+
+
+def opacity(n, name):
+    """The product of name, inherited, and every opacity along n's ancestors."""
+    o = num(prop(n, name), 1)
+    for m in chain(n):
+        o *= num(m.a.get("opacity"), 1)
+    return o
+
+
+def prop(n, name):
+    """An inherited presentation property: the nearest value set on n or an ancestor."""
+    for m in chain(n):
+        if m.a.get(name, "inherit") != "inherit":
+            return m.a[name]
+    return None
+
+
+def parts(m):
+    """Each name in m's id and class, as its parts: split at -, _ or a lowercase-to-capital change."""
+    names = [m.a.get("id", "")] + m.a.get("class", "").split()
+    return [[p for p in re.split(r"[\s_-]+", re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", s).lower()) if p]
+            for s in names]
+
+
+def named(n, word, up=True):
+    """True when n, or with up any ancestor, has an id or class naming word: a part, or two
+    parts of one name run together, that is the word, its plural, or for grid gridline(s)."""
+    want = {word, word + "s"} | ({"gridline", "gridlines"} if word == "grid" else set())
+    for m in chain(n) if up else [n]:
+        for p in parts(m):
+            if want & (set(p) | {a + b for a, b in zip(p, p[1:])}):
+                return True
+    return False
+
+
+NUM = r"(?:\d+\.?\d*|\.\d+)"
+
+
+def alpha(v):
+    v = (v or "").strip()
+    return 1.0 if not v else min(float(v[:-1]) / 100 if v.endswith("%") else float(v), 1)
+
+
+def channels(kind, body):
+    """rgb() or hsl() channels in one syntax: a comma between each, or spaces with / before the
+    alpha. The comma syntax wants % on hsl saturation and lightness; the space syntax does not."""
+    if "," in body:
+        items, legacy = [x.strip() for x in body.split(",")], True
+        if "/" in body or len(items) not in (3, 4):
+            return None
+    else:
+        main, slash, a = body.partition("/")
+        items, legacy = main.split() + ([a.strip()] if slash else []), False
+        if len(main.split()) != 3:
+            return None
+    unit = "%" if kind == "hsl" and legacy else "%?"
+    pats = ["(?:deg)?" if kind == "hsl" else "%?", unit, unit, "%?"]
+    if not all(re.fullmatch(rf"{NUM}{u}", x) for x, u in zip(items, pats)):
+        return None
+    v = [float(re.match(NUM, x)[0]) for x in items]
+    a = alpha(items[3]) if len(items) == 4 else 1.0
+    if kind == "rgb":
+        return tuple(min(v[i] / (100 if items[i].endswith("%") else 255), 1) for i in range(3)) + (a,)
+    return colorsys.hls_to_rgb(v[0] % 360 / 360, min(v[2] / 100, 1), min(v[1] / 100, 1)) + (a,)
+
+
+def color(value):
+    """(r, g, b, a) from 0 to 1 for a hex, rgb(), rgba(), hsl(), hsla() or listed named color,
+    in the comma or the space syntax, else None. Hex takes 3, 4, 6 or 8 digits."""
+    v = (value or "").strip().lower()
+    m = re.fullmatch(r"#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})", v)
+    if m:
+        h = m[1] if len(m[1]) > 4 else "".join(c * 2 for c in m[1])
+        return tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)) + (int(h[6:] or "ff", 16) / 255,)
+    m = re.fullmatch(r"(rgb|hsl)a?\((.*)\)", v)
+    if m:
+        return channels(m[1], m[2])
+    named_rgb = SVG_COLORS.get(v)
+    return named_rgb + (1.0,) if named_rgb else None
+
+
+def over_white(rgba, o=1.0):
+    """The color seen over white, at its alpha times o."""
+    a = rgba[3] * o
+    return tuple(1 - a * (1 - c) for c in rgba[:3])
+
+
+def luminance(rgb):
+    lin = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in rgb]
+    return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+
+
+def strong(rgb):
+    hi, lo = max(rgb), min(rgb)
+    light = (hi + lo) / 2
+    sat = 0 if hi == lo else (hi - lo) / (1 - abs(2 * light - 1))
+    return sat >= 0.5 and 0.25 <= light <= 0.75
+
+
+def canvas(t):
+    s = next((n for n in walk(t) if n.tag == "svg"), None)
+    if s is None:
+        return None, None
+    vb = [num(x) for x in re.split(r"[\s,]+", s.a.get("viewBox", "").strip())]
+    if len(vb) == 4 and None not in vb:
+        return s, (vb[2], vb[3])
+    w, h = length(s.a.get("width")), length(s.a.get("height"))
+    if w and h:
+        return s, (w, h)
+    return s, None
+
+
+def by_id(t):
+    return {n.a["id"]: n for n in walk(t) if "id" in n.a}
+
+
+def refs(n, *props):
+    for p in props:
+        m = re.match(r"\s*url\(\s*['\"]?#([^)'\"]+)", n.a.get(p, ""))
+        if m:
+            yield p, m[1]
+
+
+def svg_tall(lines, raw):
+    s, size = canvas(svg(raw))
+    return [(s.line, f"<svg> {size[0]:g} wide, {size[1]:g} tall")] if size and size[1] > size[0] else []
+
+
+SNUM = r"[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?"
+ARC = re.compile(rf"[\s,]*({SNUM})[\s,]*{SNUM}[\s,]*{SNUM}[\s,]*[01][\s,]*[01][\s,]*{SNUM}[\s,]*{SNUM}", re.I)
+
+
+def wedge(d):
+    """A pie wedge: one move, then line segments and arcs only, with one arc and one or two
+    lines, or two arcs and at most two lines, the arcs of different radii (a donut segment) or
+    drawn one after the other with a line (a wedge past half the disc). Each pair after M or L,
+    each number after H or V, and each arc after A, its two flags read as one digit each, is one
+    segment."""
+    letters, radii = "", []
+    for cmd, args in re.findall(r"([MmLlHhVvCcSsQqTtAaZz])([^MmLlHhVvCcSsQqTtAaZz]*)", d):
+        c = cmd.upper()
+        nums = re.findall(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?", args, re.I)
+        if c == "M":
+            letters += "M" + "L" * max(len(nums) // 2 - 1, 0)
+        elif c in "LHV":
+            letters += "L" * max(len(nums) // (2 if c == "L" else 1), 1)
+        elif c == "A":
+            found = ARC.findall(args)
+            letters += "A" * max(len(found), 1)
+            radii += [float(x) for x in found]
+        else:
+            letters += c
+    if not letters.startswith("M") or letters.count("M") != 1 or set(letters) - set("MLAZ"):
+        return False
+    lines = letters.count("L")
+    if letters.count("A") == 1:
+        return 1 <= lines <= 2
+    if letters.count("A") == 2:
+        return lines <= 2 and (len(set(radii)) == 2 or ("AA" in letters and lines >= 1))
+    return False
+
+
+def svg_pie(lines, raw):
+    return [(n.line, f"<path> d=\"{n.a['d'][:40]}\"") for n in walk(svg(raw))
+            if n.tag == "path" and wedge(n.a.get("d", ""))]
+
+
+def text_of(n):
+    return n.text + "".join(text_of(k) for k in n.kids)
+
+
+def text_at(n, axis):
+    for m in [n] + n.kids:
+        if num(m.a.get(axis)) is not None:
+            return num(m.a.get(axis))
+    return None
+
+
+def bar_baseline(lines, raw):
+    t = svg(raw)
+    box = [tuple(num(n.a.get(k), 0 if k in "xy" else None) for k in ("x", "y", "width", "height"))
+           for n in walk(t) if n.tag == "rect" and named(n, "bar")]
+    box = [b for b in box if None not in b]
+    if len(box) < 2:
+        return []
+    bottoms, lefts = {round(y + h, 1) for x, y, w, h in box}, {round(x, 1) for x, y, w, h in box}
+    if len(bottoms) == 1:
+        base, axis = bottoms.pop(), "y"
+    elif len(lefts) == 1:
+        base, axis = lefts.pop(), "x"
+    else:
+        return []
+    # A tick label sits beside the bars on the value axis; a category label sits within their span.
+    # A text with no coordinate on the other axis is not placed within it, so it reads as a tick.
+    other = "x" if axis == "y" else "y"
+    lo = min(b[0] if axis == "y" else b[1] for b in box)
+    hi = max(b[0] + b[2] if axis == "y" else b[1] + b[3] for b in box)
+    hits = []
+    for n in walk(t):
+        s = text_of(n).strip() if n.tag == "text" else ""
+        pos = text_at(n, axis) if NUMERIC.match(s) else None
+        side = text_at(n, other) if pos is not None else None
+        if pos is not None and abs(pos - base) <= TICK_TOL and not (side is not None and lo <= side <= hi):
+            value = float(re.sub(r"[^\d.-]", "", s.replace("−", "-")))
+            if value != 0:
+                hits.append((n.line, f"tick \"{s}\" at the bars' baseline, {axis} {base:g}"))
+    return hits
+
+
+def shadow(lines, raw):
+    t = svg(raw)
+    ids, hits = by_id(t), []
+    for n in walk(t):
+        for _, ref in refs(n, "filter"):
+            f = ids.get(ref)
+            prims = [m for m in walk(f)] if f is not None and f.tag == "filter" else []
+            tags = {m.tag for m in prims}
+            # An offset of 0,0 is a glow, which a blur alone already is, so it is not a shadow.
+            moved = any(num(m.a.get(k), 2 if m.tag == "feDropShadow" else 0) != 0
+                        for m in prims if m.tag in ("feDropShadow", "feOffset") for k in ("dx", "dy"))
+            if moved and ("feDropShadow" in tags or {"feOffset", "feGaussianBlur"} <= tags):
+                hits.append((n.line, f"<{n.tag}> filter url(#{ref}), a drop shadow"))
+    return hits
+
+
+def gradient(lines, raw):
+    t = svg(raw)
+    ids = by_id(t)
+    return [(n.line, f"<{n.tag}> {p} url(#{ref}), a gradient") for n in walk(t)
+            for p, ref in refs(n, "fill", "stroke")
+            if getattr(ids.get(ref), "tag", "") in ("linearGradient", "radialGradient")
+            and not named(n, "colorbar")]
+
+
+def fit(s, size):
+    """The scale the viewBox is drawn at in the <svg> width and height: the smaller ratio, the
+    larger under slice, the one ratio when only one length is set, else 1."""
+    if s is None or not size or not size[0] or not size[1]:
+        return 1
+    w, h = length(s.a.get("width")), length(s.a.get("height"))
+    r = [x for x in (w and w / size[0], h and h / size[1]) if x]
+    if not r:
+        return 1
+    return max(r) if "slice" in s.a.get("preserveAspectRatio", "") else min(r)
+
+
+def dark_grid(lines, raw):
+    t, hits = svg(raw), []
+    s, size = canvas(t)
+    scale = fit(s, size)
+    for n in walk(t):
+        if n.tag not in ("line", "path", "polyline", "rect") or not named(n, "grid"):
+            continue
+        rgba = color(prop(n, "stroke"))
+        if rgba is None:
+            continue
+        shade = luminance(over_white(rgba, opacity(n, "stroke-opacity")))
+        # Ink is darkness times width as drawn, so a light grid drawn wide is as heavy as a dark
+        # one. A line under 1 px counts as 1, since a dark line is not muted however thin.
+        fixed = n.a.get("vector-effect") == "non-scaling-stroke"
+        width = num(prop(n, "stroke-width"), 1) * (1 if fixed else scale)
+        if (1 - shade) * max(width, 1) > 1 - GRID_DARK:
+            hits.append((n.line, f"<{n.tag}> grid stroke {prop(n, 'stroke')}, luminance {shade:.2f},"
+                                 f" width {width:g}"))
+    return hits
+
+
+def box_border(lines, raw):
+    t = svg(raw)
+    _, size = canvas(t)
+    if not size:
+        return []
+    hits = []
+    for n in walk(t):
+        st = (prop(n, "stroke") or "none").strip().lower()
+        if (n.tag != "rect" or st in ("none", "transparent") or num(prop(n, "stroke-width"), 1) <= 0
+                or opacity(n, "stroke-opacity") * (color(st) or (0, 0, 0, 1))[3] <= 0):
+            continue
+        dims = []
+        for k, full in (("width", size[0]), ("height", size[1])):
+            v = n.a.get(k, "")
+            dims.append(num(v, 0) / 100 * full if v.strip().endswith("%") else num(v, 0))
+        if dims[0] >= BOX * size[0] and dims[1] >= BOX * size[1]:
+            hits.append((n.line, f"<rect> {dims[0]:g} by {dims[1]:g}, stroke {st}"))
+    return hits
+
+
+def legend(lines, raw):
+    return [(n.line, f"<{n.tag}> id \"{n.a.get('id', '')}\" class \"{n.a.get('class', '')}\"")
+            for n in walk(svg(raw)) if named(n, "legend", up=False)
+            and not (n.up is not None and named(n.up, "legend"))]
+
+
+def strong_colors(lines, raw):
+    # One entry per hue: a color within HUE_TOL degrees of one already seen is a shade of it.
+    seen = {}
+    for n in walk(svg(raw)):
+        for p, o in (("fill", "fill-opacity"), ("stroke", "stroke-opacity"), ("stop-color", "stop-opacity")):
+            rgba = color(n.a.get(p))
+            rgb = over_white(rgba, opacity(n, o)) if rgba else None
+            if rgb and strong(rgb):
+                hue = colorsys.rgb_to_hls(*rgb)[0] * 360
+                if all(min(abs(hue - h), 360 - abs(hue - h)) > HUE_TOL for h, _ in seen.values()):
+                    seen["#%02x%02x%02x" % tuple(round(c * 255) for c in rgb)] = (hue, n.line)
+    if len(seen) < 2:
+        return []
+    return [(list(seen.values())[1][1], f"{len(seen)} strong colors: {', '.join(seen)}")]
+
+
+def plant_svg(body, attrs='viewBox="0 0 200 100"'):
+    return f'<svg xmlns="http://www.w3.org/2000/svg" {attrs}>{body}</svg>'
+
+
+AVG_MAX = 20
+CONTRACTION = (rf"\b\w+n[{APOS}]t\b|\b\w+[{APOS}](re|ve|ll|m|d)\b"
+               rf"|\b(it|that|there|what|here|let|who|where|how|when|why|he|she)[{APOS}]s\b")
+DATE = (rf"\b({MONTHS})\.? +\d{{1,2}}(st|nd|rd|th)?,? +\d{{4}}\b"
+        rf"|\b\d{{1,2}} +({MONTHS})\.?,? +\d{{4}}\b")
+LONG = 25
+
+CHECKS = [
+    # id, keyword, scope, what, function, planted hits, planted cleans
+    ("S8a", "SHALL", "all", "an em dash or a horizontal bar", em_dash,
+     (f"One point {EM} then another.", f"One point {BAR} then another."),
+     ("One point, then another.",)),
+    ("S8h", "SHALL", "all", "a curly quote", line_hits(f"[{CURLY}]"),
+     (f"It said {CURLY[2]}go{CURLY[3]}.", f"# Say {chr(0x201E)}go{CURLY[2]}"),
+     ('It said "go".',)),
+    ("S8i", "SHALL", "all", "an arrow character, not ->", arrow,
+     (f"A {chr(0x2192)} B.", f"A {chr(0x27F6)} B.", f"# A {chr(0x2192)} B"),
+     ("A -> B.",)),
+    ("S7b", "SHALL", "standard", '"must" stating a provision',
+     text_hits(r"\bmust\b", re.I, quotes=True),
+     ("The writer must cite it.", "# Writers must cite", "In the '90s the writer must cite it for users' files."),
+     ('The term "must" is not used.', 'The term "must\nbe" is not used here.',
+      "~~~\nThe writer must cite it.\n~~~")),
+    ("S7c", "SHALL", "standard", "an indefinite term",
+     text_hits(r"\band/or\b|\b\w*(suitabl|adequat)\w*", re.I, quotes=True),
+     ("Use a suitable tool.", "Test it adequately.", "An unsuitable tool.", "In the '90s use a suitable tool for users' files."),
+     ('Not "suitable".',)),
+    ("S7f", "SHALL", "standard", '"unless otherwise specified" not opening its sentence',
+     sentence_hits(lambda s: re.search(r"\bunless otherwise specified\b", drop_quotes(s), re.I)
+                   and not re.match(r"\W*unless otherwise specified", s, re.I)),
+     ("Use SI units unless otherwise specified in 4.2.",
+      "In the '90s use SI units unless otherwise specified for users' files."),
+     ('(f) "Unless otherwise specified" opens. Unless otherwise specified in 4.2, use SI units.',
+      "(f) Unless otherwise specified in 4.2, use SI units.")),
+    ("S3l", "SHOULD", "all", 'a sentence opening "It is", "There is" or "There are"',
+     sentence_hits(lambda s: re.match(r"\W*(It is|There is|There are)\b", s)),
+     ("There are three files.", "(l) It is the rule.", "(m) There is a file."),
+     ("Three files exist.", "(l) Three files exist.")),
+    ("S6b", "SHOULD", "all", '"famously" or "a classic"',
+     text_hits(r"\bfamously\b|\ba classic\b", re.I, quotes=True),
+     ("It is famously hard.", "This is a\nclassic case.", "In the '90s it was famously hard for users' files."),
+     ("It is hard.",)),
+    ("S6c", "SHOULD", "all", '"serves as" or "stands as"',
+     text_hits(r"\b(serves|stands|served|stood|serving|standing) as\b", re.I, quotes=True),
+     ("The file serves as a record.", "The file, serving as a record, stays.",
+      "The file serves\nas a record.", "In the '90s the file serves as a record for users' files."),
+     ("The file is a record.",)),
+    ("S6g", "SHOULD", "all", 'a paragraph opening "The first" or "The second"',
+     lambda lines, raw: [(n, t[:80]) for n, t, lst, _ in units(lines)
+                         if not lst and re.match(r"\W*The (first|second)\b", body(t))],
+     ("The first step reads the file.", "(g) The second step reads it."),
+     ("Step one reads the file.",)),
+    ("S9a", "SHALL", "formal", "a contraction",
+     text_hits(CONTRACTION, re.I, quotes=True),
+     ("It doesn't run.", "Here's the file.", "Let's go.", "Who's there.", "In the '90s it doesn't run for users' files."),
+     ("It does not run.", "The file's owner reads it.")),
+    ("S9b", "SHALL", "all", "a number of 10 or more spelled out, not opening a sentence",
+     sentence_hits(lambda s: re.search(rf"(?<=\s)({NUM_WORDS})\b", s, re.I)),
+     ("The kit has eighteen skills.",),
+     ("The kit has 18 skills.", "(b) Twenty files pass.")),
+    ("S9c", "SHALL", "all", "a sentence opening with a numeral",
+     sentence_hits(lambda s: re.match(r"(?!\d{4}-\d\d-\d\d\b)(?!\d+\()\d", s)),
+     ("Done. 18 skills pass.", "(c) 18 skills pass.", "Done. 10% of runs fail."),
+     ("Read chs. 13 to 15. Eighteen skills pass.", "3(h) sets the average.",
+      "2026-11-10 is the date.", "Run approx. 10 tests.", "Use AR 25-50 Ed. 4 here.",
+      "Rev. 2 of the file is out.", "It ran at 1 p.m. 2 days ago.", "Sent Nov. 5, 2026.")),
+    ("S9d", "SHALL", "all", "two spaces after a period or colon",
+     line_hits(r"[.:]  +[^\s|]"), ("One.  Two.",),
+     ("One. Two.", "| Done.  | yes |", "Text.\n\n    One.  Two.\n\nMore.")),
+    ("S9e", "SHALL", "all", "a date not written 2026-11-05", text_hits(DATE),
+     ("Sent November 5, 2026.", "Sent Nov. 5, 2026.", "Sent 5 November 2026.",
+      "Sent November\n5, 2026."),
+     ("Sent 2026-11-05.", "In November 2026 it shipped.",
+      "<!--\nSent November 5, 2026.\n-->")),
+    ("S3i", "SHOULD", "all", "a paragraph greater than 10 lines", para_length,
+     ("\n".join(["Line of a long paragraph."] * 11), "word " * 220),
+     ("\n".join(["Line."] * 10),)),
+    ("S3h", "SHOULD", "all", "an average sentence greater than 20 words", avg_over,
+     (" ".join(["word"] * 21) + ".", "Short one. Word " + " ".join(["word"] * 39) + "."),
+     (" ".join(["word"] * 20) + ".", "Short one. Word " + " ".join(["word"] * 37) + ".",
+      "(a) " + " ".join(["word"] * 20) + ".")),
+    ("S3g", "SHALL", "all", "a bulleted list of one item", single_item_list,
+     ("Intro:\n\n- only one\n\nAfter.", "Intro:\n\n- outer\n  - only nested\n- second\n\nAfter.",
+      "Intro:\n\n- a\n\n1. b\n\nAfter."),
+     ("Intro:\n\n- one\n- two\n\nAfter.", "Intro:\n\n- one\n\n- two\n\nAfter.")),
+    ("T3c", "SHOULD", "technical", "a sentence greater than 25 words",
+     sentence_hits(lambda s: len(s.split()) > LONG),
+     (" ".join(["word"] * 26) + ".", "Short. Word " + " ".join(["word"] * 25) + ".",
+      "Words " + " ".join(["word"] * 12) + " for the U.S. Government " + " ".join(["word"] * 12)
+      + "."),
+     (" ".join(["word"] * 25) + ".", "(a) " + " ".join(["word"] * 25) + ".",
+      "Words " + " ".join(["word"] * 12) + " at 5 p.m. The next " + " ".join(["word"] * 10)
+      + ".")),
+    ("T3e", "SHOULD", "technical", "a paragraph of more than six sentences",
+     lambda lines, raw: [(n, t[:80]) for n, t, lst, _ in units(lines)
+                         if not lst and len(sentences(t)) > 6],
+     (" ".join(["One."] * 7), "\n".join(["One."] * 7)),
+     (" ".join(["One."] * 6), "\n".join(f"- One. {i}" for i in "ABCDEFG"),
+      "The U.S. Army reads it. The U.S. Navy reads it. " + " ".join(["One."] * 4))),
+    ("T5c", "SHALL", "technical", "a contraction", text_hits(CONTRACTION, re.I, quotes=True),
+     ("Don't stage it.", "Here's the patch.", "Don't stage 'this' file.", "In the '90s it doesn't run for users' files."),
+     ("Do not stage it.", "The word \"don't\" is barred.", "The word 'don't' is barred.")),
+    ("T5i", "SHALL", "technical", "a semicolon",
+     text_hits(f"[{SEMICOLONS}]", quotes=True, refs=True),
+     ("Stage it; then push.", "| a; b | c |", "# Stage; push", f"Stage it{chr(0x37E)} push.",
+      f"Stage it{chr(0xFF1B)} push.", "In the '90s stage it; then push for users' files.", "Stage R&D; then push.",
+      "See http://x.example/a; then push.", "Stage it&#59; then push.", "Stage it&#x3B; then push.",
+      "Stage it&semi; then push.", "See www.x.example/a; then push.",
+      "Say awww.no;then push.", "Stage &#00000044; here.", "Stage &#x0000002C; here."),
+     ("Stage it, then push.", "Run `a; b` now.", 'The mark ";" is barred.', "```\na; b\n```",
+      "Stage R&amp;D notes. See <http://x.example/a;b>.", "See http://x.example/a;b now.",
+      "Order the caf&eacute; menu, then push.", "Stage &#44; and &#x2C; here.",
+      "Stage &#1114112; and &#x110000; here.",
+      "Stage it, then see www.x.example/a;b for notes.")),
+    ("T5j", "SHALL", "technical", "a gendered pronoun",
+     text_hits(r"\b(he|she|him|his|her|hers|himself|herself)\b", re.I, quotes=True),
+     ("The operator runs it when he is ready.", "Ask her first.", "She runs it.",
+      "In the '90s he ran it for users' files."),
+     ("The operator runs it when they are ready.", 'The word "he" is barred.', "Check the shell.")),
+    ("P2a", "SHALL", "plaintext", "markup that shows as text", plain_markup,
+     ("**Ship** it today.", "__Ship__ it today.", "Run `just ship` now.", "# Title\n\nBody.",
+      "```\nship\n```", "Title\n=====\n\nBody.", "Ship **it**.",
+      "One.\n\n***\n\nTwo.", "One.\n\n___\n\nTwo.", "One.\n\n* * *\n\nTwo."),
+     ("Ship it today.", "- one\n- two", "Use 2 * 3 here.", "Issue 12 is #1 on the list.",
+      "#12 is open.", "Raise it to 2**10.", "==\n\nBody.", "Set a == b.",
+      "One.\n\n---\n\nTwo.", "Use ** here.")),
+    ("P3a", "SHALL", "plaintext", "a numbered title with no blank line after it",
+     numbered_titles,
+     ("1. Title\nBody.", "1. Title\n- item", "Intro.\n\n2. Title\nBody.", "1) Title\nBody.",
+      "  1. Title\nBody."),
+     ("1. Title\n\nBody.", "1. one\n2. two", "1. Title", "1. one\n2. two\nThat is all.",
+      "1. a\n    1. sub", "1. a\n    1. sub\n2. b",
+      "1. a\n    1. sub\n2. b\nThat is all.")),
+    ("P3b", "SHALL", "plaintext", "a lead-in with no blank line after it",
+     no_blank_after(lead_in, lambda line: False),
+     ("What I need from you:\n- a\n- b", "Note:\nBody."),
+     ("What I need from you:\n\n- a\n- b", "Time: 10:00 today.", "Ends on a colon:")),
+    ("P3c", "SHALL", "plaintext", "a paragraph hard-wrapped", hard_wrap,
+     ("One line\nwrapped here.", "- item\n  continued.", "Intro.\n\n- a\nwrapped.",
+      "We moved the meeting to November\n10. Then we left.", "We ran the tests and all of\n- them passed.",
+      "1. one\n2. two\nThat is all.", 'The answer is "yes"\n- a', '"\n- a'),
+     ("One line.\n\nNext line.", "- a\n- b", "One paragraph on one line.", "Intro:\n\n1. a\n2. b",
+      "- a\n  - b", "* a\n* b", "1) a\n2) b", "Title\n=====\n\nBody.",
+      'The answer is "yes."\n- a', "It said 'go.'\n- a",
+      f"The answer is {chr(0x201C)}yes.{chr(0x201D)}\n- a", f"It said {chr(0x2018)}go.{chr(0x2019)}\n- a")),
+    ("D2d", "SHALL", "all", "a Mermaid pie chart", mermaid_pie,
+     ("```mermaid\npie title Pets\n  \"Dogs\" : 3\n```", "~~~mermaid\n%%{init: {}}%%\npie\n~~~",
+      "```mermaid\n---\ntitle: x\n---\npie\n```"),
+     ("```mermaid\nflowchart LR\n  A --> B\n```", "```\npie\n```", "A pie chart is refused.",
+      "```mermaid\nflowchart LR\n```\npie")),
+    ("D2d", "SHALL", "svg", "an SVG pie wedge", svg_pie,
+     (plant_svg('<path d="M100 50 L150 50 A50 50 0 0 1 100 100 Z"/>'),
+      plant_svg('<path d="M150 50 A50 50 0 0 1 100 100 L100 80 A30 30 0 0 0 130 50 Z"/>'),
+      plant_svg('<path d="M100 0 A50 50 0 0 1 150 50 H100 Z"/>'),
+      plant_svg('<path d="M100 50 150 50 A50 50 0 0 1 100 100 Z"/>'),
+      plant_svg('<path d="M100 50 L150 50 A50 50 0 0 1 50 50 A50 50 0 0 1 100 0 Z"/>'),
+      plant_svg('<path d="M150 50 A50 50 0 01100 100 L100 80 A30 30 0 00130 50 Z"/>')),
+     (plant_svg('<path d="M10 90 V20 A5 5 0 0 1 15 15 H25 A5 5 0 0 1 30 20 V90 Z"/>'),
+      plant_svg('<path d="M10 90 L10 20 A5 5 0 0 1 15 15 L25 15 A5 5 0 0 1 30 20 L30 90 Z"/>'),
+      plant_svg('<path d="M0 0 L10 10"/>'), plant_svg('<circle cx="50" cy="50" r="40"/>'),
+      plant_svg('<path d="M10 90 L10 20 A5 5 0 0 1 15 15 L30 15 L30 90 Z"/>'),
+      plant_svg('<path d="M10 90 L10 20 A5 5 0 0 1 15 15 L30 15 30 90 Z"/>'),
+      plant_svg('<path d="M150 50 A50 50 0 1 1 50 50 A50 50 0 1 1 150 50 Z"/>'),
+      plant_svg('<path d="M4.5,0A4.5,4.5,0,1,1,-4.5,0A4.5,4.5,0,1,1,4.5,0"/>'))),
+    ("D2g", "SHOULD", "svg", "an SVG taller than wide", svg_tall,
+     (plant_svg("", 'viewBox="0 0 100 200"'), plant_svg("", 'width="100" height="200"'),
+      plant_svg("", 'width="2in" height="300"')),
+     (plant_svg(""), plant_svg("", 'width="100%" height="200"'), plant_svg("", 'viewBox="0 0 100 100"'),
+      plant_svg("", 'width="10cm" height="200"'))),
+    ("D3b", "SHALL", "svg", "bars not starting at zero", bar_baseline,
+     (plant_svg('<g class="bars"><rect x="10" y="40" width="20" height="50"/>'
+        '<rect x="40" y="20" width="20" height="70"/></g><text x="5" y="92">10</text>'),
+      plant_svg('<g id="bar-chart"><rect x="20" y="10" width="50" height="10"/>'
+        '<rect x="20" y="30" width="80" height="10"/></g><text x="20" y="60">5</text>'),
+      plant_svg('<g id="barChart"><rect x="10" y="40" width="20" height="50"/>'
+        '<rect x="40" y="20" width="20" height="70"/></g><text x="5" y="92">40</text>'),
+      plant_svg('<g class="bars"><rect x="0" y="40" width="20" height="50"/>'
+        '<rect x="30" y="20" width="20" height="70"/></g><text y="92">40</text>')),
+     (plant_svg('<g class="bars"><rect x="10" y="40" width="20" height="50"/>'
+        '<rect x="40" y="20" width="20" height="70"/></g><text x="5" y="92">0</text>'),
+      plant_svg('<g class="bars"><rect x="10" y="40" width="20" height="50"/>'
+        '<rect x="40" y="20" width="20" height="70"/></g><text x="20" y="105">2020</text>'),
+      plant_svg('<g class="bars"><rect x="10" y="40" width="20" height="50"/></g><text y="92">10</text>'),
+      plant_svg('<rect x="10" y="40" width="20" height="50"/><rect x="40" y="20" width="20" height="70"/>'
+        '<text x="5" y="92">10</text>'),
+      plant_svg('<g id="bars"><rect x="10" y="40" width="20" height="50"/><rect x="40" y="20" width="20"'
+        ' height="70"/></g><text x="20" y="95">1</text><text x="50" y="95">2</text>'),
+      plant_svg('<g id="bars"><rect x="10" y="40" width="20" height="50"/><rect x="40" y="20" width="20"'
+        ' height="70"/></g><text x="20" y="94">2024</text>'),
+      plant_svg('<g id="bars"><rect x="20" y="10" width="50" height="10"/><rect x="20" y="30" width="80"'
+        ' height="10"/></g><text x="14" y="18">1</text>'),
+      plant_svg('<rect class="barrier" x="10" y="40" width="20" height="50"/><rect class="barrier" x="40"'
+        ' y="20" width="20" height="70"/><text x="5" y="92">40</text>'))),
+    ("D4b", "SHALL", "svg", "a drop shadow", shadow,
+     (plant_svg('<filter id="s"><feDropShadow dx="2" dy="2"/></filter><rect filter="url(#s)"/>'),
+      plant_svg('<filter id="s"><feOffset dx="2"/><feGaussianBlur stdDeviation="2"/></filter>'
+        '<rect style="filter: url(#s)"/>')),
+     (plant_svg('<filter id="b"><feGaussianBlur stdDeviation="2"/></filter><rect filter="url(#b)"/>'),
+      plant_svg('<rect fill="#ccc"/>'),
+      plant_svg('<filter id="s"><feOffset dx="0" dy="0"/><feGaussianBlur stdDeviation="2"/></filter>'
+        '<rect filter="url(#s)"/>'))),
+    ("D4b", "SHOULD", "svg", "a gradient fill", gradient,
+     (plant_svg('<linearGradient id="g"/><rect fill="url(#g)"/>'),
+      plant_svg('<radialGradient id="g"/><rect style="stroke:url(\'#g\')"/>'),
+      plant_svg('<linearGradient id="g"/><rect class="series-color bar" fill="url(#g)"/>')),
+     (plant_svg('<pattern id="p"/><rect fill="url(#p)"/>'), plant_svg('<rect fill="#ccc"/>'),
+      plant_svg('<linearGradient id="g"/><rect class="colorbar" fill="url(#g)"/>'),
+      plant_svg('<linearGradient id="g"/><rect class="color-bar" fill="url(#g)"/>'))),
+    ("D4b1", "SHALL", "svg", "a dark grid", dark_grid,
+     (plant_svg('<g class="grid" stroke="#000"><line x1="0" x2="200"/></g>'),
+      plant_svg('<line class="gridline" stroke="#555"/>'), plant_svg('<g id="y-grid"><path style="stroke:black"/></g>'),
+      plant_svg('<line class="grid" stroke="#b0b0b0" stroke-width="6"/>'),
+      plant_svg('<line class="grid" stroke="hsl(0,0%,10%)"/>'),
+      plant_svg('<line class="grid" stroke="#000" stroke-width="0.5"/>'),
+      plant_svg('<line class="grid" stroke="#ccc"/>',
+                'width="800" height="150" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"')),
+     (plant_svg('<g class="grid" stroke="#ddd"><line x1="0" x2="200"/></g>'),
+      plant_svg('<g class="grid" stroke="#000" stroke-opacity="0.1"><line/></g>'),
+      plant_svg('<line class="axis" stroke="#000"/>'), plant_svg('<line class="gridding" stroke="#000"/>'),
+      plant_svg('<line class="grid" stroke="#ddd" stroke-width="4"/>',
+                'width="400" height="300" viewBox="0 0 4000 3000"'),
+      plant_svg('<line class="grid" stroke="#ccc"/>', 'width="800" height="150" viewBox="0 0 400 300"'),
+      plant_svg('<line class="grid" stroke="#ddd" vector-effect="non-scaling-stroke"/>',
+                'width="1600" viewBox="0 0 400 300"'))),
+    ("D4c", "SHOULD", "svg", "a box border", box_border,
+     (plant_svg('<rect width="200" height="100" fill="none" stroke="#000"/>'),
+      plant_svg('<rect width="100%" height="100%" style="stroke:black"/>')),
+     (plant_svg('<rect width="200" height="100" fill="#fff"/>'),
+      plant_svg('<rect width="40" height="20" stroke="#000"/>'),
+      plant_svg('<rect width="200" height="100" stroke="none"/>'),
+      plant_svg('<rect width="200" height="100" stroke="#000" stroke-opacity="0"/>'),
+      plant_svg('<rect width="200" height="100" fill="none" stroke="rgba(0,0,0,0)"/>'),
+      plant_svg('<rect width="200" height="100" fill="none" stroke="#00000000"/>'))),
+    ("D5b", "SHOULD", "svg", "a legend", legend,
+     (plant_svg('<g id="legend"><text>a</text></g>'),
+      plant_svg('<g class="chart-legend"><g class="legend-item"/></g>'), plant_svg('<g id="legendBox"/>')),
+     (plant_svg('<text>legend</text>'), plant_svg('<g id="labels"/>'), plant_svg('<g id="legendary-text"/>'))),
+    ("D6b", "SHOULD", "svg", "more than one strong color", strong_colors,
+     (plant_svg('<rect fill="#d62728"/><rect fill="#1f77b4"/>'), plant_svg('<rect fill="red" stroke="blue"/>'),
+      plant_svg('<rect fill="hsl(0,100%,50%)"/><rect fill="blue"/>'),
+      plant_svg('<rect fill="hsl(210 70% 40%)"/><rect fill="rgb(255 128 0 / 1)"/>'),
+      plant_svg('<rect fill="#d62728ff"/><rect fill="#1f77b4ff"/>'),
+      plant_svg('<rect fill="hsl(0 70 50)"/><rect fill="hsl(205 70 41)"/>')),
+     (plant_svg('<rect fill="#d62728"/><rect fill="#999"/><line stroke="#333"/>'),
+      plant_svg('<rect fill="#a6cee3"/><rect fill="#cccccc"/>'), plant_svg('<rect fill="#c00"/><rect fill="#cc0000"/>'),
+      plant_svg('<rect fill="rgba(214,39,40,0.2)"/><rect stroke="red"/>'),
+      plant_svg('<rect fill="#1f77b4"/><rect fill="#2080c0"/>'),
+      plant_svg('<rect fill="rgb(1.2.3,0,0)"/><rect fill="blue"/>'),
+      plant_svg('<rect fill="#d62728"/><rect fill="rgb(31, 119 180)"/>'))),
+]
+
+
+def applies(scope, path, standard, formal, technical, plaintext=False, svg=False):
+    if svg:
+        return scope == "svg"
+    in_std = standard or "standards" in os.path.abspath(path).split(os.sep)[:-1]
+    return (scope == "all" or (scope == "standard" and in_std)
+            or (scope == "formal" and (in_std or formal))
+            or (scope == "technical" and technical) or (scope == "plaintext" and plaintext))
+
+
+def check_text(text, path, standard, formal, technical=False, plaintext=False, svg=False):
+    raw = text.split("\n")
+    lines = strip_code(raw)
+    results = []
+    for cid, kw, scope, what, fn, _, _ in CHECKS:
+        # T5c is the S9a pattern, so a technical run reports a contraction once, as T5c.
+        if cid == "S9a" and technical:
+            continue
+        if applies(scope, path, standard, formal, technical, plaintext, svg):
+            results += [(cid, kw, what, n, t) for n, t in fn(lines, raw)]
+    return results, None if svg else avg_len(lines)
+
+
+def selftest():
+    bad = plants = 0
+    for cid, _, scope, what, _, hits, cleans in CHECKS:
+        wrong = []
+        tech, plain, vec = scope == "technical", scope == "plaintext", scope == "svg"
+        std = not (tech or plain or vec)
+        for text, want in [(h, True) for h in hits] + [(c, False) for c in cleans]:
+            plants += 1
+            got = any(r[0] == cid and r[2] == what
+                      for r in check_text(text, "x.md", std, std, tech, plain, vec)[0])
+            if got != want:
+                wrong.append(f"{'missed' if want else 'flagged'} {text[:40]!r}")
+        if wrong:
+            print(f"PLANT FAIL  {cid} {what}: {'; '.join(wrong)}")
+            bad = 1
+        else:
+            print(f"PLANT ok    {cid} {what} ({len(hits)} hit, {len(cleans)} clean)")
+    # The standards path and the unknown option are not checks, so they are planted here.
+    scope = [("a standards path turns on S7b", "docs/standards/x.md", "S7b", True),
+             ("another path leaves it off", "docs/x.md", "S7b", False),
+             ("a standards path leaves T5i off", "docs/standards/x.md", "T5i", False),
+             ("a standards path leaves P3c off", "docs/standards/x.md", "P3c", False)]
+    for what, path, cid, want in scope:
+        plants += 1
+        got = any(r[0] == cid for r in check_text("The writer must cite it; then\nstop.", path,
+                                                  False, False)[0])
+        print(f"PLANT {'ok  ' if got == want else 'FAIL'}  scope {what}")
+        bad |= got != want
+    plants += 1
+    ids = [r[0] for r in check_text("It doesn't run.", "x.md", True, True, True)[0]]
+    print(f"PLANT {'ok  ' if ids == ['T5c'] else 'FAIL'}  once a technical run reports a "
+          "contraction once, as T5c")
+    bad |= ids != ["T5c"]
+    tall = plant_svg("", 'viewBox="0 0 100 200"')
+    for what, text, vec, cid, want in [
+            ("a Markdown run leaves the SVG checks off", tall, False, "D2g", False),
+            ("an SVG run leaves the S checks off", tall.replace("></svg>", ">It doesn't run.</svg>"),
+             True, "S9a", False)]:
+        plants += 1
+        got = any(r[0] == cid for r in check_text(text, "x.md", True, True, False, False, vec)[0])
+        print(f"PLANT {'ok  ' if got == want else 'FAIL'}  scope {what}")
+        bad |= got != want
+    here = os.getcwd()
+    with tempfile.TemporaryDirectory() as d, tempfile.TemporaryDirectory() as away:
+        # Files are named relative to d, the working directory, since main() opens only
+        # paths under it; the file in away is the planted path outside.
+        os.chdir(d)
+        with open("x.svg", "w", encoding="utf-8") as fh:
+            fh.write("<svg><g></svg>")
+        outside = os.path.join(away, "y.md")
+        with open(outside, "w", encoding="utf-8") as fh:
+            fh.write("Clean text.\n")
+        for what, argv in [("an unknown option exits 2", ["--standrad", "x.md"]),
+                           ("an SVG that does not parse exits 2", ["--svg", "x.svg"]),
+                           ("a file outside the working directory exits 2", [outside])]:
+            plants += 1
+            err, sys.stderr = sys.stderr, open(os.devnull, "w")
+            try:
+                rc = main(argv)
+            except SystemExit as e:
+                rc = e.code
+            sys.stderr.close()
+            sys.stderr = err
+            print(f"PLANT {'ok  ' if rc == 2 else 'FAIL'}  option {what}")
+            bad |= rc != 2
+        os.chdir(here)
+    print(f"style-check selftest: {len(CHECKS)} checks, {plants} plants, "
+          f"{'FAILED' if bad else 'all passed'}")
+    return bad
+
+
+def main(argv):
+    if argv == ["--selftest"]:
+        return selftest()
+    unknown = [a for a in argv if a.startswith("--") and a not in FLAGS]
+    if unknown:
+        print(f"style-check: unknown option {unknown[0]}", file=sys.stderr)
+        return 2
+    standard, formal, technical = "--standard" in argv, "--formal" in argv, "--technical" in argv
+    plaintext, vec = "--plaintext" in argv, "--svg" in argv
+    files = [a for a in argv if not a.startswith("--")]
+    if not files:
+        print(__doc__.split("\n\n")[1])
+        return 2
+    fail = broken = 0
+    for path in files:
+        # Messages name the path as given; only the resolved one is opened.
+        with open(under(os.getcwd(), path), encoding="utf-8") as fh:
+            text = fh.read()
+        if vec:
+            try:
+                svg_parse("\n".join(text.split("\n")))
+            except expat.ExpatError as e:
+                print(f"style-check: {path} does not parse as XML: {e}", file=sys.stderr)
+                broken = 1
+                continue
+        results, avg = check_text(text, path, standard, formal, technical, plaintext, vec)
+        for cid, kw, what, n, t in results:
+            fail |= kw == "SHALL"
+            print(f"{'FAIL' if kw == 'SHALL' else 'WARN'}  {path}:{n}  {cid} {what}: {t}")
+        if avg is not None:
+            print(f"INFO  {path}  S3h average sentence {avg:.1f} words")
+    return 2 if broken else 1 if fail else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

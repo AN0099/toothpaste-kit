@@ -13,6 +13,7 @@
     "scripts/round-check.py": 88,
     "scripts/sbom.py": 90,
     "scripts/schema-check.py": 96,
-    "scripts/spdx-fragment.py": 97
+    "scripts/spdx-fragment.py": 97,
+    "scripts/style-check": 98
   }
 }
