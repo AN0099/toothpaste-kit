@@ -47,6 +47,8 @@ sweepable by a staleness checker rather than only readable. `unknown` is a legit
 
 **Round records allow all four roles of `ROLES.md`, `minion` included.** The original review-round specification lists three roles, `operator`, `lead` and `aide`, and names `ROLES.md` as its source; `ROLES.md` defines four. The round schemas and `scripts/round-check.py` follow the source, so a round that a minion takes part in can be recorded, and a role `ROLES.md` defines is never rejected. The cost is that `minion` can be named as a round's reviewer or verifier, which the specification's list does not foresee; the independence rule (verifier role differs from reviewer role) applies to it as to any other role.
 
+**`$id` removed from the three schemas that point to another file.** A schema's `$id` tells a checker where the file lives, and the files it points to with `$ref` are looked up from there. `request.json`, `response.json` and `surface-descriptor.schema.json` gave a wrong location, so a checker could not find `event-base.json`. With no `$id`, a checker looks beside the file itself. A full web address as `$id` would need the schemas published there. The other four keep their `$id`, since none of them points to another file.
+
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
 

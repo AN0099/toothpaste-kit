@@ -19,6 +19,13 @@ skill lives in that skill's own `CHANGELOG.md`.
   missing tool, each only when the message its plant names appears.
   `.github/workflows/containers.yml` runs it on linux/amd64 and linux/arm64.
   The image is now `localhost/kit-verify:v7`.
+- `scripts/schemas.sh` also checks this tree's seven JSON Schema files with
+  `check-jsonschema`, a standard tool that understands the whole format: each
+  schema must be well formed, and the registry's vendor files, the review-round
+  examples and every row of `examples/review-round/schema-cases/cases.json` must
+  match their schemas. No real messages exist in the tree, so it checks a sample
+  message it builds for each message schema. A schema file that the script does
+  not list fails it.
 - `scripts/bcp14-check.py`, gate 22: a Markdown file that uses a BCP 14
   keyword in capitals must name BCP 14, outside code, or be listed as quoting.
   The one file that did not, this changelog, now writes the word in lowercase.
@@ -57,6 +64,13 @@ skill lives in that skill's own `CHANGELOG.md`.
   `CHANGELOG.md` keeps its name.
 
 ### Fixed
+
+- `orchestration/schemas/request.json`, `orchestration/schemas/response.json`
+  and `orchestration/registry/surface-descriptor.schema.json` no longer carry
+  their `$id` line. A schema's `$id` tells a checker where the file lives, and
+  the files it points to with `$ref` are looked up from there. These three gave
+  a wrong location, so a checker could not find `event-base.json`. The kit's
+  own two checkers ignore `$id`, so nothing had shown this.
 
 - `orchestration/`: stale claims and text specific to one installation.
   The README indexes `roles.md`; links to documents the repository does

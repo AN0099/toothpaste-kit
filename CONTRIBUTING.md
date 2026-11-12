@@ -68,7 +68,7 @@ Checks that need a tool from outside this repository run from a separate script,
 
 Today it runs `reuse lint`, which checks that every file declares a copyright and a licence in the form the [REUSE specification](https://reuse.software/spec-3.3/) sets out. Install the linter with `pipx install reuse==6.2.0`, the version `.github/workflows/compliance.yml` pins. Without it, the script fails and names the missing tool; `--allow-missing` reports the check as not run instead, never as passed. CI installs it and fails on any missing declaration. To run the check without installing anything, use the verification container: `containers/verify/verify . ./scripts/compliance.sh --selftest`, described in [`containers/README.md`](containers/README.md).
 
-The two metadata files that declare a published schema, `security-insights.yml` and `CITATION.cff`, are validated against it by `./scripts/schemas.sh`. The schemas are in the verification image, not this tree, so run it there: `containers/verify/verify . ./scripts/schemas.sh --selftest`.
+The two metadata files that declare a published schema, `security-insights.yml` and `CITATION.cff`, are validated against it by `./scripts/schemas.sh`. The schemas are in the verification image, not this tree, so run it there: `containers/verify/verify . ./scripts/schemas.sh --selftest`. It also checks this tree's seven JSON Schema files and the documents they govern, so run it after changing a schema under `orchestration/` or a review-round example.
 
 The bill of materials is validated against the published SPDX 3.0.1 SHACL shapes, and its licence ids against the SPDX licence list, by `./scripts/sbom-shapes.py`, also in the verification image: `containers/verify/verify . ./scripts/sbom-shapes.py --selftest`.
 
