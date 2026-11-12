@@ -70,6 +70,10 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `README.md` describes `docs/standards/` and lists it among the project
+  documents, and names six scripts it had left out: `style-check`,
+  `bcp14-check.py`, `sbom.py`, `blog.py`, `sbom-shapes.py` and
+  `coverage-check.py`.
 - Every workflow pins `actions/checkout` by the commit SHA of its v7.0.1 tag
   instead of the `v7` tag, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty,
   so gate 19 now fails any action pinned by tag.
