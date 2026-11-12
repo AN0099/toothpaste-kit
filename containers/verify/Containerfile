@@ -76,6 +76,7 @@ RUN codeql version --format=terse | grep -qx '2.27.4' \
  && yamllint --version | grep -qx 'yamllint 1.38.0' \
  && check-jsonschema --version | grep -q '0.38.2' \
  && python3 -c 'import pyshacl, sys; sys.exit(pyshacl.__version__ != "0.40.1")' \
+ && agentskills --version | grep -qx 'agentskills, version 0.1.1' \
  && codeql resolve packs | grep -E 'codeql/(python|actions)-queries' > /opt/codeql-packs.txt
 
 # The published schemas scripts/schemas.sh validates against, each from the

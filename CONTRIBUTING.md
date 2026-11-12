@@ -72,6 +72,8 @@ The two metadata files that declare a published schema, `security-insights.yml` 
 
 The bill of materials is validated against the published SPDX 3.0.1 SHACL shapes, and its licence ids against the SPDX licence list, by `./scripts/sbom-shapes.py`, also in the verification image: `containers/verify/verify . ./scripts/sbom-shapes.py --selftest`.
 
+Every skill's `SKILL.md` is checked against the [Agent Skills specification](https://agentskills.io/specification), the published format for a skill file, by `./scripts/skills-spec.sh`. It uses skills-ref, the checker the specification's authors publish, in the verification image: `containers/verify/verify . ./scripts/skills-spec.sh --selftest`. A skill that sets `disable-model-invocation`, a Claude Code field the specification does not define, must be listed in that script.
+
 ## Skills
 
 One directory per skill under `skills/`, containing `SKILL.md` and an optional `references/`. Frontmatter requires `name` and `description`.

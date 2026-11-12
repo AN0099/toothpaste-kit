@@ -22,6 +22,17 @@ skill lives in that skill's own `CHANGELOG.md`.
 - `scripts/bcp14-check.py`, gate 22: a Markdown file that uses a BCP 14
   keyword in capitals must name BCP 14, outside code, or be listed as quoting.
   The one file that did not, this changelog, now writes the word in lowercase.
+- `scripts/skills-spec.sh`: checks every skill's `SKILL.md` against the Agent
+  Skills specification, the published format for a skill file, with
+  skills-ref 0.1.1, the checker the specification's authors publish. It is
+  installed by hash in the verification image, with the four packages it
+  needs. The eight skills a person invokes set `disable-model-invocation`, a
+  Claude Code field the specification does not define; they are listed in the
+  script and checked as a copy with that one line removed, so skills-ref still
+  sees every other field. Its selftest runs deliberately broken cases and
+  passes only when each is rejected with the message expected for it.
+  `.github/workflows/containers.yml` runs it on linux/amd64 and linux/arm64.
+  The image is now `localhost/kit-verify:v8`.
 - `.github/workflows/tags.yml`: on every newly created tag, runs
   `scripts/check-branch-name --tag-new`, which requires the full `v1.2.3`
   shape with no leading zeros and a tag greater than every other `v` tag, and
