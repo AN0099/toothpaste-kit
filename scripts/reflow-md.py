@@ -31,7 +31,8 @@ trailing spaces are preserved as line breaks rather than joined.
 
 Usage:
     reflow-md.py FILE...            rewrite in place
-    reflow-md.py --check FILE...    report what would change, write nothing
+    reflow-md.py --check FILE...    report what would change, write nothing,
+                                    exit 1 if any file would change
     reflow-md.py --selftest         run the fixture, write nothing, exit nonzero on failure
 
 The fixture is reflow-md.test.md next to this script, with the expected result
@@ -52,6 +53,7 @@ import difflib
 import os
 import re
 import sys
+import tempfile
 
 FENCE = re.compile(r'^(\s*)(`{3,}|~{3,})')
 LIST = re.compile(r'^(\s*)([-*+]\s+|\d+[.)]\s+)')
@@ -168,8 +170,9 @@ def tokens(text):
 def selftest():
     """Reflow the fixture and compare against the expected result.
 
-    Never writes. Also checks idempotence: reflowing an already-unwrapped
-    document must be a no-op, or repeated runs would keep changing the file.
+    Writes only to a temporary directory. Also checks idempotence:
+    reflowing an already-unwrapped document must be a no-op, or repeated runs
+    would keep changing the file.
     """
     here = os.path.dirname(os.path.abspath(__file__))
     fixture = os.path.join(here, 'reflow-md.test.md')
@@ -225,6 +228,25 @@ def selftest():
         else:
             print(f'pass  planted {name} fault is caught')
 
+    # --check is a gate only if its exit status says what it found: 1 for a
+    # file that would change, 0 for one already unwrapped.
+    with tempfile.TemporaryDirectory() as tmp:
+        for name, text, want in (('a wrapped', 'a\nb\n', 1),
+                                 ('an unwrapped', 'a b\n', 0)):
+            path = os.path.join(tmp, name.split()[-1] + '.md')
+            with open(path, 'w', encoding='utf-8') as fh:
+                fh.write(text)
+            got = process([path], check=True, quiet=True)
+            with open(path, encoding='utf-8') as fh:
+                kept = fh.read() == text
+            if got != want or not kept:
+                ok = False
+                print(f'FAIL  --check on {name} file exited {got}, '
+                      f'want {want}{"" if kept else ", and wrote it"}',
+                      file=sys.stderr)
+            else:
+                print(f'pass  --check on {name} file exits {want}')
+
     return 0 if ok else 1
 
 
@@ -278,8 +300,18 @@ def main():
     if not args.files:
         ap.error('no files given')
 
+    return process(args.files, args.check)
+
+
+def process(paths, check, quiet=False):
+    """Reflow each file, or with check only report. 1 on any failure, or
+    with check on any file that would change."""
+    def say(msg):
+        if not quiet:
+            print(msg)
+
     failed = False
-    for path in args.files:
+    for path in paths:
         try:
             with open(path, encoding='utf-8') as fh:
                 before = fh.read()
@@ -297,17 +329,18 @@ def main():
             continue
 
         if before == after:
-            print(f'ok     {path} (already unwrapped)')
+            say(f'ok     {path} (already unwrapped)')
             continue
 
         n_before, n_after = len(before.split('\n')), len(after.split('\n'))
-        if args.check:
-            print(f'would  {path}: {n_before} -> {n_after} lines')
+        if check:
+            say(f'would  {path}: {n_before} -> {n_after} lines')
+            failed = True
             continue
 
         with open(path, 'w', encoding='utf-8') as fh:
             fh.write(after)
-        print(f'wrote  {path}: {n_before} -> {n_after} lines')
+        say(f'wrote  {path}: {n_before} -> {n_after} lines')
 
     return 1 if failed else 0
 
