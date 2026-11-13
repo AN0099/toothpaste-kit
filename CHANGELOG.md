@@ -95,6 +95,9 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Fixed
 
+- `scripts/check-pr-body` now reads a Provenance section holding only an
+  empty code fence as empty, so a body with "Yes" ticked and no trailers is
+  reported. Before, `` ```text `` then `` ``` `` passed with no finding.
 - `orchestration/schemas/request.json`, `orchestration/schemas/response.json`
   and `orchestration/registry/surface-descriptor.schema.json` no longer carry
   their `$id` line. A schema's `$id` tells a checker where the file lives, and

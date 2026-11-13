@@ -21,7 +21,8 @@ Fails (exit 1) on any of:
               Provenance section, when the template has one
 
 The template is read on every run, so the check follows it. Headings inside
-code fences do not count. It does NOT check that the boxes ticked are true,
+code fences do not count, and neither does a Provenance section holding only
+comments or empty code fences. It does NOT check that the boxes ticked are true,
 that a Provenance line matches the commits, or anything about the prose.
 """
 
@@ -45,6 +46,11 @@ YES_TICKED = re.compile(r"^- \[[xX]\] Yes\b", re.M)
 
 def strip_comments(text):
     return re.sub(r"<!--.*?-->", "", text, flags=re.S)
+
+
+def strip_empty_fences(text):
+    # A fence holding only blank lines is a placeholder, not content.
+    return re.sub(r"^```[^\n]*\n(?:[ \t]*\n)*```[ \t]*$", "", text, flags=re.M)
 
 
 def headings(text):
@@ -94,7 +100,7 @@ def check(body, template):
     found += unticked(body)
     if PROVENANCE.search(template) and YES_TICKED.search(body):
         m = PROVENANCE.search(body)
-        if not m or not strip_comments(m.group(1)).strip():
+        if not m or not strip_empty_fences(strip_comments(m.group(1))).strip():
             found.append("provenance: Yes is ticked and the Provenance section is missing or empty")
     return found
 
@@ -140,6 +146,12 @@ def selftest():
         ("Yes not a word", good + "- [x] Yesterday\n", set()),
         ("comment-only provenance", good + "- [x] Yes\n\n<details>\n<summary>Provenance</summary>\n\n"
          "<!-- t -->\n\n</details>\n", {"comment", "provenance"}),
+        ("empty-fence provenance", good + "- [x] Yes\n\n<details>\n<summary>Provenance</summary>\n\n"
+         "```text\n```\n\n</details>\n", {"provenance"}),
+        ("blank-line fence provenance", good + "- [x] Yes\n\n<details>\n<summary>Provenance</summary>\n\n"
+         "```\n\n  \n```\n\n</details>\n", {"provenance"}),
+        ("fenced trailers", good + "- [x] Yes\n\n<details>\n<summary>Provenance</summary>\n\n"
+         "```text\nAssisted-by: m via t/1\n```\n\n</details>\n", set()),
         ("other details only", good + "- [x] Yes\n\n<details>\n<summary>Notes</summary>\n\nx\n\n</details>\n",
          {"provenance"}),
         ("deep template, met", "# What this changes\n\n### Deep\n", set(), deep),
