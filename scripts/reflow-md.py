@@ -258,6 +258,37 @@ def selftest():
             else:
                 print(f'pass  --check on {name} file exits {want}')
 
+        # Without --check the file is rewritten in place, the mode every run
+        # outside CI uses, and a path that cannot be read must fail the run
+        # without stopping the files after it.
+        path = os.path.join(tmp, 'write.md')
+        with open(path, 'w', encoding='utf-8') as fh:
+            fh.write('a\nb\n')
+        got = process([path], check=False, quiet=True)
+        with open(path, encoding='utf-8') as fh:
+            text = fh.read()
+        if got != 0 or text != 'a b\n':
+            ok = False
+            print(f'FAIL  write mode exited {got} and left {text!r}, '
+                  "want 0 and 'a b\\n'", file=sys.stderr)
+        else:
+            print('pass  write mode rewrites a wrapped file and exits 0')
+
+        missing = os.path.join(tmp, 'missing.md')
+        with open(path, 'w', encoding='utf-8') as fh:
+            fh.write('a\nb\n')
+        got = process([missing, path], check=False, quiet=True)
+        with open(path, encoding='utf-8') as fh:
+            text = fh.read()
+        if got != 1 or text != 'a b\n':
+            ok = False
+            print(f'FAIL  unreadable file exited {got} and left {text!r}, '
+                  "want 1 and the next file rewritten to 'a b\\n'",
+                  file=sys.stderr)
+        else:
+            print('pass  unreadable file exits 1 and the next file is still '
+                  'processed')
+
     return 0 if ok else 1
 
 
