@@ -13,7 +13,10 @@ usage: scripts/check-pr-body BODY_FILE
 Fails (exit 1) on any of:
   heading     a template heading missing, or headings out of order
   comment     a template <!-- comment --> left in the body
-  wrapped     a paragraph broken across lines; GitHub shows each break
+  wrapped     a paragraph broken across lines; GitHub shows each break.
+              Also any line scripts/reflow-md.py would join, such as a list
+              item continued on an indented line, which the paragraph rule
+              does not read
   unticked    an empty box; a box that does not apply is replaced by a
               "Does not apply" line, never left empty or ticked, and the
               one box under "Drafted with an agent?" by a "No." line
@@ -27,6 +30,7 @@ that a Provenance line matches the commits, or anything about the prose.
 """
 
 import contextlib
+import importlib.util
 import io
 import json
 import os
@@ -39,9 +43,18 @@ TEMPLATE = pathlib.Path(".github/pull_request_template.md")
 # A line starting one of these is a block of its own, so a line after it is
 # not a wrapped continuation.
 BLOCK_START = re.compile(r"^\s*(#|[-*+] |\d+\. |\||>|<|```|\[)")
+# Line starts BLOCK_START matches that still continue a paragraph: an autolink is
+# inline, and only an ordered list starting at 1 can interrupt a paragraph.
+JOINABLE = re.compile(r"^\s*(<[A-Za-z][A-Za-z0-9+.-]{1,31}:|<[^\s<>@]+@|(?!1[.)])\d+[.)] )")
 PROVENANCE = re.compile(
     r"<details>\s*<summary>Provenance</summary>(.*?)</details>", re.S)
 YES_TICKED = re.compile(r"^- \[[xX]\] Yes\b", re.M)
+# reflow-md.py sits beside this script; its name has a hyphen, so it is loaded
+# by path rather than imported.
+_spec = importlib.util.spec_from_file_location(
+    "reflow_md", pathlib.Path(__file__).resolve().parent / "reflow-md.py")
+reflow_md = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(reflow_md)
 
 
 def strip_comments(text):
@@ -97,6 +110,19 @@ def check(body, template):
                 and not BLOCK_START.match(prev) and not BLOCK_START.match(line)):
             found.append(f"wrapped: line {n} continues the paragraph above it")
         prev = line
+    # The paragraph rule above skips a line after a list item. reflow-md.py
+    # reads those too, so a line it joins onto the one above counts as
+    # wrapped, unless it starts a block by the rule above. Runs of blank lines
+    # and the final newline are set aside first, since reflow-md.py
+    # normalizes them and GitHub does not show them.
+    plain = re.sub(r"\n{3,}", "\n\n", body).rstrip("\n") + "\n"
+    kept = set(reflow_md.reflow(plain).split("\n"))
+    lines = plain.split("\n")
+    for n, line in enumerate(lines, 1):
+        if (n > 1 and lines[n - 2].strip() and line.strip() and line not in kept
+                and (not BLOCK_START.match(line) or JOINABLE.match(line))):
+            if f"wrapped: line {n} continues the paragraph above it" not in found:
+                found.append(f"wrapped: line {n} continues the line above it; reflow-md.py would join them")
     found += unticked(body)
     if PROVENANCE.search(template) and YES_TICKED.search(body):
         m = PROVENANCE.search(body)
@@ -120,6 +146,12 @@ def selftest():
         ("comment left", good + "No.\n\n<!-- left -->\n", {"comment"}),
         ("wrapped", good.replace("One line.", "One\nline.") + "No.\n", {"wrapped"}),
         ("empty box", good.replace("- [x] done", "- [ ] done") + "No.\n", {"unticked"}),
+        ("wrapped list item", good.replace("- [x] done", "- [x] done and\n  more") + "No.\n", {"wrapped"}),
+        ("wrapped onto an autolink", good.replace("One line.", "See\n<https://e.x/a> now.") + "No.\n",
+         {"wrapped"}),
+        ("wrapped onto a number", good.replace("One line.", "Step\n2. ran.") + "No.\n", {"wrapped"}),
+        ("paragraph then list", good.replace("One line.", "Steps:\n1. one\n2. two") + "No.\n", set()),
+        ("blank runs, no final newline", good.replace("One line.\n", "One line.\n\n\n") + "No.", set()),
         ("agent box left empty", good + "- [ ] Yes\n", {"unticked"}),
         ("no provenance", good + "- [x] Yes\n", {"provenance"}),
         ("empty provenance", good + "- [x] Yes\n\n<details>\n<summary>Provenance</summary>\n\n</details>\n",
