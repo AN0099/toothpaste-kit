@@ -70,6 +70,10 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `docs/releasing.md` step 2 now closes each release's notes with a
+  "Known accessibility limitations" subsection, written after a review of the
+  release against `docs/accessibility.md` and `docs/document-accessibility.md`.
+  0.6.0 carried the first one.
 - `scripts/reflow-md.py --check` exits 1 when any file would change, and 0
   when every file is already unwrapped. Before, it exited 0 either way, so a
   wrapped file passed any gate that read its status. Its selftest plants one

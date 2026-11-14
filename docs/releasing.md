@@ -151,6 +151,17 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
    repeating them wholesale. Name every skill whose revision moved, as "Skill
    revisions" above says.
 
+   **Close the notes with the release's known accessibility limitations.**
+   Review what the release changes against `docs/accessibility.md` and
+   `docs/document-accessibility.md`, then end the section with a
+   `### Known accessibility limitations` subsection, after the others. Each
+   line states one limitation the repository records or the review found: a
+   draft that is not a deployed configuration, a kind of produced artifact no
+   check covers, a generated page with no separate check. The last line says
+   whether the release makes any accessibility conformance or certification
+   claim. The subsection reaches the GitHub release body in step 6 with the
+   rest of the section.
+
 3. **Set `version` and `date-released` in `CITATION.cff` in the tree that gets
    tagged.** They go in on the release branch before the merge, so the merge
    commit the tag points at carries them. For example:
