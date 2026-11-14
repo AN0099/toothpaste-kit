@@ -70,6 +70,10 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `scripts/reflow-md.py --check` exits 1 when any file would change, and 0
+  when every file is already unwrapped. Before, it exited 0 either way, so a
+  wrapped file passed any gate that read its status. Its selftest plants one
+  of each.
 - `README.md` describes `docs/standards/` and lists it among the project
   documents, and names six scripts it had left out: `style-check`,
   `bcp14-check.py`, `sbom.py`, `blog.py`, `sbom-shapes.py` and
