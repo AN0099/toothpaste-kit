@@ -127,3 +127,16 @@ code
 
 Two blank lines above
 collapse to one.
+
+A wrapped line ends on
+<https://example.org/a> and goes on.
+
+A wrapped line names
+<someone@example.org> as its contact.
+
+A wrapped line ends on step
+2. and goes on.
+
+A paragraph before a list
+1. one
+2. two

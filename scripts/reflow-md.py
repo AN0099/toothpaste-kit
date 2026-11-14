@@ -62,6 +62,8 @@ HRULE = re.compile(r'^\s*([-*_])(\s*\1){2,}\s*$')
 TABLE = re.compile(r'^\s*\|')
 QUOTE = re.compile(r'^\s*>')
 HTML = re.compile(r'^\s*<')
+# An autolink is inline, not an HTML block, so it continues a paragraph.
+AUTOLINK = re.compile(r'^\s*<([A-Za-z][A-Za-z0-9+.-]{1,31}:[^\s<>]*|[^\s<>@]+@[^\s<>]+)>')
 HEADING = re.compile(r'^\s*#{1,6}\s')
 
 
@@ -126,13 +128,22 @@ def reflow(text):
             continue
 
         if (HEADING.match(line) or HRULE.match(line) or TABLE.match(line)
-                or QUOTE.match(line) or HTML.match(line)):
+                or QUOTE.match(line)
+                or (HTML.match(line) and not AUTOLINK.match(line))):
             flush()
             in_list = False
             out.append(line)
             continue
 
-        if LIST.match(line):
+        # Only an ordered list starting at 1 can interrupt a paragraph, so
+        # "2. " inside an open paragraph continues it.
+        m = LIST.match(line)
+        if (m and buf and not in_list and m.group(2)[0].isdigit()
+                and int(m.group(2).rstrip('.) \t')) != 1):
+            buf.append(line)
+            continue
+
+        if m:
             flush()
             in_list = True
             buf.append(line.rstrip())

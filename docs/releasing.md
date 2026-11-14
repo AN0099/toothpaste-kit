@@ -227,7 +227,11 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
 
 6. **Create the GitHub release** from that tag, pasting the `CHANGELOG.md`
    section as the body. Publish it rather than saving a draft: the Zenodo
-   webhook fires on a published release.
+   webhook fires on a published release. GitHub shows each newline in a
+   release body as a line break, so the section goes in unwrapped: save it to
+   a file, run `scripts/reflow-md.py` on that file, and paste it only once
+   `scripts/reflow-md.py --check` on it exits 0. `CHANGELOG.md` itself keeps
+   its wrap.
 
 7. **Record the version DOI in the next release, not in a pull request of its
    own.** The Zenodo integration is enabled, and it mints from the GitHub

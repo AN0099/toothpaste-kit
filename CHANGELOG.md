@@ -70,6 +70,13 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `scripts/check-pr-body` now fails a body holding a line that
+  `scripts/reflow-md.py` would join onto the one above, such as a list item
+  continued on an indented line, which its paragraph rule did not read. Lines
+  the paragraph rule treats as starting a block stay allowed. Gate 16 copies
+  `reflow-md.py` beside its mutant copy. `docs/releasing.md` step 6 now runs
+  the release notes through `reflow-md.py` before they become the release
+  body, since 0.6.0's notes were published hard-wrapped.
 - `docs/releasing.md` step 2 now closes each release's notes with a
   "Known accessibility limitations" subsection, written after a review of the
   release against `docs/accessibility.md` and `docs/document-accessibility.md`.
@@ -103,6 +110,12 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Fixed
 
+- `scripts/reflow-md.py` now joins a wrapped line that starts with an
+  autolink (`<https://...>` or an email address in angle brackets), which it
+  had kept as an HTML block, and one that starts with an ordered list number
+  other than 1 inside a paragraph, which CommonMark reads as a continuation.
+  `scripts/check-pr-body` fails both. A paragraph followed by a list starting
+  at 1 is unchanged.
 - `scripts/check-pr-body` now reads a Provenance section holding only an
   empty code fence as empty, so a body with "Yes" ticked and no trailers is
   reported. Before, `` ```text `` then `` ``` `` passed with no finding.
