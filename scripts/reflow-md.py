@@ -258,6 +258,37 @@ def selftest():
             else:
                 print(f'pass  --check on {name} file exits {want}')
 
+        # Without --check the file is rewritten in place and the run exits 0.
+        path = os.path.join(tmp, 'write.md')
+        with open(path, 'w', encoding='utf-8') as fh:
+            fh.write('a\nb\n')
+        got = process([path], check=False, quiet=True)
+        with open(path, encoding='utf-8') as fh:
+            written = fh.read()
+        if got != 0 or written != 'a b\n':
+            ok = False
+            print(f'FAIL  rewrite exited {got} and left {written!r}, '
+                  "want 0 and 'a b\\n'", file=sys.stderr)
+        else:
+            print('pass  a wrapped file is rewritten in place')
+
+        # A path that cannot be read is a failure and must not stop the
+        # files after it: the readable one is still rewritten.
+        gone = os.path.join(tmp, 'missing.md')
+        path = os.path.join(tmp, 'after.md')
+        with open(path, 'w', encoding='utf-8') as fh:
+            fh.write('c\nd\n')
+        got = process([gone, path], check=False, quiet=True)
+        with open(path, encoding='utf-8') as fh:
+            written = fh.read()
+        if got != 1 or written != 'c d\n':
+            ok = False
+            print(f'FAIL  unreadable path exited {got} and the next file '
+                  f'held {written!r}, want 1 and the next file rewritten',
+                  file=sys.stderr)
+        else:
+            print('pass  an unreadable path exits 1 and later files still run')
+
     return 0 if ok else 1
 
 
