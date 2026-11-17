@@ -81,8 +81,6 @@ Three are procedures an agent may run on its own at a clean boundary. None sets 
 
 `docs/project-state.md` is where the kit itself stands.
 
-`docs/standards/` holds eight standards for writing and publishing: style, technical writing, plaintext messages, data display, records, continuity, risk and editorial policy. Each is a set of numbered requirements with BCP 14 keywords, and carries a conformance table naming, for every requirement, whether it is checked mechanically, by review or by judgment, and how. [Its README](docs/standards/README.md) states the keywords, how a standard is kept up to date and how conformance is recorded. Gate 23 runs `scripts/style-check` on every file there.
-
 ### `examples/`
 
 `examples/workspace/` is the workspace the quickstart copies: a `CLAUDE.md` naming where the other files are, the manifest `index.md`, and stubs of the standing files under `.agents/`. The stubs hold comments saying what goes in each, and point at `docs/standing-documents.md` rather than restating it. A gate checks that each stub matches a file that document describes.
@@ -106,15 +104,12 @@ The gates call these, and each runs on its own as well:
 - `check-hooks.py`: checks the rules in `hooks/` and shows each blocking one can fire
 - `check-workspace-stubs.py`: checks `examples/workspace/` against `docs/standing-documents.md`
 - `schema-check.py`: validates `orchestration/registry/*.json` against its schema
-- `check-qblock`: checks a reply's closing question block against `working-preferences`
 - `check-pr-body`: checks a pull request body against `.github/pull_request_template.md`, including any line `reflow-md.py` would join; CI also runs it on each pull request
 - `cli_path.py`: keeps a path given on a script's command line inside a root directory; `spdx-fragment.py` uses it for `--models`
 - `spdx-fragment.py`: builds an SPDX fragment of who assisted a commit range from its `Assisted-by:` trailers, taking per-model values from `spdx-models.json`
 - `remote-level.sh`: classifies a repository by where its remotes point, as none, internal or external, and treats any host it cannot prove internal as external
 - `reorient`: prints where a workspace stands in one screen, for the start of a session and after a compaction; the observing half of the `orient` skill
 - `round-check.py`: validates review-round documents against their schemas in `orchestration/schemas/round/`
-- `style-check`: the mechanical checks of `docs/standards/`, each named by the requirement it enforces; gate 23 runs it on every standard
-- `bcp14-check.py`: fails a Markdown file that uses a BCP 14 keyword in capitals without naming BCP 14; gate 22
 - `sbom.py`: writes an SPDX 3.0.1 bill of materials for the tree, standard library only
 - `blog.py`: builds the kit blog's pages and feed from `blog/posts/`; [the blog guide](docs/blog.md) covers it
 
@@ -209,7 +204,6 @@ The lowest-friction first contribution is a surface descriptor in `orchestration
 | [Code of conduct](CODE_OF_CONDUCT.md) | Expected conduct, and who a report reaches |
 | [Project state](docs/project-state.md) | Where the kit itself stands right now |
 | [Standing documents](docs/standing-documents.md) | The document structure the procedure skills assume |
-| [Standards](docs/standards/README.md) | The eight writing and publishing standards, their keywords, upkeep and conformance |
 | [Glossary](docs/glossary.md) | What each term of art here means, and which file defines it |
 | [Concepts](docs/concepts.md) | Each idea a contributor needs, with every file that carries it |
 | [Interface accessibility](docs/accessibility.md) | Accessibility of the interface the work is done through |

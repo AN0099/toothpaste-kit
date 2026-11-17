@@ -167,7 +167,7 @@ surface that was already open.
 |---|---|---|---|
 | 7.1 Local core | `scripts/mdlint.py` | Yes, it is this project's code | Standard library only, nothing installed |
 | 7.2 Local core | `markdownlint-cli2` at the desk | No | Fetches from a registry at run time, and adds a package manifest to a repository that ships none |
-| 7.3 Local core | WCAG technique IDs, RFC keyword usage | Yes | Published standards, readable at the source. Gate 22 (`scripts/bcp14-check.py`) fails a Markdown file using a BCP 14 keyword in capitals that never names BCP 14 |
+| 7.3 Local core | WCAG technique IDs, RFC keyword usage | Yes | Published standards, readable at the source |
 | 7.4 Runner | `markdownlint-cli2` pinned in a workflow step | Yes | Disposable container, no token, exact version |
 | 7.5 Runner | A third party marketplace action | No | Runs with the workflow's token |
 | 7.6 Runner | `actions/checkout` | Yes, with the pin recorded above | First party, and unavoidable |

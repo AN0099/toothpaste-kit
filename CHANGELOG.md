@@ -7,13 +7,6 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
-- `docs/standards/`: eight standards for writing and publishing, each as
-  numbered requirements with BCP 14 keywords and a conformance table naming the
-  check for every requirement: style, technical writing, plaintext messages,
-  data display, records, continuity, risk and editorial policy.
-  `scripts/style-check`, gate 23, holds the mechanical checks; the gate runs
-  its selftest, then every file in `docs/standards/`, and fails on any SHALL
-  finding. Its coverage floor in `.coverage-thresholds.json` is 98%.
 - `docs/security-posture.md` section 8 now maps the OpenSSF Project Security
   Baseline, Level 2 named as the target, and the Best Practices Badge's passing
   criteria by ID, from the published lists at stated commits. OSPS-SA-01.01,
@@ -33,9 +26,6 @@ skill lives in that skill's own `CHANGELOG.md`.
   match their schemas. No real messages exist in the tree, so it checks a sample
   message it builds for each message schema. A schema file that the script does
   not list fails it.
-- `scripts/bcp14-check.py`, gate 22: a Markdown file that uses a BCP 14
-  keyword in capitals must name BCP 14, outside code, or be listed as quoting.
-  The one file that did not, this changelog, now writes the word in lowercase.
 - `scripts/skills-spec.sh`: checks every skill's `SKILL.md` against the Agent
   Skills specification, the published format for a skill file, with
   skills-ref 0.1.1, the checker the specification's authors publish. It is
@@ -85,10 +75,8 @@ skill lives in that skill's own `CHANGELOG.md`.
   when every file is already unwrapped. Before, it exited 0 either way, so a
   wrapped file passed any gate that read its status. Its selftest plants one
   of each.
-- `README.md` describes `docs/standards/` and lists it among the project
-  documents, and names six scripts it had left out: `style-check`,
-  `bcp14-check.py`, `sbom.py`, `blog.py`, `sbom-shapes.py` and
-  `coverage-check.py`.
+- `README.md` names four scripts it had left out: `sbom.py`, `blog.py`,
+  `sbom-shapes.py` and `coverage-check.py`.
 - Every workflow pins `actions/checkout` by the commit SHA of its v7.0.1 tag
   instead of the `v7` tag, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty,
   so gate 19 now fails any action pinned by tag.
@@ -107,6 +95,13 @@ skill lives in that skill's own `CHANGELOG.md`.
   - `references.md`: "What is not here".
   - `docs/security-posture.md` section 5: "Badges not shown".
   - `docs/review-rounds.md`: the lead-in to the list outside version 0.1.
+
+### Removed
+
+- `scripts/check-qblock`, its 30 cases in `tests/qblock-cases/` and gate 15,
+  which ran its selftest. The checker tested one installation's reply format
+  rather than anything the kit ships, and its header named a private project.
+  The gates are now twenty; their numbers are unchanged, so 15 is unused.
 
 ### Fixed
 
