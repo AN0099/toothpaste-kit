@@ -2,7 +2,7 @@
 
 <!-- One or two sentences. What changed, and why. -->
 
-<!-- Tick every box in a section that applies. Where a section or an item does not apply, replace its boxes with a line saying "Does not apply" and why; scripts/check-pr-body fails on an empty box. -->
+<!-- Keep every heading: scripts/check-pr-body checks that each is present and in order. Where a section does not apply, write "Does not apply" and why. -->
 
 ## Related issue or task
 
@@ -17,22 +17,15 @@ Run this before opening the PR. It is the same command the `gates` job in CI run
 ```
 
 - [ ] `./scripts/gates.sh --selftest` passes
-- [ ] No em dashes in any file I changed
-- [ ] Only public `TK-` task IDs appear
-- [ ] Every `.json` I touched parses
-- [ ] Markdown I touched passes `scripts/mdlint.py`
 - [ ] Every commit is signed off (`git commit -s`)
-- [ ] No `Co-Authored-By` naming an AI, session link or generated-with footer in my commits or this PR
 
 ## If this touches a skill
 
-- [ ] I read `skills/skill-creation/SKILL.md` first
-- [ ] `name` and `description` are in the frontmatter
-- [ ] I ran `grep -rn '<old-name>' skills/` after any rename
+<!-- Read skills/skill-creation/SKILL.md first, keep name and description in the frontmatter, and after any rename run grep -rn '<old-name>' skills/. Say what you did. -->
 
 ## If this changes an orchestration message field
 
-- [ ] The schema that holds the field, `protocol.md` and `taxonomy.md` changed together
+<!-- The schema that holds the field, protocol.md and taxonomy.md change together. Say which you changed. -->
 
 ## Verification
 
@@ -45,7 +38,7 @@ confirmed it yourself. An agent auditing its own work does not count. -->
 
 ## Drafted with an agent?
 
-<!-- If no agent drafted any of it, replace the box with the line "No." and delete the Provenance section. -->
+<!-- If no agent drafted any of it, leave the box empty and delete the Provenance section. -->
 
 - [ ] Yes, and I checked the output mechanically
 

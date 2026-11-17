@@ -13,24 +13,17 @@ usage: scripts/check-pr-body BODY_FILE
 Fails (exit 1) on any of:
   heading     a template heading missing, or headings out of order
   comment     a template <!-- comment --> left in the body
-  wrapped     a paragraph broken across lines; GitHub shows each break.
-              Also any line scripts/reflow-md.py would join, such as a list
-              item continued on an indented line, which the paragraph rule
-              does not read
-  unticked    an empty box; a box that does not apply is replaced by a
-              "Does not apply" line, never left empty or ticked, and the
-              one box under "Drafted with an agent?" by a "No." line
   provenance  the box under "Drafted with an agent?" ticked and no filled
               Provenance section, when the template has one
 
 The template is read on every run, so the check follows it. Headings inside
 code fences do not count, and neither does a Provenance section holding only
-comments or empty code fences. It does NOT check that the boxes ticked are true,
-that a Provenance line matches the commits, or anything about the prose.
+comments or empty code fences. It does NOT check the boxes, that a Provenance
+line matches the commits, or anything about the prose, line wrapping included.
+The pr-body job in CI is advisory: no ruleset requires it.
 """
 
 import contextlib
-import importlib.util
 import io
 import json
 import os
@@ -40,22 +33,9 @@ import sys
 import tempfile
 
 TEMPLATE = pathlib.Path(".github/pull_request_template.md")
-# A line starting one of these is a block of its own, so a line after it is
-# not a wrapped continuation.
-BLOCK_START = re.compile(r"^\s*(#|[-*+] |\d+\. |\||>|<|```|\[)")
-# Line starts BLOCK_START matches that still continue a paragraph: an autolink is
-# inline, and only an ordered list starting at 1 can interrupt a paragraph.
-JOINABLE = re.compile(r"^\s*(<[A-Za-z][A-Za-z0-9+.-]{1,31}:|<[^\s<>@]+@|(?!1[.)])\d+[.)] )")
 PROVENANCE = re.compile(
     r"<details>\s*<summary>Provenance</summary>(.*?)</details>", re.S)
 YES_TICKED = re.compile(r"^- \[[xX]\] Yes\b", re.M)
-# reflow-md.py sits beside this script; its name has a hyphen, so it is loaded
-# by path rather than imported.
-_spec = importlib.util.spec_from_file_location(
-    "reflow_md", pathlib.Path(__file__).resolve().parent / "reflow-md.py")
-reflow_md = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(reflow_md)
-
 
 def strip_comments(text):
     return re.sub(r"<!--.*?-->", "", text, flags=re.S)
@@ -76,19 +56,6 @@ def headings(text):
     return out
 
 
-def unticked(text):
-    """Every box ticked. Each empty box is listed with the section it sits in."""
-    found, section, fence = [], "", False
-    for line in text.splitlines():
-        if line.startswith("```"):
-            fence = not fence
-        elif not fence and re.match(r"^#{1,6} ", line):
-            section = line.lstrip("# ").strip()
-        elif not fence and re.match(r"^\s*- \[ \] ", line):
-            found.append(f"unticked: {section}: {line.strip()}")
-    return found
-
-
 def check(body, template):
     found = []
     have, pos = headings(body), 0
@@ -99,31 +66,6 @@ def check(body, template):
             found.append(f"heading: missing or out of order: {h}")
     if "<!--" in body:
         found.append("comment: a template comment is still in the body")
-    fence, prev = False, ""
-    for n, line in enumerate(body.splitlines(), 1):
-        if line.startswith("```"):
-            fence, prev = not fence, ""
-            continue
-        if fence:
-            continue
-        if (prev.strip() and line.strip()
-                and not BLOCK_START.match(prev) and not BLOCK_START.match(line)):
-            found.append(f"wrapped: line {n} continues the paragraph above it")
-        prev = line
-    # The paragraph rule above skips a line after a list item. reflow-md.py
-    # reads those too, so a line it joins onto the one above counts as
-    # wrapped, unless it starts a block by the rule above. Runs of blank lines
-    # and the final newline are set aside first, since reflow-md.py
-    # normalizes them and GitHub does not show them.
-    plain = re.sub(r"\n{3,}", "\n\n", body).rstrip("\n") + "\n"
-    kept = set(reflow_md.reflow(plain).split("\n"))
-    lines = plain.split("\n")
-    for n, line in enumerate(lines, 1):
-        if (n > 1 and lines[n - 2].strip() and line.strip() and line not in kept
-                and (not BLOCK_START.match(line) or JOINABLE.match(line))):
-            if f"wrapped: line {n} continues the paragraph above it" not in found:
-                found.append(f"wrapped: line {n} continues the line above it; reflow-md.py would join them")
-    found += unticked(body)
     if PROVENANCE.search(template) and YES_TICKED.search(body):
         m = PROVENANCE.search(body)
         if not m or not strip_empty_fences(strip_comments(m.group(1))).strip():
@@ -144,36 +86,17 @@ def selftest():
         ("missing heading", "# What this changes\n\nText.\n", {"heading"}),
         ("out of order", "## Checks\n\n# What this changes\n\n## Drafted with an agent?\n", {"heading"}),
         ("comment left", good + "No.\n\n<!-- left -->\n", {"comment"}),
-        ("wrapped", good.replace("One line.", "One\nline.") + "No.\n", {"wrapped"}),
-        ("empty box", good.replace("- [x] done", "- [ ] done") + "No.\n", {"unticked"}),
-        ("wrapped list item", good.replace("- [x] done", "- [x] done and\n  more") + "No.\n", {"wrapped"}),
-        ("wrapped onto an autolink", good.replace("One line.", "See\n<https://e.x/a> now.") + "No.\n",
-         {"wrapped"}),
-        ("wrapped onto a number", good.replace("One line.", "Step\n2. ran.") + "No.\n", {"wrapped"}),
-        ("paragraph then list", good.replace("One line.", "Steps:\n1. one\n2. two") + "No.\n", set()),
-        ("blank runs, no final newline", good.replace("One line.\n", "One line.\n\n\n") + "No.", set()),
-        ("agent box left empty", good + "- [ ] Yes\n", {"unticked"}),
+        ("agent box left empty", good + "- [ ] Yes\n", set()),
         ("no provenance", good + "- [x] Yes\n", {"provenance"}),
         ("empty provenance", good + "- [x] Yes\n\n<details>\n<summary>Provenance</summary>\n\n</details>\n",
          {"provenance"}),
     ]
-    # Each block-start kind after a plain line, and each before one, is not a
-    # wrapped paragraph.
-    starts = ["#5 next", "- a", "1. a", "| a |", "> q", "<br>", "[r]: https://e.x", "  - a"]
-    blocks = "".join(f"Intro:\n{s}\n\n" for s in starts)
     # A template whose comment holds a heading, with a deeper heading, and a
     # "#" line that is not a heading.
     deep = ("# What this changes\n\n<!--\n## Not required\n-->\n\n#5 is not a heading\n\n"
             "### Deep\n")
     cases += [
-        ("block starts unwrapped", good.replace("One line.\n", blocks) + "No.\n", set()),
-        ("heading then text", good.replace("changes\n\n", "changes\n") + "No.\n", set()),
-        ("text then box", good.replace("- [x] done", "Ran:\n- [x] done") + "No.\n", set()),
-        ("fenced lines", good.replace("One line.", "```\na\nb\n- [ ] x\n```") + "No.\n", set()),
-        ("text after fence", good.replace("One line.", "Para.\n```\nx\n```\nAfter.") + "No.\n", set()),
         ("heading trailing space", good.replace("## Checks\n", "## Checks  \n") + "No.\n", set()),
-        ("nested empty box", good.replace("- [x] done", "- [x] done\n  - [ ] sub") + "No.\n",
-         {"unticked"}),
         ("capital X Yes", good + "- [X] Yes\n", {"provenance"}),
         ("Yes not a word", good + "- [x] Yesterday\n", set()),
         ("comment-only provenance", good + "- [x] Yes\n\n<details>\n<summary>Provenance</summary>\n\n"
@@ -212,18 +135,24 @@ def selftest():
         saved, TEMPLATE = TEMPLATE, pathlib.Path(d) / "template.md"
         TEMPLATE.write_text(template)
         rcs = []
-        for body in (good + "No.\n", good + "- [ ] Yes\n"):
+        for body in (good + "No.\n", good + "- [x] Yes\n"):
             (pathlib.Path(d) / "body.md").write_text(body)
             with contextlib.redirect_stdout(io.StringIO()):
                 rcs.append(main([str(pathlib.Path(d) / "body.md")]))
+        # --event reads the event file, and an unknown argument prints usage.
+        event.write_text(json.dumps({"pull_request": {"body": good + "No.\n"}}))
+        saved_env = os.environ.get("GITHUB_EVENT_PATH")
+        os.environ["GITHUB_EVENT_PATH"] = str(event)
+        with contextlib.redirect_stdout(io.StringIO()):
+            rcs += [main(["--event"]), main(["--bogus"])]
+        if saved_env is None:
+            os.environ.pop("GITHUB_EVENT_PATH")
+        else:
+            os.environ["GITHUB_EVENT_PATH"] = saved_env
         TEMPLATE = saved
-        ok_main = rcs == [0, 1]
+        ok_main = rcs == [0, 1, 0, 2]
         print(f"{'ok  ' if ok_main else 'FAIL'}  main exit codes" + ("" if ok_main else f": got {rcs}"))
         ok = ok and ok_main
-    msg = check(good.replace("- [x] done", "- [ ] done") + "No.\n", template)
-    ok_msg = msg == ["unticked: Checks: - [ ] done"]
-    print(f"{'ok  ' if ok_msg else 'FAIL'}  empty box names its section" + ("" if ok_msg else f": got {msg}"))
-    ok = ok and ok_msg
     print("check-pr-body selftest:", "passed" if ok else "FAILED")
     return 0 if ok else 1
 

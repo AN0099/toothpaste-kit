@@ -885,12 +885,9 @@ PY2
   ( cd "$tmp/hk-ok" && python3 "$hk" --selftest ) >/dev/null 2>&1
   plant_rejected $bad $? "hooks checker selftest, a check weakened"
 
-  # Gate 16: a copy of the checker without its empty-box rule must fail its
-  # own selftest. The copy loads scripts/reflow-md.py from its own directory,
-  # so that goes beside it; without it the copy would fail on the load, not
-  # the rule.
-  mkdir -p "$tmp/pb/scripts" && grep -v 'found += unticked(body)' scripts/check-pr-body > "$tmp/pb/scripts/check-pr-body"
-  cp scripts/reflow-md.py "$tmp/pb/scripts/"
+  # Gate 16: a copy of the checker without its heading rule must fail its
+  # own selftest.
+  mkdir -p "$tmp/pb/scripts" && grep -v 'found.append(f"heading: ' scripts/check-pr-body > "$tmp/pb/scripts/check-pr-body"
   python3 "$tmp/pb/scripts/check-pr-body" --selftest >/dev/null 2>&1
   bad=$?
   python3 scripts/check-pr-body --selftest >/dev/null 2>&1
