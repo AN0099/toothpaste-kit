@@ -8,8 +8,7 @@ rules; nothing here adds one.
 - **Checks:** `./scripts/gates.sh --selftest`, the same command CI runs, also run by `tests/run`. Its
   header states what each gate covers. Checks that need an installed tool, REUSE among them, are
   `./scripts/compliance.sh --selftest`; `./scripts/schemas.sh --selftest` validates the two schema-declaring
-  metadata files and this tree's JSON Schema files with the documents they govern, and `./scripts/sbom-shapes.py --selftest` the bill of materials against the
-  SPDX 3.0.1 shapes and licence list, both in the verification container.
+  metadata files and this tree's JSON Schema files with the documents they govern, both in the verification container.
 - **Skills:** read `skills/skill-creation/SKILL.md` before changing one. `./scripts/skills-spec.sh --selftest`
   checks every skill against the Agent Skills specification, the published format for a skill file, in the
   verification container.

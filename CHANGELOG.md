@@ -11,14 +11,6 @@ skill lives in that skill's own `CHANGELOG.md`.
   Baseline, Level 2 named as the target, and the Best Practices Badge's passing
   criteria by ID, from the published lists at stated commits. OSPS-SA-01.01,
   OSPS-SA-02.01 and OSPS-SA-03.01 are not met.
-- `scripts/sbom-shapes.py`: validates the bill of materials against the
-  published SPDX 3.0.1 SHACL shapes with pyshacl, and each licence id against
-  the SPDX licence list 3.29.0. The verification image downloads the model,
-  context and list, checked by digest, and the script checks the digests again.
-  Its selftest rejects planted documents, files with the wrong digest and a
-  missing tool, each only when the message its plant names appears.
-  `.github/workflows/containers.yml` runs it on linux/amd64 and linux/arm64.
-  The image is now `localhost/kit-verify:v7`.
 - `scripts/schemas.sh` also checks this tree's seven JSON Schema files with
   `check-jsonschema`, a standard tool that understands the whole format: each
   schema must be well formed, and the registry's vendor files, the review-round
@@ -75,8 +67,8 @@ skill lives in that skill's own `CHANGELOG.md`.
   when every file is already unwrapped. Before, it exited 0 either way, so a
   wrapped file passed any gate that read its status. Its selftest plants one
   of each.
-- `README.md` names four scripts it had left out: `sbom.py`, `blog.py`,
-  `sbom-shapes.py` and `coverage-check.py`.
+- `README.md` names three scripts it had left out: `sbom.py`, `blog.py` and
+  `coverage-check.py`.
 - Every workflow pins `actions/checkout` by the commit SHA of its v7.0.1 tag
   instead of the `v7` tag, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty,
   so gate 19 now fails any action pinned by tag.
@@ -102,6 +94,16 @@ skill lives in that skill's own `CHANGELOG.md`.
   which ran its selftest. The checker tested one installation's reply format
   rather than anything the kit ships, and its header named a private project.
   The gates are now twenty; their numbers are unchanged, so 15 is unused.
+- `scripts/spdx-fragment.py`, `scripts/spdx-models.json` and gate 17, which
+  ran the builder's selftest, with the pull request template's step that ran
+  it. `spdx-models.json` shipped empty, so every fragment marked each model
+  `noAssertion`, and nothing read the fragments. The gates are now nineteen;
+  17 is unused.
+- `scripts/cli_path.py`, whose one caller was `spdx-fragment.py`.
+- `.github/labeler.yml` and `.github/workflows/labeler.yml`, which labelled
+  pull requests by path, and `.github/workflows/ai-fix.yml`, which answered
+  the `ai-fix` issue label. Nothing read either label, and no workflow now runs
+  on `pull_request_target`.
 
 ### Fixed
 
