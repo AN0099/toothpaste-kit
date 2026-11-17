@@ -5,9 +5,6 @@ set by what a change touches, a change that touches several paths takes the high
 them, and each tier's review includes every tier below it. Each requirement within a tier restates
 a rule held elsewhere in the kit and names its source.
 
-The `labeler` workflow adds a path label to each pull request, which shows the tier at a glance.
-The label is a prompt for the reviewer and decides nothing.
-
 ## The tiers
 
 | Tier | Touches | Labels |
@@ -83,8 +80,7 @@ This tier covers skills under `skills/`, hook rules under `hooks/` and agent con
   header comment.
 - A workflow uses no third party action and pins versions exactly. Source:
   `docs/security-posture.md`, section 7. As current practice rather than a rule, each workflow
-  declares its own `permissions`, `contents: read` except in `ai-fix.yml`, and `labeler.yml` adds
-  `pull-requests: write` to label pull requests; row 4.4 records the practice.
+  declares its own `permissions`, read-only plus the writes a job needs; row 4.4 records the practice.
 - A workflow binds only once it is a required status check in the ruleset on the default branch.
   Source: `docs/security-posture.md`, row 4.6.
 - The rulesets in `.github/rulesets/` and the branch name guard,

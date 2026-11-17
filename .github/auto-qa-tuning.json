@@ -17,8 +17,6 @@
     {"workflow": "commit-attribution", "file": ".github/workflows/commit-attribution.yml", "job": "check"},
     {"workflow": "dco", "file": ".github/workflows/dco.yml", "job": "check"},
     {"workflow": "compliance", "file": ".github/workflows/compliance.yml", "job": "compliance"},
-    {"workflow": "labeler", "file": ".github/workflows/labeler.yml", "job": "label"},
-    {"workflow": "ai-fix", "file": ".github/workflows/ai-fix.yml", "job": "route"},
     {"workflow": "auto-qa", "file": ".github/workflows/auto-qa.yml", "job": "propose"}
   ]
 }

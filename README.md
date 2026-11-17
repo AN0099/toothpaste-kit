@@ -105,8 +105,6 @@ The gates call these, and each runs on its own as well:
 - `check-workspace-stubs.py`: checks `examples/workspace/` against `docs/standing-documents.md`
 - `schema-check.py`: validates `orchestration/registry/*.json` against its schema
 - `check-pr-body`: checks a pull request body against `.github/pull_request_template.md`, including any line `reflow-md.py` would join; CI also runs it on each pull request
-- `cli_path.py`: keeps a path given on a script's command line inside a root directory; `spdx-fragment.py` uses it for `--models`
-- `spdx-fragment.py`: builds an SPDX fragment of who assisted a commit range from its `Assisted-by:` trailers, taking per-model values from `spdx-models.json`
 - `remote-level.sh`: classifies a repository by where its remotes point, as none, internal or external, and treats any host it cannot prove internal as external
 - `reorient`: prints where a workspace stands in one screen, for the start of a session and after a compaction; the observing half of the `orient` skill
 - `round-check.py`: validates review-round documents against their schemas in `orchestration/schemas/round/`
@@ -114,8 +112,6 @@ The gates call these, and each runs on its own as well:
 - `blog.py`: builds the kit blog's pages and feed from `blog/posts/`; [the blog guide](docs/blog.md) covers it
 
 `schemas.sh` runs outside the gates suite, in the verification image: it validates `security-insights.yml`, `CITATION.cff`, this tree's JSON Schema files and the documents they govern with `check-jsonschema`, a standard tool that understands the whole JSON Schema format.
-
-`sbom-shapes.py` also runs in the verification image: it validates the bill of materials against the published SPDX 3.0.1 shapes and each licence ID against the SPDX licence list.
 
 `coverage-check.py` runs the gates selftest under coverage.py in the verification image and holds each Python script it runs at the floor set in `.coverage-thresholds.json`. A script the suite runs with no floor fails it.
 

@@ -127,8 +127,8 @@ now parses under bash 3.2.
 
 ## L4: the first change
 
-These files arrive together as the first L4 change: an AI security policy, risk tiers, a labeler,
-a nightly run and reflections. No issue names these criteria, so no entry here names one; the
+These files arrive together as the first L4 change: an AI security policy, risk tiers, a nightly
+run and reflections. No issue names these criteria, so no entry here names one; the
 labels below are the change's own.
 
 - **[`SECURITY-AI.md`](../SECURITY-AI.md).** What an AI agent may and may not do in the
@@ -138,12 +138,6 @@ labels below are the change's own.
 - **[`docs/risk-tiers.md`](risk-tiers.md).** Which changes need which review. A tier is set by the
   paths a change touches, from 1 (documentation) to 4 (gates and workflows), and each tier's review
   includes every tier below it. Tiers grade change risk, not the sensitivity of content.
-- **[`.github/labeler.yml`](../.github/labeler.yml).** The path rules that map changed files to
-  labels such as `docs`, `skills` and `gates`. Read by the workflow below.
-- **[`.github/workflows/labeler.yml`](../.github/workflows/labeler.yml).** Labels each pull
-  request from those rules, so its risk tier shows at a glance. A label is a prompt for the
-  reviewer and decides nothing. The action is pinned to a full commit and never checks out the
-  pull request's code.
 - **[`.github/workflows/nightly.yml`](../.github/workflows/nightly.yml).** The gate selftest once a
   day on Linux and macOS, so a change in a runner's tools shows up without a pull request to
   trigger it.
@@ -167,13 +161,9 @@ maintainer's decision that every per-tool instruction file points at `AGENTS.md`
 
 ## L4: the second change
 
-One workflow, added after the first change and separately from it. As with the first, no issue
-names a criterion, so the entry names none.
-
-- **[`.github/workflows/ai-fix.yml`](../.github/workflows/ai-fix.yml).** Acknowledges the `ai-fix`
-  label on an issue, once, and routes the issue to the desk. No agent runs in CI, no stored secret
-  is used, and the token is limited to issues. The label must exist first:
-  `gh label create ai-fix --description "Route to the desk; no agent runs in CI"`.
+One workflow, `.github/workflows/ai-fix.yml`, which acknowledged the `ai-fix` label on an issue.
+It was removed before 0.7.0, with the first change's labeler; the [changelog](../CHANGELOG.md)
+records both.
 
 ## L4: the third change
 
