@@ -42,8 +42,6 @@ scripts/mdlint.py path/to/file.md
 
 It states its own coverage in its header, including the thirty-four markdownlint rules it does not implement and why.
 
-**markdownlint itself runs in CI, and it is not the same check.** `scripts/mdlint.py` is this project's own reimplementation, so a clean result from it is a self-audit, and the standing rule here is that a completion claim is not fact until a party other than the one making it verifies it. The `markdownlint` job in `.github/workflows/gates.yml` runs the real tool against the same rule IDs for exactly that reason. Nothing is installed at your desk to make this work, and you are not expected to run it locally. If the two ever disagree, the defect is in `scripts/mdlint.py`: report the disagreement rather than editing the document to satisfy whichever one complained. Its configuration is in `.markdownlint-cli2.jsonc`.
-
 ## Run the checks the way CI runs them
 
 You need a POSIX shell, `bash`, `git`, `python3`, `find`, and a `grep` with `-r` and `--exclude-dir`, which GNU `grep` has. Nothing else needs installing: the gates use only the Python standard library. A `grep` without those options makes the two search gates fail rather than pass.

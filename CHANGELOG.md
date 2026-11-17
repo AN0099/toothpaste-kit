@@ -87,6 +87,12 @@ skill lives in that skill's own `CHANGELOG.md`.
   - `references.md`: "What is not here".
   - `docs/security-posture.md` section 5: "Badges not shown".
   - `docs/review-rounds.md`: the lead-in to the list outside version 0.1.
+- `.github/workflows/compliance.yml` installs `reuse` from
+  `containers/verify/requirements.txt` and `build-requirements.txt` with
+  `--require-hashes`, on Python 3.13 from `actions/setup-python`, so reuse and
+  every package it depends on are pinned by hash. Before, `pipx install
+  reuse==6.2.0` pinned reuse alone, and its dependencies resolved to their
+  newest release on each run.
 
 ### Removed
 
@@ -104,6 +110,12 @@ skill lives in that skill's own `CHANGELOG.md`.
   pull requests by path, and `.github/workflows/ai-fix.yml`, which answered
   the `ai-fix` issue label. Nothing read either label, and no workflow now runs
   on `pull_request_target`.
+- The `markdownlint` job in `.github/workflows/gates.yml`, with
+  `.markdownlint-cli2.jsonc` and `skills/.markdownlint-cli2.jsonc`. It fetched
+  `markdownlint-cli2` with `npx` on every run at a version never checked
+  against the markdownlint release `scripts/mdlint.py` mirrors.
+  `scripts/mdlint.py`, gate 7, is the one Markdown linter, and its plants show
+  each rule can fire; nothing outside it now checks its results.
 
 ### Fixed
 

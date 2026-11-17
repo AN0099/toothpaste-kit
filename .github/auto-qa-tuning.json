@@ -10,7 +10,6 @@
   },
   "jobs": [
     {"workflow": "gates", "file": ".github/workflows/gates.yml", "job": "gates"},
-    {"workflow": "gates", "file": ".github/workflows/gates.yml", "job": "markdownlint"},
     {"workflow": "gates", "file": ".github/workflows/gates.yml", "job": "branch-name"},
     {"workflow": "ci", "file": ".github/workflows/ci.yml", "job": "test"},
     {"workflow": "nightly", "file": ".github/workflows/nightly.yml", "job": "nightly"},

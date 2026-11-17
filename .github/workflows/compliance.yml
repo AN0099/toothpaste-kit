@@ -27,11 +27,21 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # An exact version, and no third party action: an action runs with the
-      # workflow's token, a pinned package in a throwaway runner does not.
-      # pipx ships on the hosted Ubuntu runners.
+      # The verification image's Python, so the hashes in
+      # containers/verify/requirements.txt, resolved for python 3.13, apply.
+      # First party, pinned by commit SHA, read from the upstream v7.1.0 tag
+      # (docs/security-posture.md rows 3.7 and 7.6).
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+
+      # The image's own install: every package and dependency at an exact
+      # version with its sha256, so pip refuses anything else. reuse is built
+      # from its sdist with the backend pinned in build-requirements.txt.
       - name: Install reuse
-        run: pipx install reuse==6.2.0
+        run: |
+          python -m pip install --no-cache-dir --require-hashes -r containers/verify/build-requirements.txt
+          python -m pip install --no-cache-dir --require-hashes --no-build-isolation -r containers/verify/requirements.txt
 
       # A missing tool fails the script, so a broken install cannot pass as
       # "not checked"; --require asks for that explicitly. --selftest shows the check rejects a

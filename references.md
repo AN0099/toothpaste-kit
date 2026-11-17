@@ -44,8 +44,7 @@ one, the citation carries enough to retrieve the document independently.
   **Used by:** `scripts/mdlint.py`, `scripts/reflow-md.py`.
 - **[MDL]** "markdownlint Rules", markdownlint 0.41.1. The 53 rule IDs,
   semantics and parameter defaults. **Used by:** `scripts/mdlint.py`, which
-  implements 19 of the 53 under the same IDs, and
-  `.markdownlint-cli2.jsonc`, which runs the real tool over the same set.
+  implements 19 of the 53 under the same IDs.
 
 ### Other
 

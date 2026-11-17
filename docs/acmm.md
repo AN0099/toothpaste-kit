@@ -179,7 +179,7 @@ the entry names none.
   are never tuned; the gates jobs get timeouts like any other job.
 - **`timeout-minutes: 5` on the `gates` and `markdownlint` jobs in [`gates.yml`](../.github/workflows/gates.yml).** The
   tuner's first proposals: neither job had a timeout, so each ran under GitHub's 360 minute default,
-  and no run has taken a minute.
+  and no run has taken a minute. The `markdownlint` job was removed before 0.7.0.
 - **`timeout-minutes: 5` on `check` in
   [`commit-attribution.yml`](../.github/workflows/commit-attribution.yml).** The same proposal for
   the same reason: no timeout, and no run has taken a minute.
