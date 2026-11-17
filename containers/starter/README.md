@@ -60,7 +60,7 @@ them, as the installing guide's "Symlink or copy" section describes.
 
 | Part | Why |
 |---|---|
-| Python 3.13, the base image, pinned by digest | The `.py` scripts and `check-qblock` and `check-pr-body` run on `python3`, standard library only. The same base as the verification container |
+| Python 3.13, the base image, pinned by digest | The `.py` scripts and `check-pr-body` run on `python3`, standard library only. The same base as the verification container |
 | git | Quickstart step 1 runs `git --version`; `gates.sh`, `remote-level.sh`, `reorient` and `spdx-fragment.py` read a repository |
 | `sh`, `bash`, GNU `grep`, `find`, `sed`, `awk`, `sort`, `mktemp`, `ln -r` | Called by the shell scripts; all are in the base image's Debian already, so nothing is added for them |
 | Node.js 22.12.0 and Claude Code 2.1.304, with its platform package for the architecture being built (`linux-x64` or `linux-arm64`) | Quickstart steps 1 and 5 run `claude` |

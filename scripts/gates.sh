@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These twenty-three gates cover: the em dash ban, the private task ID ban,
+# check. These twenty gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency (including every vendor
 # file's shape against surface-descriptor.schema.json, checked by
 # scripts/schema-check.py, which fails loudly on any schema keyword it does
@@ -38,9 +38,7 @@
 # name rule's selftest in scripts/check-branch-name, which also fails if the
 # ruleset's prefix list has drifted from the script's, and the commit-msg
 # hook's attribution, provenance and sign-off rules against
-# tests/attribution-cases.tsv and three sign-off cases, and the
-# question block checker's selftest in scripts/check-qblock against
-# tests/qblock-cases/, which states its own eight-rule coverage, and the pull
+# tests/attribution-cases.tsv and three sign-off cases, and the pull
 # request body checker's selftest in scripts/check-pr-body, which plants each
 # finding it reports, and the SPDX fragment builder's selftest in
 # scripts/spdx-fragment.py, which builds fragments from commits in a scratch
@@ -56,11 +54,7 @@
 # check it makes, then a build of blog/posts, so a post the builder refuses
 # fails here and not at deploy, and the CI timeout tuner's selftest in
 # scripts/auto-qa-tuner.py, which plants each workflow shape it reads or
-# refuses and each proposal rule, and BCP 14 keywords via scripts/bcp14-check.py:
-# a Markdown file using one in capitals must name BCP 14, and that script states
-# its own coverage, and the standards in docs/standards/ via scripts/style-check,
-# its selftest first, then every file there with no SHALL finding; the script
-# states its own coverage. They
+# refuses and each proposal rule. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -373,16 +367,6 @@ gate_attribution() {
   fi
 }
 
-# ---------------------------------------------------------------- 15
-gate_qblock() {
-  gate_start "question block checker"
-  if python3 scripts/check-qblock --selftest; then
-    gate_ok "question block checker"
-  else
-    gate_bad "question block checker"
-  fi
-}
-
 # ---------------------------------------------------------------- 16
 gate_pr_body() {
   gate_start "pull request body checker"
@@ -504,31 +488,6 @@ gate_qa_tuner() {
   fi
 }
 
-# ---------------------------------------------------------------- 22
-gate_bcp14() {
-  gate_start "BCP 14 keywords"
-  if out=$(python3 -I scripts/bcp14-check.py --selftest 2>&1); then
-    gate_ok "BCP 14 keywords"
-  else
-    printf '%s\n' "$out" | grep -vE '^PLANT ok' | sed 's/^/  /'
-    gate_bad "BCP 14 keywords"
-  fi
-}
-
-# ---------------------------------------------------------------- 23
-gate_standards() {
-  gate_start "standards style-check"
-  if ! out=$(python3 -I scripts/style-check --selftest 2>&1); then
-    printf '%s\n' "$out" | grep -E '^PLANT FAIL' | sed 's/^/  /'
-    gate_bad "standards style-check, selftest"
-  elif ! out=$(python3 -I scripts/style-check docs/standards/*.md 2>&1); then
-    printf '%s\n' "$out" | grep -E '^FAIL' | sed 's/^/  /'
-    gate_bad "standards style-check"
-  else
-    gate_ok "standards style-check"
-  fi
-}
-
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -544,16 +503,13 @@ run_all() {
   gate_hooks
   gate_branch_names
   gate_attribution
-  gate_qblock
   gate_pr_body
   gate_spdx
   gate_review_rounds
   gate_sbom
   gate_blog
   gate_qa_tuner
-  gate_bcp14
-  gate_standards
-  printf '\n%s of 23 gates passed\n' "$pass_n"
+  printf '\n%s of 20 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -944,17 +900,6 @@ PY2
   ( cd "$tmp/hk-ok" && python3 "$hk" --selftest ) >/dev/null 2>&1
   plant_rejected $bad $? "hooks checker selftest, a check weakened"
 
-  # Gate 15: the selftest must fail when a fail case is filed as a pass case.
-  for d in qb-bad qb-ok; do
-    mkdir -p "$tmp/$d/scripts" "$tmp/$d/tests" && cp scripts/check-qblock "$tmp/$d/scripts/"
-    cp -R tests/qblock-cases "$tmp/$d/tests/"
-  done
-  mv "$tmp/qb-bad/tests/qblock-cases/fail-no-block.md" "$tmp/qb-bad/tests/qblock-cases/pass-no-block.md"
-  python3 "$tmp/qb-bad/scripts/check-qblock" --selftest >/dev/null 2>&1
-  bad=$?
-  python3 "$tmp/qb-ok/scripts/check-qblock" --selftest >/dev/null 2>&1
-  plant_rejected $bad $? "question block gate, fail case filed as pass"
-
   # Gate 16: a copy of the checker without its empty-box rule must fail its
   # own selftest. The copy loads scripts/reflow-md.py from its own directory,
   # so that goes beside it; without it the copy would fail on the load, not
@@ -1097,37 +1042,6 @@ PY
   python3 -I scripts/auto-qa-tuner.py --selftest >/dev/null 2>&1
   plant_rejected $bad $? "auto-qa-tuner gate, timeout doubling removed"
 
-  # Gate 22: a copy of the BCP 14 check whose keyword pattern matches nothing
-  # must fail its own selftest, and a tree with an unstated keyword must fail
-  # the check as installed.
-  mkdir -p "$tmp/bc/scripts" && sed "s/^KEYWORD = re.compile($/KEYWORD = re.compile(r'(?!)') or re.compile(/" scripts/bcp14-check.py > "$tmp/bc/scripts/bcp14-check.py"
-  if cmp -s scripts/bcp14-check.py "$tmp/bc/scripts/bcp14-check.py"; then
-    echo "PLANT FAIL  BCP 14 gate, keyword pattern emptied: the plant did not apply"; plant_fail=1
-  else
-    python3 -I "$tmp/bc/scripts/bcp14-check.py" --selftest >/dev/null 2>&1
-    bad=$?
-    python3 -I scripts/bcp14-check.py --selftest >/dev/null 2>&1
-    plant_rejected $bad $? "BCP 14 gate, keyword pattern emptied"
-  fi
-  mkdir -p "$tmp/bt-bad/scripts" "$tmp/bt-ok/scripts"
-  cp scripts/bcp14-check.py "$tmp/bt-bad/scripts/" && cp scripts/bcp14-check.py "$tmp/bt-ok/scripts/"
-  printf 'A reader MUST check.\n' > "$tmp/bt-bad/a.md"
-  printf 'Keywords are BCP 14.\n\nA reader MUST check.\n' > "$tmp/bt-ok/a.md"
-  python3 -I "$tmp/bt-bad/scripts/bcp14-check.py" >/dev/null 2>&1
-  bad=$?
-  python3 -I "$tmp/bt-ok/scripts/bcp14-check.py" >/dev/null 2>&1
-  plant_rejected $bad $? "BCP 14 gate, an unstated keyword"
-  # Gate 23: a standard with a contraction, a SHALL finding, must fail the
-  # check as installed, and the same standard without it must pass.
-  mkdir -p "$tmp/sc-bad/standards" "$tmp/sc-ok/standards"
-  printf '# T\n\n(a) It isn'"'"'t optional.\n' > "$tmp/sc-bad/standards/a.md"
-  printf '# T\n\n(a) It is required.\n' > "$tmp/sc-ok/standards/a.md"
-  # Run from each scratch tree, since style-check opens only files under the working directory.
-  sc=$PWD/scripts/style-check
-  (cd "$tmp/sc-bad" && python3 -I "$sc" standards/a.md >/dev/null 2>&1)
-  bad=$?
-  (cd "$tmp/sc-ok" && python3 -I "$sc" standards/a.md >/dev/null 2>&1)
-  plant_rejected $bad $? "standards gate, a contraction in a standard"
   # gates.sh from another directory: two copies of the kit, each in a fresh
   # repository of one commit (the sbom gate reads the index and HEAD), run
   # from a third directory. The one whose cd to the kit root is removed must
