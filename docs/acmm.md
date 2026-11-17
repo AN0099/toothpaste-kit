@@ -110,9 +110,10 @@ whether the tests pass on more than one system, and a record of each session.
 - **[`docs/review-rubric.md`](review-rubric.md).** What a reviewer checks on a pull request, in six
   numbered items, each restating a practice the kit already holds and naming its source. Added for
   `acmm:pr-review-rubric`, issue #39.
-- **[`.github/workflows/ci.yml`](../.github/workflows/ci.yml).** The test matrix: the gate
-  selftest on Linux and macOS, so a portability fault shows up. The gates workflow runs on Linux
-  alone. Added for `acmm:ci-matrix`, issue #40.
+- **[`.github/workflows/gates.yml`](../.github/workflows/gates.yml).** The test matrix: the gate
+  selftest on Linux and macOS, so a portability fault shows up. Added for `acmm:ci-matrix`,
+  issue #40, as `ci.yml`, whose Linux job repeated the gates workflow; its macOS job moved into
+  `gates.yml` before 0.7.0.
 - **[`docs/quality.md`](quality.md).** The quality dashboard as a page of text: each measure the
   kit has, where it lives, and how to read it, with what the measures leave out. Added for
   `acmm:quality-dashboard`, issue #41.
@@ -138,9 +139,9 @@ labels below are the change's own.
 - **[`docs/risk-tiers.md`](risk-tiers.md).** Which changes need which review. A tier is set by the
   paths a change touches, from 1 (documentation) to 4 (gates and workflows), and each tier's review
   includes every tier below it. Tiers grade change risk, not the sensitivity of content.
-- **[`.github/workflows/nightly.yml`](../.github/workflows/nightly.yml).** The gate selftest once a
-  day on Linux and macOS, so a change in a runner's tools shows up without a pull request to
-  trigger it.
+- **[`.github/workflows/nightly.yml`](../.github/workflows/nightly.yml).** The gate selftest on a
+  schedule on Linux and macOS, so a change in a runner's tools shows up without a pull request to
+  trigger it. Daily until 0.7.0, now weekly.
 - **[`docs/reflections/README.md`](reflections/README.md).** The format of a reflection entry: a
   bounded record about one documentation row at a pinned version, ending in a one-sentence lesson
   shaped as a rule. Entries are never edited; a correction is a new entry that supersedes the old.

@@ -96,6 +96,14 @@ skill lives in that skill's own `CHANGELOG.md`.
   every package it depends on are pinned by hash. Before, `pipx install
   reuse==6.2.0` pinned reuse alone, and its dependencies resolved to their
   newest release on each run.
+- The gates selftest runs once per platform. `.github/workflows/gates.yml`
+  runs it on macOS as well as Linux; the Linux job keeps the name `gates`.
+  `.github/workflows/containers.yml` runs it in the verification image only,
+  and the starter image runs `node --version` and `claude --version`, its own
+  claim. `.github/workflows/nightly.yml` runs weekly, not daily. In
+  `scripts/gates.sh --selftest`, the check that the script works from another
+  directory runs one gate in place of all of them, from one copy of the tree
+  in place of two, and `scripts/mdlint.py --selftest` runs once, not twice.
 
 ### Removed
 
@@ -119,6 +127,8 @@ skill lives in that skill's own `CHANGELOG.md`.
   against the markdownlint release `scripts/mdlint.py` mirrors.
   `scripts/mdlint.py`, gate 7, is the one Markdown linter, and its plants show
   each rule can fire; nothing outside it now checks its results.
+- `.github/workflows/ci.yml`. Its Linux job ran the same command on the same
+  runner as `gates.yml`, and its macOS job is now in `gates.yml`.
 
 ### Fixed
 

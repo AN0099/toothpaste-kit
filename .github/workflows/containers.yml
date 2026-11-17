@@ -4,10 +4,11 @@
 
 name: containers
 
-# Builds each image in containers/ for linux/amd64 and linux/arm64 and runs
-# the gates selftest inside it. A container exists to run the same on any
-# host, so an image that builds on one architecture only is a failure here,
-# not a README note.
+# Builds each image in containers/ for linux/amd64 and linux/arm64. The
+# starter image runs its own claim, that Node and Claude Code start; the
+# verification image runs the gates selftest and the checks below. A
+# container exists to run the same on any host, so an image that builds on
+# one architecture only is a failure here, not a README note.
 #
 # Each architecture builds on a native runner, never under emulation: an
 # emulated pass is not a native one, and CodeQL under emulation runs many
@@ -22,7 +23,7 @@ name: containers
 #
 # Run the same thing yourself, one architecture:
 #   containers/verify/verify . ./scripts/gates.sh --selftest
-#   containers/starter/run "$(mktemp -d)" sh -c 'cp -a /kit /tmp/work && cd /tmp/work && ./scripts/gates.sh --selftest'
+#   containers/starter/run "$(mktemp -d)" sh -c 'node --version && claude --version'
 
 on:
   pull_request:
@@ -51,11 +52,11 @@ jobs:
         run: docker build -t kit-starter -f containers/starter/Containerfile containers/starter
 
       # As containers/starter/run does: the calling user's uid, no network.
-      - name: Gates selftest in the starter image
+      # The gates selftest runs once, in the verification image below.
+      - name: Node and Claude Code start in the starter image
         run: |
           docker run --rm --network=none --user "$(id -u):$(id -g)" -v "$PWD:/kit:ro" kit-starter \
-            sh -c 'uname -m && node --version && claude --version \
-              && cp -a /kit /tmp/work && cd /tmp/work && ./scripts/gates.sh --selftest'
+            sh -c 'uname -m && node --version && claude --version'
 
       - name: Build the verification image
         run: docker build -t kit-verify -f containers/verify/Containerfile containers/verify

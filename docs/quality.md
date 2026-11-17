@@ -12,7 +12,7 @@ What quality this project measures, where each measure lives, and how to read it
 | Corrections in place | `docs/security-posture.md` and `CHANGELOG.md` | What the project stated wrongly and how it was fixed |
 | PR acceptance | `docs/metrics.md` | Merged against closed unmerged, and recorded reviews |
 | Review rubric | `docs/review-rubric.md` | What a reviewer checked on a change |
-| CI matrix | `.github/workflows/ci.yml` | Whether the selftest passes on Linux and macOS |
+| CI matrix | `.github/workflows/gates.yml` | Whether the selftest passes on Linux and macOS |
 
 ## How to read each one
 
@@ -28,7 +28,7 @@ What quality this project measures, where each measure lives, and how to read it
 
 **Review rubric.** `docs/review-rubric.md` is a checklist and produces no figure. A review is read for which of its six items were recorded as checked.
 
-**CI matrix.** The `test` job in `ci.yml` reports one result per operating system. A pass on both means the selftest ran clean on each. A failure on macOS alone is a portability finding about the scripts.
+**CI matrix.** The `gates` workflow reports one result per operating system: `gates` for Linux and `gates (macos-latest)` for macOS. A pass on both means the selftest ran clean on each. A failure on macOS alone is a portability finding about the scripts.
 
 ## What these measures leave out
 
