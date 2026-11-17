@@ -104,7 +104,7 @@ The gates call these, and each runs on its own as well:
 - `check-hooks.py`: checks the rules in `hooks/` and shows each blocking one can fire
 - `check-workspace-stubs.py`: checks `examples/workspace/` against `docs/standing-documents.md`
 - `schema-check.py`: validates `orchestration/registry/*.json` against its schema
-- `check-pr-body`: checks a pull request body against `.github/pull_request_template.md`, including any line `reflow-md.py` would join; CI also runs it on each pull request
+- `check-pr-body`: checks that a pull request body keeps the headings of `.github/pull_request_template.md` in order, leaves no template comment, and fills the Provenance section when an agent drafted the change; CI also runs it on each pull request, as an advisory check
 - `remote-level.sh`: classifies a repository by where its remotes point, as none, internal or external, and treats any host it cannot prove internal as external
 - `reorient`: prints where a workspace stands in one screen, for the start of a session and after a compaction; the observing half of the `orient` skill
 - `round-check.py`: validates review-round documents against their schemas in `orchestration/schemas/round/`

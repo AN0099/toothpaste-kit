@@ -5,8 +5,8 @@
 name: pr-body
 
 # Checks a pull request's body against .github/pull_request_template.md: every
-# heading in order, no template comment left, no paragraph broken across lines,
-# and a filled Provenance section when an agent drafted the change. Runs again
+# heading in order, no template comment left, and a filled Provenance section
+# when an agent drafted the change. Advisory: no ruleset requires it. Runs again
 # when the body is edited, which the gates workflow does not.
 
 on:
