@@ -6,17 +6,19 @@ name: nightly
 
 # The gates on a schedule, so a change in a runner's tools shows up without
 # a pull request to trigger it. Same command as the gates job in gates.yml,
-# on Linux and macOS.
+# on Linux and macOS. Weekly: the tree has no package dependencies to drift,
+# so only the runner images change between pull requests. The workflow keeps
+# its name so its run history stays in one place.
 #
-# A nightly failure with no new commit is a finding about the environment or
-# the scripts, to be raised, and not a reason to loosen the gate.
+# A scheduled failure with no new commit is a finding about the environment
+# or the scripts, to be raised, and not a reason to loosen the gate.
 #
 # Run the same thing yourself:  ./scripts/gates.sh --selftest   or   tests/run
 
 on:
   schedule:
-    # Once a day, UTC.
-    - cron: '17 4 * * *'
+    # Once a week, Monday, UTC.
+    - cron: '17 4 * * 1'
   workflow_dispatch:
 
 permissions:

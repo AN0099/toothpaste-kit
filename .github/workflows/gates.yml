@@ -8,7 +8,13 @@ name: gates
 #
 # Like commit-attribution, this binds only when set as a required status
 # check in the ruleset on the default branch. Unset, it reports and blocks
-# nothing.
+# nothing. The Linux job reports as `gates`, the name the ruleset requires;
+# the macOS job reports as `gates (macos-latest)` and is not required.
+#
+# macOS is here because portability is a claim: sed, date, grep, ln and the
+# bundled bash differ from GNU userland, and the scripts are written to work
+# on both. A macOS failure is a finding about the scripts, to be raised, and
+# not a reason to loosen the gate.
 #
 # The gates live in scripts/gates.sh rather than inline here, so that a
 # contributor's local run and this job are the same text. A gate whose CI
@@ -27,8 +33,16 @@ permissions:
 
 jobs:
   gates:
+    # The name the ruleset requires stays `gates` for Linux; a matrix job
+    # without this would report as `gates (ubuntu-latest)`.
+    name: ${{ matrix.os == 'ubuntu-latest' && 'gates' || format('gates ({0})', matrix.os) }}
     timeout-minutes: 5
-    runs-on: ubuntu-latest
+    strategy:
+      # Let both systems finish, so one failure does not hide the other result.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       # Pinned by commit SHA, read from the upstream v7.0.1 tag
       # (docs/security-posture.md row 3.7); Dependabot moves the SHA and

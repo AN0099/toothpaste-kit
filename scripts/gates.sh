@@ -999,27 +999,23 @@ PY
   python3 -I scripts/auto-qa-tuner.py --selftest >/dev/null 2>&1
   plant_rejected $bad $? "auto-qa-tuner gate, timeout doubling removed"
 
-  # gates.sh from another directory: two copies of the kit, each in a fresh
-  # repository of one commit (the sbom gate reads the index and HEAD), run
-  # from a third directory. The one whose cd to the kit root is removed must
-  # fail, and the one as installed must pass every gate.
-  mkdir -p "$tmp/cwd-elsewhere"
-  for t in cwd-bad cwd-ok; do
-    mkdir -p "$tmp/$t"
-    cp -R . "$tmp/$t/"
-    rm -rf "$tmp/$t/.git"
-    ( cd "$tmp/$t" && export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null &&
-      git init -q && git add -A &&
-      git -c user.name=plant -c user.email=plant@invalid commit -qm plant ) \
-      || { echo "PLANT FAIL  gates.sh from another directory: scratch repository failed"; plant_fail=1; }
-  done
-  sed '/^cd "$(dirname "$0")\/\.\." || exit 2$/d' scripts/gates.sh > "$tmp/cwd-bad/scripts/gates.sh"
-  if cmp -s scripts/gates.sh "$tmp/cwd-bad/scripts/gates.sh"; then
+  # gates.sh from another directory: one copy of the kit holding two copies
+  # of gates.sh cut down to gate 8, which reads scripts/ from the kit root,
+  # both run from a third directory. The one whose cd to the kit root is
+  # removed must fail, and the one with it must pass. One gate is enough to
+  # show the cd works; the real run below covers every gate from the root.
+  mkdir -p "$tmp/cwd-elsewhere" "$tmp/cwd"
+  cp -R . "$tmp/cwd/"
+  sed 's/^run_all() {$/run_all() { gate_stubs; [ "$fail" -eq 0 ]; return; }; run_all_full() {/' \
+    scripts/gates.sh > "$tmp/cwd/scripts/gates-probe.sh"
+  sed '/^cd "$(dirname "$0")\/\.\." || exit 2$/d' "$tmp/cwd/scripts/gates-probe.sh" > "$tmp/cwd/scripts/gates-nocd.sh"
+  if cmp -s scripts/gates.sh "$tmp/cwd/scripts/gates-probe.sh" ||
+     cmp -s "$tmp/cwd/scripts/gates-probe.sh" "$tmp/cwd/scripts/gates-nocd.sh"; then
     echo "PLANT FAIL  gates.sh from another directory, cd removed: the plant did not apply"; plant_fail=1
   else
-    ( cd "$tmp/cwd-elsewhere" && sh "$tmp/cwd-bad/scripts/gates.sh" ) >"$tmp/gate.out" 2>&1
+    ( cd "$tmp/cwd-elsewhere" && sh "$tmp/cwd/scripts/gates-nocd.sh" ) >"$tmp/gate.out" 2>&1
     bad=$?
-    ( cd "$tmp/cwd-elsewhere" && sh "$tmp/cwd-ok/scripts/gates.sh" ) >"$tmp/gate.out" 2>&1
+    ( cd "$tmp/cwd-elsewhere" && sh "$tmp/cwd/scripts/gates-probe.sh" ) >"$tmp/gate.out" 2>&1
     plant_rejected $bad $? "gates.sh from another directory, cd removed"
   fi
 
@@ -1028,8 +1024,6 @@ PY
   echo "selftest: all $plant_n planted positives fired."
   echo
   echo "== gate 7 plants its own positives, one per rule =="
-  python3 scripts/mdlint.py --selftest >/dev/null 2>&1
-  rc=$?
   # exit 1 here means findings in the tree, which run_all reports properly.
   # Only a plant failure is fatal to the selftest itself.
   if python3 scripts/mdlint.py --selftest 2>&1 | grep -q 'PLANT FAIL'; then
