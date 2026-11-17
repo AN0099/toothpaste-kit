@@ -19,7 +19,7 @@ statement that does not add up to its whole field is the defect this file is
 most concerned with, so the arithmetic is stated rather than implied.
 
 Four rules have parameters whose defaults differ from the behaviour here, and
-each is aligned in the CI configuration rather than left to diverge: MD009
+a configuration for the real tool would set each to match: MD009
 br_spaces 0 rather than 2, MD010 code_blocks false, MD012 maximum 1, and
 MD059's prohibited_texts extended from four entries to thirteen.
 

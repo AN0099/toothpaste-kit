@@ -30,7 +30,7 @@ Source: `docs/interaction-manual.md`, section 4, "Nobody self-certifies"; `CONTR
 
 ## 5. The gates pass
 
-`./scripts/gates.sh --selftest` passes, and the `gates` and `markdownlint` jobs in CI are green. Confirm from the job result, not from the author's statement.
+`./scripts/gates.sh --selftest` passes, and the `gates` job in CI is green. Confirm from the job result, not from the author's statement.
 
 Source: `CONTRIBUTING.md`, "Run the checks the way CI runs them"; `.github/workflows/gates.yml`; `.github/pull_request_template.md`, the Checks section.
 

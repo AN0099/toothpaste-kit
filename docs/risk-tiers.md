@@ -12,7 +12,7 @@ a rule held elsewhere in the kit and names its source.
 | 1 | Documentation and repository metadata: `docs/`, root Markdown files, `examples/`, `LICENSE`, `CITATION.cff`, `corrections.jsonl`, `.editorconfig`, `.gitignore` | `docs`, `examples`. `.editorconfig` and `.gitignore` carry no label |
 | 2 | Skills, hook rules and agent configuration: `skills/`, `hooks/`, `.claude/`, `.cursor/` | `skills`, `hooks`, `agent-config` |
 | 3 | Interfaces: a skill's frontmatter, `orchestration/` schemas, `protocol.md`, `taxonomy.md`, a documented rule | `orchestration`. A frontmatter or rule change carries no label of its own, so the reviewer sets the tier |
-| 4 | Gates and workflows: `scripts/`, `tests/`, `.githooks/`, `.github/`, the `redaction-gate` skill, and gate configuration (`.markdownlint-cli2.jsonc`, `skills/.markdownlint-cli2.jsonc`) | `gates`, `workflows` |
+| 4 | Gates and workflows: `scripts/`, `tests/`, `.githooks/`, `.github/`, and the `redaction-gate` skill | `gates`, `workflows` |
 
 ## Per-tool instruction files
 
@@ -27,7 +27,7 @@ maintainer's decision of 2026-10-20, recorded in the root `CHANGELOG.md` entry f
 Every requirement here applies to every tier 1 path, except the third, which applies to a document,
 and the fifth, which applies to `CLAUDE.md`.
 
-- `./scripts/gates.sh --selftest` passes, and the `gates` and `markdownlint` jobs in CI are green.
+- `./scripts/gates.sh --selftest` passes, and the `gates` job in CI is green.
   Source: `GOVERNANCE.md`, "How a change lands", step 3, and `CONTRIBUTING.md`, "Run the checks the
   way CI runs them".
 - No em dashes, public `TK-` task IDs only, no tool attribution. Source: `CONTRIBUTING.md`, "Rules
