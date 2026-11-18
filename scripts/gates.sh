@@ -18,7 +18,7 @@
 # claims to enforce.
 #
 # Coverage, stated because a check that does not state its coverage is not a
-# check. These nineteen gates cover: the em dash ban, the private task ID ban,
+# check. These eighteen gates cover: the em dash ban, the private task ID ban,
 # JSON wellformedness, registry self-consistency (including every vendor
 # file's shape against surface-descriptor.schema.json, checked by
 # scripts/schema-check.py, which fails loudly on any schema keyword it does
@@ -42,15 +42,13 @@
 # request body checker's selftest in scripts/check-pr-body, which plants each
 # finding it reports, and the review-round records under
 # examples/ via scripts/round-check.py, which states its own keyword coverage
-# and runs its own selftest first, and the SBOM generator in
-# scripts/sbom.py, run on its own planted trees and then on this tree, so a
-# tracked file with no licence or copyright, a licence with no text under
-# LICENSES/, or a workflow action not pinned by commit SHA fails, and the
-# blog builder's selftest in scripts/blog.py, which plants each page and feed
-# check it makes, then a build of blog/posts, so a post the builder refuses
-# fails here and not at deploy, and the CI timeout tuner's selftest in
-# scripts/auto-qa-tuner.py, which plants each workflow shape it reads or
-# refuses and each proposal rule. They
+# and runs its own selftest first, and the action pin check in
+# scripts/sbom.py, run on planted action and docker:// pins by tag and by
+# commit SHA or digest and then on this tree, so a workflow action not
+# pinned by a full commit SHA, or a docker:// action not pinned by digest,
+# fails, and the blog builder's selftest in scripts/blog.py, which plants
+# each page and feed check it makes, then a build of blog/posts, so a post
+# the builder refuses fails here and not at deploy. They
 # do NOT cover: en dashes (ranges and clause separators are not mechanically
 # separable, so that stays a review prompt), prose quality, internal link
 # validity, whether a skill's Scope Pointer is last, or whether any document's
@@ -463,17 +461,6 @@ gate_blog() {
   fi
 }
 
-# ---------------------------------------------------------------- 21
-gate_qa_tuner() {
-  gate_start "auto-qa-tuner selftest"
-  if out=$(python3 -I scripts/auto-qa-tuner.py --selftest 2>&1); then
-    gate_ok "auto-qa-tuner selftest"
-  else
-    printf '%s\n' "$out" | grep -E '^FAIL' || printf '%s\n' "$out" | tail -5
-    gate_bad "auto-qa-tuner selftest"
-  fi
-}
-
 run_all() {
   gate_em_dash
   gate_task_ids
@@ -493,8 +480,7 @@ run_all() {
   gate_review_rounds
   gate_sbom
   gate_blog
-  gate_qa_tuner
-  printf '\n%s of 19 gates passed\n' "$pass_n"
+  printf '\n%s of 18 gates passed\n' "$pass_n"
   [ "$fail" -eq 0 ] || { echo "gates: FAILED"; return 1; }
   echo "gates: all passed"
   return 0
@@ -502,8 +488,8 @@ run_all() {
 
 # A gate that has never returned a hit has not been shown capable of
 # returning one, so each of the first five, and the eighth, is run against a
-# planted positive in a scratch tree, as are 12, 13, 14, 15, 16, 17, 18, 22 and 23. Gates 6, 9, 10, 11,
-# 21, 22 and 23 run their tools' own selftests, which carry their own planted cases, and
+# planted positive in a scratch tree, as are 12, 13, 14, 16, 18, 19 and 20. Gates 6, 9, 10
+# and 11 run their tools' own selftests, which carry their own planted cases, and
 # gate 7 plants one positive per rule below.
 run_selftest() {
   tmp=$(mktemp -d) || return 1
@@ -960,7 +946,7 @@ PY
     echo "PLANT skip  review-round gate: no round-check.py or valid-complete-round in this tree"
   fi
 
-  # Gate 19: a copy of the generator that no longer checks action pins must
+  # Gate 19: a copy of the pin check that no longer checks action pins must
   # fail its own selftest.
   mkdir -p "$tmp/sb/scripts" && sed 's/if not ok and uses not in KNOWN_TAG_PINS:/if False:/' scripts/sbom.py > "$tmp/sb/scripts/sbom.py"
   python3 "$tmp/sb/scripts/sbom.py" --selftest >/dev/null 2>&1
@@ -990,14 +976,6 @@ PY
   fi
   blog_check >/dev/null 2>&1
   plant_rejected $bad $? "blog gate, a post the builder refuses"
-
-  # Gate 21: a copy of the CI timeout tuner that never doubles a timeout a
-  # run ended at must fail its own selftest.
-  mkdir -p "$tmp/qa/scripts" && sed 's/return max(value, 2 \* current), /return value, /' scripts/auto-qa-tuner.py > "$tmp/qa/scripts/auto-qa-tuner.py"
-  python3 -I "$tmp/qa/scripts/auto-qa-tuner.py" --selftest >/dev/null 2>&1
-  bad=$?
-  python3 -I scripts/auto-qa-tuner.py --selftest >/dev/null 2>&1
-  plant_rejected $bad $? "auto-qa-tuner gate, timeout doubling removed"
 
   # gates.sh from another directory: one copy of the kit holding two copies
   # of gates.sh cut down to gate 8, which reads scripts/ from the kit root,

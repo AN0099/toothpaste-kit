@@ -171,13 +171,10 @@ records both.
 A weekly proposal of job timeouts, and the timeouts it found missing. No issue names a criterion, so
 the entry names none.
 
-- **[`scripts/auto-qa-tuner.py`](../scripts/auto-qa-tuner.py), run by
-  [`.github/workflows/auto-qa.yml`](../.github/workflows/auto-qa.yml).** Reads the last 100 runs of
-  each workflow it tunes and proposes a timeout for each job listed in
-  [`.github/auto-qa-tuning.json`](../.github/auto-qa-tuning.json), from how long its runs took and
-  whether any ended at the timeout. It writes the proposals to the job summary and never edits a
-  workflow: a person accepts one in a pull request. The rules the gates enforce are not thresholds and
-  are never tuned; the gates jobs get timeouts like any other job.
+- **A CI timeout tuner, `scripts/auto-qa-tuner.py`, run weekly by `.github/workflows/auto-qa.yml`.**
+  It proposed a timeout for each job it was given, from how long the job's runs took, and never
+  edited a workflow. It was removed before 0.7.0, with its workflow, its job list and its gate; the
+  [changelog](../CHANGELOG.md) records it. The timeouts below stay.
 - **`timeout-minutes: 5` on the `gates` and `markdownlint` jobs in [`gates.yml`](../.github/workflows/gates.yml).** The
   tuner's first proposals: neither job had a timeout, so each ran under GitHub's 360 minute default,
   and no run has taken a minute. The `markdownlint` job was removed before 0.7.0.
