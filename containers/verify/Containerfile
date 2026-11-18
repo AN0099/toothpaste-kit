@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# Verification container, v2: every third-party checker the kit's checks call,
+# Verification container: every third-party checker the kit's checks call,
 # so a check never reports a tool as not installed, and nothing is installed on
 # the host. The tree goes in read-only and checks run with no network
 # (containers/verify/verify). Built for linux/amd64 and linux/arm64.
