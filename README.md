@@ -16,7 +16,7 @@ Where to go, by what you came for.
 
 - [What this kit is](#what-this-kit-is), if you want the one-paragraph version
 - [What is here](#what-is-here), a directory-by-directory tour of the repository
-  - [`skills/`](#skills), the eighteen skills in three classes
+  - [`skills/`](#skills), the nineteen skills in three classes
   - [`docs/`](#docs), the documents the skills assume, and the eight writing and publishing standards
   - [`examples/`](#examples), the workspace the quickstart copies and a practice review round
   - [`hooks/`](#hooks), example rules for the `hookify` plugin
@@ -40,13 +40,14 @@ It is currently designed around a local Claude Code instance as the lead orchest
 
 ### `skills/`
 
-Eighteen skills, in three classes.
+Nineteen skills, in three classes.
 
-Seven govern agent behavior continuously. An agent loads them on its own when the frontmatter `description` matches what it is doing.
+Eight govern agent behavior continuously. An agent loads them on its own when the frontmatter `description` matches what it is doing.
 
 | Skill | Covers |
 |---|---|
 | `working-preferences` | Standing defaults, register, correction protocol, command vocabulary |
+| `house-preferences` | The maintainer's own opinions layered on `working-preferences`; optional, left out by `scripts/link-skills.sh --base` |
 | `document-standards` | Writing standards for generated documents, with formality, density, and audience dials |
 | `technical-documents` | Presets for runbooks, postmortems, ADRs, and handoff notes aimed at ops readers |
 | `surface-regimes` | Detects whether a session is interactive, autonomous, or programmatic, and sets dials to match |
@@ -54,7 +55,7 @@ Seven govern agent behavior continuously. An agent loads them on its own when th
 | `skill-discovery` | Whether a recurring need is worth a skill, and finding one that already exists |
 | `commands` | Index for the twenty-seven-command vocabulary, with brevity codes |
 
-Eight are procedures a person invokes. All eight set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started. `disable-model-invocation` is a Claude Code field that the Agent Skills specification does not define, so these eight pass the specification's own checker, skills-ref, only with that one line removed; the other ten pass it as written (`scripts/skills-spec.sh`).
+Eight are procedures a person invokes. All eight set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started. `disable-model-invocation` is a Claude Code field that the Agent Skills specification does not define, so these eight pass the specification's own checker, skills-ref, only with that one line removed; the other eleven pass it as written (`scripts/skills-spec.sh`).
 
 | Skill | Runs |
 |---|---|

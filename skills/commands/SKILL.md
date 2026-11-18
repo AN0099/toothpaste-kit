@@ -3,7 +3,7 @@ name: commands
 description: Index of the twenty-seven project commands with brevity codes and one-line summaries; resolves HELP and MAN. Does not hold the behavioral rules; working-preferences is the source of truth for each command.
 ---
 # Scope
-Discoverability index for the twenty-seven commands in the project command vocabulary, with the brevity code for each. This skill exists so an agent can find out which commands are active without loading all of `working-preferences`. HELP and MAN resolve here. Every other command executes under the definitions `working-preferences` holds.
+Discoverability index for the twenty-seven commands in the project command vocabulary, with the brevity code for each of the twenty-six that have one. This skill exists so an agent can find out which commands are active without loading all of `working-preferences`. HELP and MAN resolve here. Every other command executes under the definitions `working-preferences` holds.
 # Command Index
 Code in parentheses. A code is a code only when it is the entire message, or paired with a question label (`f q1`); see `working-preferences` Questions and Answers.
 - ATOMIC (`jd`): toggle. Nothing is applied until every part is done and checked; a failure reverts the whole set.
@@ -11,7 +11,7 @@ Code in parentheses. A code is a code only when it is the entire message, or pai
 - COMPLETE (`fl`): finalize now with available context, no further checkpointing.
 - CONFIRM (`f`): yes to the thing proposed. Answers a proposal; PROCEED advances a stage.
 - DECLINE (`d`): no to the thing proposed. Rejects that one option without stopping the work.
-- DEEPEN [target] (`j`): add depth. With a target, that element only; with none, the whole last response.
+- DEEPEN [target] (no code): add depth. With a target, that element only; with none, the whole last response.
 - EXPORT (`sfj`): recap of session decisions and open threads, pipe-delimited numbered lines (EVENT_00N | CATEGORY | Detail). Append-only across a session. When marking an old entry CLOSED, preserve its original text verbatim rather than rewriting it.
 - FLAG [content] (`k`): treat as load-bearing; surface conflicts before overriding later.
 - FREEZE [content] (`sdj`): treat as fixed; don't revise without flagging conflict first.

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v5
+
+The heading `working-preferences` opens with is now `# Register`, after its v8 split. No change to
+the procedure.
+
 ## v4
 
 The frontmatter rule admits `disable-model-invocation: true` as a third key on a procedure a person

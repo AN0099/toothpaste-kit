@@ -72,6 +72,11 @@ once your workspace has such a tool.
 Claude Code chooses a skill by its frontmatter `description`;
 `skills/skill-discovery/SKILL.md` says how that resolution works.
 
+One skill is optional. `house-preferences` holds the maintainer's own
+opinions layered on `working-preferences`, and nothing else depends on
+it. `scripts/link-skills.sh --base` installs every skill except that one
+and prints an `omit` line for it; a copy leaves its directory out.
+
 ## Symlink or copy
 
 `scripts/link-skills.sh` symlinks each skill into the target directory.

@@ -174,8 +174,8 @@ reader who wants the why.
 
 ## Cross-references
 
-- `skills/working-preferences/SKILL.md`: normative machine-facing rules, the command vocabulary, the
-  brevity code, and the input syntax. Everything above is explanation; that file is the contract.
+- `skills/working-preferences/SKILL.md`: normative machine-facing rules, the command vocabulary and the
+  brevity code; `skills/house-preferences/SKILL.md` holds the input syntax. Everything above is explanation; that file is the contract.
 - `interface-contract.md`: working doc tracking which parts of the contract are live and which are
   designed but not yet promoted.
 - `accessibility.md`: input strain and pointer elimination treated as a design axis.

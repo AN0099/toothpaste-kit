@@ -7,10 +7,11 @@ Last updated 2026-11-10.
 
 ## Live
 
-Eighteen skills in three classes.
+Nineteen skills in three classes.
 
-Seven govern agent behavior and are in daily use: `working-preferences`, `document-standards`,
-`technical-documents`, `surface-regimes`, `skill-creation`, `skill-discovery`, `commands`.
+Eight govern agent behavior and are in daily use: `working-preferences`, `house-preferences`,
+`document-standards`, `technical-documents`, `surface-regimes`, `skill-creation`, `skill-discovery`,
+`commands`. `house-preferences` is optional; `scripts/link-skills.sh --base` leaves it out.
 
 Eight are human-invoked procedures: `redaction-gate`, `session-close`,
 `daily-dashboard`, `daily-review`, `weekly-review`, `monthly-review`, `session-log` and `merge-proxy`. All eight set `disable-model-invocation`, which is the point in

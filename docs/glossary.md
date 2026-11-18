@@ -27,7 +27,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 
 - **BCP 14**: the IETF convention under which MUST, SHOULD, MAY and their relatives carry defined force, here only when written in capitals. See [document layers](document-layers.md#requirements-language).
 - **BREAKING**: the label a release puts beside a skill whose interface it removes, renames, narrows or reverses, a weakened guarantee included, with a one-line migration saying what to do instead. See [releasing](releasing.md#a-skills-interface).
-- **Brevity code**: a lowercase home-row code for each command in the command vocabulary, one to three keys, tiered by measured frequency and balanced across the hands. `f` is CONFIRM, `j` DEEPEN, `d` DECLINE, `k` FLAG, `s` REVIEW, `l` HELP. A code counts only as a whole message or paired with a question label. See [`working-preferences`](../skills/working-preferences/SKILL.md#brevity-code) and [the interface contract](interface-contract.md#3-the-brevity-code-and-the-constraint-that-shaped-it).
+- **Brevity code**: a lowercase home-row code for each command in the command vocabulary, one to three keys, tiered by measured frequency and balanced across the hands. `f` is CONFIRM, `d` DECLINE, `k` FLAG, `s` REVIEW, `l` HELP. A code counts only as a whole message or paired with a question label. See [`working-preferences`](../skills/working-preferences/SKILL.md#brevity-code) and [the interface contract](interface-contract.md#3-the-brevity-code-and-the-constraint-that-shaped-it).
 - **Bridle Works**: the umbrella the kit belongs to, one of its kits. See [contributing](../CONTRIBUTING.md) and [the README](../README.md).
 
 ## C
@@ -37,11 +37,11 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 - **Carry count**: how many daily reviews a task has stayed in Doing. A count of three or more is said aloud. See [`daily-review`](../skills/daily-review/SKILL.md).
 - **Clean boundary**: a point after a commit, a dispatch or a closed decision, with the work's current state already on disk. The only point at which a compaction is proposed. See [`working-preferences`](../skills/working-preferences/SKILL.md#context-cadence).
 - **Clearance**: what an agent may read, set in the roster. One of the axes role is independent of. See [roles](../orchestration/roles.md#what-this-axis-is-and-the-three-it-is-not).
-- **Command vocabulary**: the closed set of twenty-seven ALLCAPS commands (CONFIRM, DEEPEN, DECLINE, FLAG, STAGE and the rest), each with a brevity code. See [`working-preferences`](../skills/working-preferences/SKILL.md#command-vocabulary), indexed in [`commands`](../skills/commands/SKILL.md).
+- **Command vocabulary**: the closed set of twenty-seven ALLCAPS commands (CONFIRM, DEEPEN, DECLINE, FLAG, STAGE and the rest), all but DEEPEN with a brevity code. See [`working-preferences`](../skills/working-preferences/SKILL.md#command-vocabulary), indexed in [`commands`](../skills/commands/SKILL.md).
 - **Containment**: the outermost control layer. It limits damage after every other layer has failed, through placement such as tier separation or a sandbox. See [control layers](control-layers.md#7-containment-assume-everything-above-failed).
 - **Content-depth principle**: what makes the sensitivity tiers mean something. The lower tiers carry almost nothing sensitive; the third carries operational behaviour with entities abstracted; only the fourth carries real reasoning and named entities. Moving a fact down a tier means stripping the reasoning as well as the names. See [standing documents](standing-documents.md#sensitivity-tiering).
 - **Content Read**: the one line stated before a document is generated, naming its type, audience and dial values. A read-back, not a question. See [`document-standards`](../skills/document-standards/SKILL.md#content-read).
-- **Context cadence**: when the agent raises compaction: from about 60k tokens of context a status line, the CTX line (`CTX ~75k est; next clean boundary: <what>`, about every 20k), an offer to compact from about 100k, and past 130k a warning in every reply, finishing only the current step and then stopping to ask. See [`working-preferences`](../skills/working-preferences/SKILL.md#context-cadence).
+- **Context cadence**: when the agent raises compaction: from about 60k tokens of context a status line, the CTX line (`CTX ~75k est; next clean boundary: <what>`, about every 20k), an offer to compact from about 100k, and past 130k a warning in every reply, finishing only the current step and then stopping to ask. The numbers are the maintainer's, in [`house-preferences`](../skills/house-preferences/SKILL.md#why-the-context-cadence-exists); [`working-preferences`](../skills/working-preferences/SKILL.md#context-cadence) states the rules without them.
 - **Control fidelity**: what this project is judged on in place of capability: legible state, cheap correction, a reliable halt. See [the philosophy](../philosophy.md#riding-tack-interface-and-experience).
 - **Coverage line**: the closing statement of a check or tool that names what it read and what it did not. A check that does not state its coverage is not a check. See [contributing](../CONTRIBUTING.md) and [`orient`](../skills/orient/SKILL.md).
 
@@ -129,7 +129,7 @@ are in [`working-preferences`](../skills/working-preferences/SKILL.md).
 
 ## Q
 
-- **Question block**: the three numbered questions, Q1 to Q3, that close a reply needing a decision, one per line, each ending with the codes it accepts. Alternatives are digits, `1` the recommendation; `f` always does what the question names, and `d` always stops. See [`working-preferences`](../skills/working-preferences/SKILL.md#questions-and-answers).
+- **Question block**: up to three numbered questions, Q1 to Q3, that close a reply needing a decision, one per line, each ending with the codes it accepts. Alternatives are digits, `1` the recommendation; `f` always does what the question names, and `d` always stops. See [`working-preferences`](../skills/working-preferences/SKILL.md#questions-and-answers).
 
 ## R
 

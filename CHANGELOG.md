@@ -7,6 +7,11 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `skills/house-preferences`, the maintainer's own layer over
+  `working-preferences`. The kit now has nineteen skills.
+- `scripts/link-skills.sh --base` links every skill except
+  `house-preferences` and prints an `omit` line for it. Its selftest checks
+  that.
 - `docs/security-posture.md` section 8 now maps the OpenSSF Project Security
   Baseline, Level 2 named as the target, and the Best Practices Badge's passing
   criteria by ID, from the published lists at stated commits. OSPS-SA-01.01,
@@ -63,6 +68,14 @@ skill lives in that skill's own `CHANGELOG.md`.
   the container, and it and `docs/installing.md` name the Podman version the
   build needs. The quickstart says the em dash rule is unenforced until a hook
   is installed.
+- `working-preferences` is cut to the general behavior every adopter gets
+  (v8). The maintainer's own opinions moved to a new optional skill,
+  `house-preferences`: role framing, input syntax, reply cost, and the
+  reasons behind the brevity code and the context cadence. The brevity code
+  drops `j`, so DEEPEN has no code; Questions and Answers asks up to three
+  questions; the Format section is folded into it. `commands` (v5),
+  `daily-dashboard` (v3), `skill-creation` (v5) and `surface-regimes` (v6)
+  follow.
 - `scripts/check-pr-body` checks headings, template comments and the
   Provenance section only. Its wrapped-line and empty-box rules are removed,
   and with them its use of `scripts/reflow-md.py`. The `pr-body` job is
