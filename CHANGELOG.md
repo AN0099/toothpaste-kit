@@ -104,6 +104,13 @@ skill lives in that skill's own `CHANGELOG.md`.
   `scripts/gates.sh --selftest`, the check that the script works from another
   directory runs one gate in place of all of them, from one copy of the tree
   in place of two, and `scripts/mdlint.py --selftest` runs once, not twice.
+- `.github/workflows/containers.yml` always runs, and its two build jobs,
+  `build (ubuntu-latest)` and `build (ubuntu-24.04-arm)`, are required
+  checks, so an image that fails on either architecture blocks a merge. On a
+  pull request whose every changed file is Markdown outside `skills/`, the
+  build steps are skipped and the job passes. `docs/security-posture.md` rows
+  4.2 and 4.6 state the current selftest and bindings; row 4.2 no longer
+  holds a dated gate count.
 
 ### Removed
 

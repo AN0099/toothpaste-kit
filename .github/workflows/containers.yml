@@ -21,6 +21,14 @@ name: containers
 # 2, an analysis that did not finish. Comparing alerts is CodeQL's own job
 # in CI, not this one's.
 #
+# The two build jobs, build (ubuntu-latest) and build (ubuntu-24.04-arm),
+# are required checks, so the job always runs and reports. On a pull request
+# whose every changed file is Markdown outside skills/, the build steps are
+# skipped and the job passes: no check below reads such a file, except
+# through gates.sh, which gates.yml runs on the same pull request. A change
+# to skills/ is read by skills-spec.sh, so it builds. A push to main always
+# builds, so main carries a full run on both architectures.
+#
 # Run the same thing yourself, one architecture:
 #   containers/verify/verify . ./scripts/gates.sh --selftest
 #   containers/starter/run "$(mktemp -d)" sh -c 'node --version && claude --version'
@@ -47,21 +55,47 @@ jobs:
       # Pinned by commit SHA, as in gates.yml. See
       # docs/security-posture.md, row 3.7.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The merge commit and its parents, so the next step can diff a
+          # pull request against its base.
+          fetch-depth: 2
+
+      # Any doubt builds: a push, a diff that fails, or one file that is not
+      # Markdown outside skills/.
+      - name: Decide whether the images need building
+        id: changed
+        run: |
+          build=true
+          if [ "$GITHUB_EVENT_NAME" = pull_request ] &&
+             files=$(git diff --name-only HEAD^1 HEAD); then
+            printf '%s\n' "$files"
+            build=false
+            # Here-strings, not pipes: the step's shell sets pipefail, and
+            # grep -q closing a pipe early would read as no match.
+            grep -qv -e '\.md$' -e '^$' <<<"$files" && build=true
+            grep -q '^skills/' <<<"$files" && build=true
+          fi
+          echo "build=$build"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
 
       - name: Build the starter image
+        if: steps.changed.outputs.build == 'true'
         run: docker build -t kit-starter -f containers/starter/Containerfile containers/starter
 
       # As containers/starter/run does: the calling user's uid, no network.
       # The gates selftest runs once, in the verification image below.
       - name: Node and Claude Code start in the starter image
+        if: steps.changed.outputs.build == 'true'
         run: |
           docker run --rm --network=none --user "$(id -u):$(id -g)" -v "$PWD:/kit:ro" kit-starter \
             sh -c 'uname -m && node --version && claude --version'
 
       - name: Build the verification image
+        if: steps.changed.outputs.build == 'true'
         run: docker build -t kit-verify -f containers/verify/Containerfile containers/verify
 
       - name: Gates, compliance, schema and skills selftests in the verification image
+        if: steps.changed.outputs.build == 'true'
         run: |
           docker run --rm --network=none -v "$PWD:/src:ro" kit-verify \
             sh -c 'uname -m && codeql version --format=terse \
@@ -71,6 +105,7 @@ jobs:
               && ./scripts/skills-spec.sh --selftest'
 
       - name: Coverage floors in the verification image
+        if: steps.changed.outputs.build == 'true'
         run: |
           docker run --rm --network=none -v "$PWD:/src:ro" kit-verify \
             sh -c 'cp -a /src /tmp/work && cd /tmp/work \
@@ -78,6 +113,7 @@ jobs:
               && python3 -I scripts/coverage-check.py'
 
       - name: CodeQL scan in the verification image
+        if: steps.changed.outputs.build == 'true'
         run: |
           set +e
           docker run --rm --network=none -v "$PWD:/src:ro" kit-verify \
