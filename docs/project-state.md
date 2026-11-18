@@ -457,7 +457,7 @@ What `main` holds since 0.6.0, by pull request. `CHANGELOG.md` has the detail.
 
 - Whether `orchestration/registry/` stays JSON or moves to YAML. It was authored as JSON for
   consistency with `schemas/`, without weighing that against the declarative-configuration
-  conventions the target audience works in. Needs dev-2.
+  conventions the target audience works in. Needs a reviewer who works in those conventions.
 - **Copyright holder: settled.** Bridle Works is the name of this project and is not a formed
   entity, so it cannot hold a copyright. Copyright rests with the individual authors, currently one
   person, and `CITATION.cff` and `README.md` name that person. Forming Bridle Works later and moving the copyright to

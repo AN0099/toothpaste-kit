@@ -190,6 +190,8 @@ other gates keep their numbers, so those three are unused.
 
 ### Fixed
 
+- `docs/project-state.md`: the open question on the registry format names the
+  reviewer it needs by what they work in, in place of a private seat label.
 - `scripts/reflow-md.py` now joins a wrapped line that starts with an
   autolink (`<https://...>` or an email address in angle brackets), which it
   had kept as an HTML block, and one that starts with an ordered list number
