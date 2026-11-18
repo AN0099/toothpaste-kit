@@ -3,7 +3,7 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-11-10.
+Last updated 2026-11-18.
 
 ## Live
 
@@ -16,7 +16,9 @@ Eight govern agent behavior and are in daily use: `working-preferences`, `house-
 Eight are human-invoked procedures: `redaction-gate`, `session-close`,
 `daily-dashboard`, `daily-review`, `weekly-review`, `monthly-review`, `session-log` and `merge-proxy`. All eight set `disable-model-invocation`, which is the point in
 each case. A gate a model can invoke to satisfy itself is not a gate, and an agent should not decide
-on its own that a session is over or that a working day has started.
+on its own that a session is over or that a working day has started. `daily-review`,
+`weekly-review` and `monthly-review` read a lane-board tool the kit does not ship, so
+`scripts/link-skills.sh` links them only with `--all`.
 
 Three are procedures an agent may run on its own at a clean boundary: `orient`, `jot` and `touch`.
 None sets `disable-model-invocation`, because each reads or records and none decides anything, and
@@ -203,6 +205,56 @@ Since that record, governance, versioning, branch protection and most other rows
 The plan, once the target tier is fixed, belongs in its own document with one row per criterion and
 a pointer to the evidence, because a posture claim without per-criterion evidence is the same
 unverifiable clean result this project's own conventions reject.
+
+## Unreleased
+
+What `main` holds since 0.6.0, by pull request. `CHANGELOG.md` has the detail.
+
+- **Orchestration files (pull requests #108 and #109).** `orchestration/` drops stale claims and
+  text specific to one installation, and four of its files take lowercase names.
+- **CodeQL 2.27.4 (pull request #110).** The verification image carries the bundle GitHub's
+  default setup runs, so a local scan reports what CI reports.
+- **Action pins (pull request #112).** Every workflow pins `actions/checkout` by commit SHA, and
+  gate 19 fails any action pinned by tag.
+- **OpenSSF Scorecard (pull request #113).** A weekly Scorecard run and its badge in `README.md`.
+- **Metadata schemas (pull request #114).** `scripts/schemas.sh` validates
+  `security-insights.yml` and `CITATION.cff` against schemas pinned by digest.
+- **Tag checks (pull request #115).** `.github/workflows/tags.yml` checks every new tag's shape and
+  order, and `.github/rulesets/release-tags.json` refuses moving or deleting a `v` tag once applied.
+- **Blog build gate (pull request #121).** Gate 20 builds `blog/posts` after the builder's
+  selftest, so a post the builder refuses fails a gate and not the deploy.
+- **OpenSSF criteria (pull request #122).** `docs/security-posture.md` section 8 maps the OpenSSF
+  Project Security Baseline and the Best Practices Badge criteria by ID.
+- **JSON Schema check (pull request #124).** `scripts/schemas.sh` checks the tree's JSON Schema
+  files, and the files they govern, with `check-jsonschema`.
+- **Agent Skills check (pull request #126).** `scripts/skills-spec.sh` checks every skill against
+  the Agent Skills specification with skills-ref.
+- **Scope statements (pull request #128).** Four scope statements say what is out of scope without
+  calling it a past choice.
+- **README scripts (pull request #130).** `README.md` names `sbom.py` and `blog.py`.
+- **Pull request bodies (pull requests #131 and #138).** `scripts/check-pr-body` checks headings,
+  template comments and the Provenance section, and reads an empty code fence there as empty. The
+  `pr-body` job is advisory.
+- **`reflow-md.py --check` (pull request #132).** Exits 1 when a file would change.
+- **Accessibility in releases (pull request #133).** `docs/releasing.md` step 2 closes each
+  release's notes with its known accessibility limitations.
+- **Cuts (pull requests #135, #136, #137, #139 and #143).** Out: `scripts/check-qblock`, the SPDX
+  fragment builder, the labeler and `ai-fix` workflows, the `npx` markdownlint job, `ci.yml`,
+  `tests/e2e/`, the CI timeout tuner and the coverage floors. `scripts/sbom.py` is cut to its
+  action pin check, `reuse` is pinned by hash, and the gates selftest runs once per platform. The
+  gates are eighteen.
+- **Containers build required (pull request #140).** Both `build` jobs in `containers.yml` are
+  required checks, and the build steps skip when only Markdown outside `skills/` changed.
+- **Review skills on request (pull request #141).** `scripts/link-skills.sh` links `daily-review`,
+  `weekly-review` and `monthly-review` only with `--all`.
+- **Desk residue (pull request #142).** Six skills and the starter container page lose wording
+  that only made sense in the tree they were written in.
+- **`working-preferences` split (pull request #144).** The general behavior stays in
+  `working-preferences` (v8); the maintainer's own layer is the optional `house-preferences`. JUDGE
+  takes `j` and DEEPEN moves to `h`.
+- **Cut before release.** The BCP 14 keyword check (#115), the SPDX model validation (#117), eight
+  writing standards (#129) and the wrapped-line rule in `check-pr-body` (#134) merged and were cut
+  again; none ships.
 
 ## In v0.6.0
 
