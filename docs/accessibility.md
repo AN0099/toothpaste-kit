@@ -170,8 +170,8 @@ repeating it becomes a document nobody finishes.
 - `interaction-manual.md`: the human-facing manual this supports, particularly its section on pricing
   the input.
 - `interface-contract.md`: current status of the brevity code and the input syntax.
-- `skills/working-preferences/SKILL.md`: normative location of the brevity code, the input syntax and
-  the reply-cost rules.
+- `skills/working-preferences/SKILL.md`: normative location of the brevity code;
+  `skills/house-preferences/SKILL.md`, of the input syntax and the reply-cost rules.
 - The accessibility of produced artifacts, covering WCAG, PDF/UA and the document pipeline, is
   not covered in this repository. It belongs with the ingestion specification and is named here as
   a gap rather than promised as forthcoming.

@@ -18,6 +18,10 @@
 #   scripts/link-skills.sh --dry-run [DIR] prints the target directory and
 #                                          every link it would create or skip;
 #                                          writes nothing
+#   scripts/link-skills.sh --base [DIR]    links every skill except the
+#                                          maintainer's own layer,
+#                                          house-preferences; combines with
+#                                          --dry-run
 #   scripts/link-skills.sh --selftest      runs it in a temporary directory and
 #                                          checks the result; scripts/gates.sh
 #                                          runs this (TK-111)
@@ -119,6 +123,21 @@ if [ "${1:-}" = --selftest ]; then
     if [ -n "$plan_line" ] && [ -n "$write_line" ] && [ "$plan_line" -lt "$write_line" ]; then
         ok "the plan is printed before any link or skip line"
     else bad "the plan did not print before writing"; fi
+    # --base must link every skill but house-preferences, and leave it out.
+    if sh "$self" --base "$tmp/base-dest" > "$tmp/out6" 2>&1; then
+        nb=0
+        for name in $want; do
+            [ "$name" = house-preferences ] && continue
+            [ -L "$tmp/base-dest/$name" ] && nb=$((nb + 1))
+        done
+        if [ -e "$tmp/base-dest/house-preferences" ] || [ -L "$tmp/base-dest/house-preferences" ]; then
+            bad "--base linked house-preferences"
+        elif [ "$nb" -ne $((n - 1)) ]; then
+            bad "--base linked $nb of $((n - 1)) base skills"
+        elif ! grep -q "^omit  house-preferences (--base)$" "$tmp/out6"; then
+            bad "--base did not report house-preferences as omitted"
+        else ok "--base links the $((n - 1)) base skills, omits house-preferences and says so"; fi
+    else bad "--base exited non-zero"; fi
     [ "$fails" -eq 0 ] && { echo "link-skills: selftest passed"; exit 0; }
     echo "link-skills: selftest FAILED ($fails)"; exit 1
 fi
@@ -128,11 +147,13 @@ src="$repo_root/skills"
 
 dry_run=0
 all=0
+base=0
 dest=""
 for arg in "$@"; do
     case "$arg" in
         --dry-run) dry_run=1 ;;
         --all) all=1 ;;
+        --base) base=1 ;;
         -*) echo "error: unknown option $arg" >&2; exit 2 ;;
         *) dest=$arg ;;
     esac
@@ -146,6 +167,11 @@ fi
 
 # is_optional NAME: NAME is on the list above and --all was not given.
 is_optional() { [ "$all" -eq 0 ] && printf '%s\n' "$optional" | grep -qxF "$1"; }
+# The maintainer's own layer over working-preferences. --base leaves it out;
+# an existing link to it in the target is left as it is.
+omitted() {
+    [ "$base" -eq 1 ] && [ "$1" = house-preferences ]
+}
 
 echo "Target directory: $dest"
 plan_linked=0
@@ -157,6 +183,8 @@ for d in "$src"/*/; do
     if is_optional "$name"; then
         echo "  would skip  $name (optional; --all links it)"
         plan_skipped=$((plan_skipped + 1))
+    elif omitted "$name"; then
+        echo "  would omit  $name (--base)"
     elif [ -e "$target" ] && [ ! -L "$target" ]; then
         echo "  would skip  $name (a real directory is already there)"
         plan_skipped=$((plan_skipped + 1))
@@ -196,6 +224,10 @@ for d in "$src"/*/; do
     if is_optional "$name"; then
         echo "skip  $name (optional; --all links it)"
         optional_n=$((optional_n + 1))
+        continue
+    fi
+    if omitted "$name"; then
+        echo "omit  $name (--base)"
         continue
     fi
 

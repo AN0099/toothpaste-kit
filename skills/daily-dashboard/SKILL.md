@@ -62,7 +62,7 @@ This is the phase the skill exists for. A dashboard that slides into doing the w
 - `session-close`: the other half of the loop, and the one that writes what this reads. Anything this skill finds unrecorded belongs to that procedure, not this one. Do not capture session residue here.
 - `session-log`: mid-session capture. It writes to the provenance layer only and never to the
   standing files this skill reads, so anything it captured reaches here only after a `session-close`.
-- `working-preferences`: source of truth for the command vocabulary and for the standing Q1 through Q3 convention that phase 4 extends.
+- `working-preferences`: source of truth for the command vocabulary and for the Q1 to Q3 question block that phase 4 extends.
 - `redaction-gate`: runs before content crosses a sensitivity boundary outward. This skill crosses none; it reads local state and reports in chat. If the day's work will cross one, that gate is a separate invocation.
 - `document-standards`: governs any document written as a result of the dashboard. It does not govern the dashboard itself, which is chat output, not a generated document.
 

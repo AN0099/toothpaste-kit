@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v8 (the house split)
+
+The maintainer's own opinions move to a new optional skill, `house-preferences`, which layers on this
+one; `scripts/link-skills.sh --base` installs without it. This file keeps what any adopter needs.
+
+- **Moved to `house-preferences`:** the polymath role line, Input Syntax, Reply Cost, the full reasons for the brevity code's tiers and keys, and the full Context Cadence prose with its banded table. Each is kept there, so none of the patches Failure-Mode Preservation protects is lost.
+- **JUDGE is added, and DEEPEN moves to `h`.** JUDGE weighs a proposal (main pro and con, a bottom line, a recommendation) and leaves the decision with the operator; it takes `j`, which was DEEPEN's. Twenty-eight commands, twenty-eight codes. BREAKING: `j` now means JUDGE; type `h` for DEEPEN.
+- **Context Cadence is three rules with no numbers.** The banded table moves to `house-preferences`: its thresholds suited one model and window size and do not carry over to others.
+- **The warning to read codes against the table stays here**, now naming `j`, since v8 changes the codes again.
+- **Format is folded into Questions and Answers.** The two disagreed: Format required three questions after every response, while "ask only when the answer changes what happens next" said otherwise. The second wins, so the form is now up to three questions, and Format's exceptions sit under the new "When not to ask".
+- **The menu-key example changes from `j` to `k`.** The rule it illustrates, that letters are only ever brevity codes, is unchanged.
+
 ## v7
 
 The frontmatter description is shortened to fit the description gate (pull request #63). No change

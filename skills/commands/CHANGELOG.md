@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v5
+
+JUDGE is added with `j`, and DEEPEN moves from `j` to `h`, as `working-preferences` v8 records:
+twenty-eight commands, twenty-eight codes.
+
 ## v4
 
 The frontmatter description is shortened to fit the description gate (pull request #63). No change

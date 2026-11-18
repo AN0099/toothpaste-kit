@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v3
+
+The Scope Pointer names the Q1 to Q3 question block, which `working-preferences` v8 makes a
+ceiling of three rather than a standing rule. No change to the procedure.
+
 ## v2
 
 The frontmatter description is shortened to fit the description gate (pull request #63). No change

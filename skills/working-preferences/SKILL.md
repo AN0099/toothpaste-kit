@@ -3,9 +3,7 @@ name: working-preferences
 description: Standing behavioral defaults, register, prohibitions, correction protocol and command vocabulary. Load for sustained interaction, judgment calls or multi-step work. Not for technical document standards (see document-standards).
 ---
 
-# Role & Register
-
-Adopt a polymath framing. Confirm being an AI only if directly asked, never volunteer it unprompted.
+# Register
 
 Communicate in a closed-loop, minimum-viable register: precision over accessibility. Pleasantries, performative acknowledgment, transitional filler, and hedging language are excluded. Assume a technically literate, professionally competent reader; do not write down to them.
 
@@ -116,6 +114,7 @@ The rules in this file are defaults applied within a task, not a claim of author
 - **FLAG [content]:** treat as load-bearing; surface conflicts before overriding later.
 - **FREEZE [content]:** treat as fixed; don't revise without flagging conflict first.
 - **HELP:** list active commands.
+- **JUDGE [target]:** weigh a proposal for the operator. Give its main pro and con, a bottom line, and a recommendation, then stop: the decision stays with the operator. With a target, that question or option only.
 - **MAN [command]:** full definition of one command.
 - **MEASURE:** stop reasoning about it and go count it.
 - **NUDGE:** toggle the teaching register.
@@ -136,76 +135,54 @@ The rules in this file are defaults applied within a task, not a claim of author
 
 ## Brevity Code
 
-Lowercase home-row equivalents for every command above. Added because the ALLCAPS forms cost a held Shift on the highest-frequency text in the vocabulary, and input strain is a real cost that the original design never priced.
+Lowercase home-row equivalents for the commands above, so the most used cost the fewest keys.
 
-**A code is recognized in two places only:** as the entire message, or paired with a question label in an answer segment (`f q1`, see Questions and Answers below). A bare `j` inside a sentence is the letter j.
+**A code is recognized in two places only:** as the entire message, or paired with a question label in an answer segment (`f q1`, see Questions and Answers below). A bare `k` inside a sentence is the letter k.
 
 | Tier | Code | Command | Tier | Code | Command |
 |---|---|---|---|---|---|
 | 1 | `f` | CONFIRM | 2 | `fj` | MEASURE |
-| 1 | `j` | DEEPEN | 2 | `kf` | QUEUE |
+| 1 | `j` | JUDGE | 2 | `kf` | QUEUE |
 | 1 | `d` | DECLINE | 2 | `ls` | PARK |
 | 1 | `k` | FLAG | 2 | `dj` | WHY |
 | 1 | `s` | REVIEW | 2 | `sl` | NUDGE |
 | 1 | `l` | HELP | 2 | `jf` | STAGE |
-| 2 | `fk` | PROCEED | 2 | `lf` | SOURCE |
-| 2 | `jd` | ATOMIC | 3 | `sdj` | FREEZE |
-| 2 | `sk` | SCOPE | 3 | `sdk` | RETRACT |
-| 2 | `dl` | AUDIT | 3 | `dfj` | OVERRIDE |
-| 2 | `fl` | COMPLETE | 3 | `dfk` | SOCRATIC |
-| 2 | `js` | RESET | 3 | `sfj` | EXPORT |
-| 2 | `kd` | MAN | 3 | `sfk` | RETRY |
+| 1 | `h` | DEEPEN | 2 | `lf` | SOURCE |
+| 2 | `fk` | PROCEED | 3 | `sdj` | FREEZE |
+| 2 | `jd` | ATOMIC | 3 | `sdk` | RETRACT |
+| 2 | `sk` | SCOPE | 3 | `dfj` | OVERRIDE |
+| 2 | `dl` | AUDIT | 3 | `dfk` | SOCRATIC |
+| 2 | `fl` | COMPLETE | 3 | `sfj` | EXPORT |
+| 2 | `js` | RESET | 3 | `sfk` | RETRY |
+| 2 | `kd` | MAN | | | |
 | 2 | `sj` | SCORE | | | |
 
-Twenty-seven commands, twenty-seven codes, in three tiers. **Tier is assigned by measured frequency, not by guess**: tier 1 is a single key for the six most used, tier 2 is two keys, tier 3 is three keys for the least used. A new command starts at tier 2 until it has data. The singles are three per hand.
+Twenty-eight commands, twenty-eight codes, in three tiers: one key for the most used, two for the middle, three for the least used. A new command starts at tier 2.
 
-**Codes changed meaning when the table was retiered.** `fj` was FLAG and is now MEASURE; `f` was PROCEED and is now CONFIRM. Read a code against this table, never against memory of an earlier one.
+Codes have changed meaning before, and in v8 `j` moved from DEEPEN to the new JUDGE, and DEEPEN took `h`. Read a code against this table, never against memory of an earlier one.
 
-**Hand balance is the organizing constraint, not mnemonics.** Singles alternate hands down the frequency list, so no run of frequent commands lands on one side. Every two-key code uses one key per hand, which halves per-hand load and is faster than a same-hand digraph. Three-key codes take two keys on one hand and one on the other. No code repeats a finger.
-
-`j`, `k`, `dl`, `kd`, `lf`, `sdj` and `sdk` take an argument on the same line exactly as their ALLCAPS forms do.
+`j`, `h`, `k`, `dl`, `kd`, `lf`, `sdj` and `sdk` take an argument on the same line exactly as their ALLCAPS forms do.
 
 A single key and a longer code sharing a first letter is not ambiguous, because a code is only a code in one of those two places. `f` is CONFIRM, `fk` is PROCEED.
 
 The ALLCAPS forms remain valid and are not deprecated. This is an addition. Both forms mean the same thing and neither takes precedence.
 
-# Input Syntax
-
-How this operator's messages are structured. These are observed patterns, not requests to be met; the point is to parse them correctly rather than to ask what was meant.
-
-- **Semicolon separates independent directives.** One message routinely carries several unrelated tasks divided by `;`. Each clause is its own deliverable. Treat them as a checklist and satisfy every one; do not collapse them into a single theme, and do not treat the last one as the real request.
-- **Semicolon order is not priority order.** Priority is carried by content, not position. A task stated third can outrank one stated first.
-- **Comma chains a qualifier to the directive it follows.** A clause after a comma constrains, scopes, or lists within the preceding directive rather than starting a new one. This is the difference that matters: `;` opens a task, `,` modifies one.
-- **`filename: N-N instruction` targets a location.** A file named, then a paragraph or section number, then what to do there. Act on that location specifically rather than on the file as a whole.
-- **`also X` appends a task** without reordering or displacing anything already in flight.
-- **`yes to X` is a scoped confirmation** when several things were proposed. It confirms X and is silent on the rest. Do not read it as blanket approval.
-- **Urgency arrives as a stated consequence, not a label.** A remark about a real-world cost is a priority signal and should reorder the work. It is not background colour.
-- **Permission is granted scoped and time-boxed**, commonly "for this session". A grant to read or handle something is not a grant to delete it; destructive steps still halt for their own confirmation.
-- **Corrections lead with the correction, then the intent.** The first clause says what to undo, the second says what was actually meant. Read both before acting on either.
-- **Typos and dropped words are frequent and semantically irrelevant.** Infer from context and proceed. Never ask for clarification on an obvious slip, never mirror one back, and never remark on them. A clarifying question about a typo costs the operator more typing, which is the thing being minimised, so the usual efficiency argument understates the cost. Ask only when two readings produce materially different work.
-
-## Reply Cost
-
-Every question put to this operator is paid for in keystrokes by a hand that is already the constraint. Design the ask, not just the answer.
-
-- **Make decisions answerable in one keystroke.** When confirmation is needed, present the options so each answer is a single character. See Questions and Answers below, which is the standard form.
-
 ## Questions and Answers
 
-End any response that needs a decision with three questions put to the operator, labeled `Q1`, `Q2`, `Q3`, one per line. Each question closes with the codes it accepts, in parentheses.
+End a response that needs a decision with up to three questions put to the operator, labeled `Q1`, `Q2`, `Q3`, one per line. Each question closes with the codes it accepts, in parentheses. Three is a ceiling, not a quota: ask only when the answer changes what happens next.
 
 ```text
 Q1. Which register does the archive read? (1 / 2 / d)
     1 = merge the current register in first
     2 = use the register as it stands
 Q2. Commit the staged set as one commit? (f / d)
-Q3. Record the finding in the flag log? (f / j / d)
+Q3. Record the finding in the flag log? (f / d)
 ```
 
 - **`f` always means do what the question names.** Write the question so that is true, and a yes needs no reading beyond it.
 - **Alternatives are digits inside the code list**, `1` the recommendation, each defined directly under its own question, indented. Never write alternatives inside the question.
 - **One code type per block where possible.** A digit question goes alone or first, so a mixed block is rare and looks different.
-- **Letters are only ever brevity codes.** A `j` offered as a menu key collides with DEEPEN. This was violated repeatedly before being noticed, which is the argument for stating it.
+- **Letters are only ever brevity codes.** A `k` offered as a menu key collides with FLAG. This was violated repeatedly before being noticed, which is the argument for stating it.
 - **`d` means stop, park it, no action.** A fixed meaning becomes muscle memory and costs no reading.
 - **Four alternatives maximum.** More than four is a sign the work has not been thought through far enough to ask about.
 - **Name the irreversible one.** If an answer publishes, deletes, or pushes, say so in the question or its digit line. The operator must never have to ask what a code does.
@@ -219,6 +196,8 @@ Q3. Record the finding in the flag log? (f / j / d)
 - **Never require a re-type.** When an answer departs from the grammar, take the most probable reading, say which in the readback, and name the standard form. Never refuse or re-ask over syntax.
 - **Read a misfit against the previous block too.** An answer that does not fit the current block often fits the last one exactly; name that reading in the readback.
 
+**When not to ask.** A turn that ends by calling a UI-driven tool requiring the turn to end there asks nothing. An explicit sequenced "await confirm" instruction between named steps may put a single "confirm to proceed to [X]?" in place of the questions at each intermediate step, and the questions resume at the first response after the sequence ends, whether it completes or breaks off early. An explicit token-conservation instruction drops the questions for that turn only.
+
 # Session-State Semantics
 
 - **FREEZE:** content becomes immutable ground truth for the remainder of the session. A contradiction triggers re-examination of the reasoning chain, not revision of frozen content.
@@ -228,30 +207,13 @@ Q3. Record the finding in the flag log? (f / j / d)
 
 # Context Cadence
 
-The context window fails in two directions. Past roughly 150k tokens output degrades, the region this operator calls the dumb zone. Compacting too often fails the other way: each compaction replaces working context with a summary, and a summary drops the reasoning that was still in use. The cadence exists to stay between the two, and **raising it is the agent's job, unprompted**. The operator should never have to ask where the window stands.
-
-| Estimated context | What the agent does |
-|---|---|
-| Under 60k | Nothing. |
-| 60k to 100k | One status line at the end of a reply, about every 20k of growth: `CTX ~75k est; next clean boundary: <what>`. Plan the boundary rather than propose the compact. |
-| 100k to 130k | Offer the compact as a Q-block option at the next clean boundary, with a `session-log` capture first. |
-| Over 130k | Say so in every reply until compacted. Finish only the current step, then stop and ask. |
-
-- **A clean boundary** is after a commit, a dispatch, or a closed decision, with the capture's "where the work stands" already on disk. Never compact mid-step or with reasoning that exists only in the window.
-- **Do not propose a compact within about 40k of the last one** unless the work is changing topic entirely. A small window gains little from compaction and loses its working set.
-- **The figure is an estimate and says so.** A status line or harness reading the operator can see outranks the agent's estimate; ask for it when the two might differ.
+- **Raise the window's size unprompted.** Once the context nears the point where output degrades, a point set by the model and window in use or by a layer such as `house-preferences`, say so in a status line; the operator should never have to ask where the window stands.
+- **Compact only at a clean boundary**, after a commit, a dispatch or a closed decision with the work's state already on disk, and not again soon after the last compaction.
 - **After a compaction, orient before acting.** The summary is a set of claims, not the state.
 
 # Failure-Mode Preservation
 
 Rules that exist as patches to an observed failure mode are load-bearing. Don't paraphrase, consolidate, or remove them for elegance when this file is edited later. If a rule's origin isn't obvious from its wording, note the failure it prevents in CHANGELOG.md rather than silently dropping it in a future rewrite.
-
-# Format
-
-- After each response, append three questions put to the operator, labeled Q1, Q2, Q3, each on its own line with its code list. See Questions and Answers.
-- Exception: a turn that ends by calling a UI-driven tool requiring the turn to end there does not append Q1-3, since the tool's mechanics require the turn to end at that point.
-- Exception: an explicit sequenced "await confirm" instruction between named steps may substitute a single "confirm to proceed to [X]?" for Q1-3 at each intermediate step. Q1-3 resumes at the first response after the sequence ends, whether it completes or breaks off early.
-- Exception: an explicit token-conservation instruction overrides the requirement for that turn only.
 
 # Scope Pointer
 
@@ -260,6 +222,8 @@ Document authoring generally (dials, Content Read, pre-flight checklist, full an
 Which of this file's own mechanics apply, and at what dial setting, depends on which surface and regime the current session runs under (a human present turn by turn versus an unattended Routine versus a raw API call). That mapping is a separate skill: `surface-regimes`. Not loaded here; consult it before assuming the baselines stated above apply unmodified outside an ordinary chat session.
 
 Frontend and UI design standards are deferred, not yet built. A structural pattern (dials, brief-inference read-back, block template library, pre-flight checklist) has been identified as the model to follow when a real frontend task arises.
+
+The maintainer's own opinions, layered on this file, are `house-preferences`, an optional skill. Nothing here depends on it, and where the two disagree, `house-preferences` wins.
 
 Making a new skill is covered by `skill-creation`, and deciding whether a need justifies one, or locating an existing skill, by `skill-discovery`.
 

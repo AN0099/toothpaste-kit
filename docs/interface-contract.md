@@ -13,9 +13,9 @@ would create exactly the drift the pairing is meant to avoid.
 
 Three surfaces, which had never been described together:
 
-1. **Command vocabulary.** Twenty-seven closed commands, defined in `working-preferences`, indexed in
+1. **Command vocabulary.** Twenty-eight closed commands, defined in `working-preferences`, indexed in
    `skills/commands`.
-2. **Brevity code.** Lowercase home-row equivalents for all twenty-seven, tiered by
+2. **Brevity code.** Lowercase home-row equivalents for all twenty-eight, tiered by
    measured frequency of use.
 3. **Input syntax.** How a message is segmented into tasks and qualifiers, and how the model should
    parse it.
@@ -27,13 +27,14 @@ project and no document described them, so every session rediscovered them by in
 
 | Element | State | Where it lives |
 |---|---|---|
-| Twenty-seven ALLCAPS commands | **Live** | `working-preferences`, `commands` |
-| Brevity code, 27 codes in three tiers | **Live** | `working-preferences` |
-| Input syntax, 10 rules | **Live** | `working-preferences` |
-| Reply-cost rule, with the Questions and Answers form | **Live** | `working-preferences` |
+| Twenty-eight ALLCAPS commands | **Live** | `working-preferences`, `commands` |
+| Brevity code, 28 codes in three tiers | **Live** | `working-preferences` |
+| Input syntax, 10 rules | **Live** | `house-preferences` |
+| Reply-cost rule | **Live** | `house-preferences` |
+| Questions and Answers form | **Live** | `working-preferences` |
 | `commands` index updated with codes | **Done** | `commands` |
 | `CHANGELOG.md` entry for the above | **Done** | both skills' `CHANGELOG.md` |
-| Q1-3 format compliance | **Open, see 5-2** | `working-preferences` `# Format` |
+| Q1-3 format compliance | **Resolved, see 5-2** | `working-preferences` `# Questions and Answers` |
 
 ## 3. The brevity code, and the constraint that shaped it
 
@@ -56,7 +57,7 @@ by general principle can be exactly wrong for its user, and it will not announce
 
 ## 4. Input syntax, condensed
 
-Full statement is in `working-preferences`. The shape, for orientation:
+Full statement is in `house-preferences`. The shape, for orientation:
 
 - Semicolon opens an independent task. Comma modifies the task before it.
 - Semicolon order is not priority order. Priority is carried by content.
@@ -81,7 +82,10 @@ it, which is the only reason it surfaced. Two readings are possible and they lea
 the rule is live and compliance lapsed, or the rule has fallen out of use and should be retired. It
 is the operator's call and it is not made here.
 
-5-3. **Whether the brevity code should extend beyond the twenty-seven.** The commands are conversational
+Resolved in `working-preferences` v8: the `# Format` section is gone, and Questions and Answers
+asks up to three questions, a ceiling rather than a quota.
+
+5-3. **Whether the brevity code should extend beyond the twenty-eight.** The commands are conversational
 control verbs. Procedures are slash commands and were deliberately excluded from the vocabulary. If
 typing `/session-close` is itself a cost worth removing, that is a separate decision about slash
 commands, not an extension of this code.
@@ -91,7 +95,7 @@ built.**
 
 *What breaks.* The current code's organising constraint is hand alternation, and for a one-handed
 user that is not a neutral property, it is a hard failure. Every two-key code requires both hands
-and none of them can be typed. The singles are three per hand, so half sit on the wrong side. The feature and
+and none of them can be typed. The singles are split between the hands, so some sit on the wrong side. The feature and
 the defect are the same design decision, which is the useful part of this flag: an accessibility
 choice made for one body can exclude another, and hand balance looked unambiguously correct until
 this question was asked.
@@ -101,8 +105,8 @@ this question was asked.
 - **Two mirrored variants, or one that is mechanically mirrorable.** Handedness is not predictable
   and a single-hand layout that assumes the left excludes half its users.
 - **Same-hand digraphs throughout**, which is the exact inverse of the current rule. One hand's home
-  row is five keys, giving five singles and twenty-five ordered pairs, so twenty-seven commands fit
-  inside one hand's home position with three to spare before any three-key code is needed.
+  row is five keys, giving five singles and twenty-five ordered pairs, so twenty-eight commands fit
+  inside one hand's home position with two to spare before any three-key code is needed.
 - **Inward rolls preferred, same-finger repeats forbidden.** With four usable fingers on five keys
   this constrains harder than the two-handed case and is the part that needs real care.
 - **Sequential, never chorded.** Simultaneity is the thing a single hand cannot cheaply do.

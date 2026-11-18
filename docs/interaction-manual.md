@@ -29,7 +29,7 @@ so its effect varies, and when it varies you cannot tell whether the model misbe
 instruction was empty.
 
 Fix this by defining a small set of words that mean exactly one thing, and using them for the moves
-you make constantly. This project uses twenty-seven. The exact list matters far less than three
+you make constantly. This project uses twenty-eight. The exact list matters far less than three
 properties of it:
 
 - **Closed.** New words are added deliberately, not invented mid-conversation.
@@ -174,8 +174,8 @@ reader who wants the why.
 
 ## Cross-references
 
-- `skills/working-preferences/SKILL.md`: normative machine-facing rules, the command vocabulary, the
-  brevity code, and the input syntax. Everything above is explanation; that file is the contract.
+- `skills/working-preferences/SKILL.md`: normative machine-facing rules, the command vocabulary and the
+  brevity code; `skills/house-preferences/SKILL.md` holds the input syntax. Everything above is explanation; that file is the contract.
 - `interface-contract.md`: working doc tracking which parts of the contract are live and which are
   designed but not yet promoted.
 - `accessibility.md`: input strain and pointer elimination treated as a design axis.

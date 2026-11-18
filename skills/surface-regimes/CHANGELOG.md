@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v6
+
+Names the question block where it said "Q1-3 follow-up questions", since `working-preferences` v8 asks
+questions only when a decision is open. No change to the regimes.
+
 ## v5
 
 The frontmatter description is shortened to fit the description gate (pull request #63). No change

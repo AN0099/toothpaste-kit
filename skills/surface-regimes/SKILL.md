@@ -5,7 +5,7 @@ description: Detect the session's regime (interactive, autonomous or programmati
 
 # Purpose
 
-`working-preferences` states mechanics (Q1-3, propose-before-generating, dial baselines) as if one register fits every session. It does not, because "a human is present and can respond before the next step" is true in a chat window and false in a Routine running unattended. This skill states which mechanics apply, and at what dial setting, based on which of three regimes the current session actually runs under. It does not replace `working-preferences`; it sets the dial before that skill's task-specific override applies.
+`working-preferences` states mechanics (the question block, propose-before-generating, dial baselines) as if one register fits every session. It does not, because "a human is present and can respond before the next step" is true in a chat window and false in a Routine running unattended. This skill states which mechanics apply, and at what dial setting, based on which of three regimes the current session actually runs under. It does not replace `working-preferences`; it sets the dial before that skill's task-specific override applies.
 
 Regime is a property of what a session can do. Product names are a label on top of that property, so the same three regimes hold whether a session runs on Anthropic's surfaces, another vendor's, or a locally hosted model.
 
@@ -39,7 +39,7 @@ The full capability vector and the evidence that this rule reproduces every row 
 
 | Mechanic | Interactive-synchronous | Autonomous-asynchronous | Programmatic-contractual |
 |---|---|---|---|
-| Q1-3 follow-up questions | Applies as stated in `working-preferences` | Suppressed; nothing present reads them mid-run | N/A, no prose output |
+| The question block, when a decision is open | Applies as stated in `working-preferences` | Suppressed; nothing present reads them mid-run | N/A, no prose output |
 | Propose-before-generating | Applies as stated | Converted to a logged decision in the handoff note, not a pause | N/A |
 | Dialog before large builds | Applies as stated | Front-loaded into the initiating request's parameters; no mid-run dialog is possible | Calibration lives in the request schema itself |
 | AUTONOMY dial | Stated baseline, roughly 3 by default | Defaults to 8-10; overridable by an explicit instruction in the initiating request | Caller controls via request parameters |
