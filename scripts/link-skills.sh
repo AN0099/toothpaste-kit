@@ -26,8 +26,8 @@
 # link it will create or skip. --dry-run stops there and writes nothing.
 #
 # The optional skills, listed below, are left out unless --all is given. They
-# need a tool this kit does not ship: the three review skills read a lane-board
-# tool. A link already in place for one is left as it is either way.
+# need a tool this kit does not yet ship: the three review skills read a
+# lane-board tool. A link already in place for one is left as it is either way.
 #
 # Re-runnable. Existing symlinks are replaced. A real directory of the same name
 # is left alone and reported, so a hand-edited local skill is never clobbered.

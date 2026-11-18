@@ -67,7 +67,7 @@ Eight are procedures a person invokes. All eight set `disable-model-invocation`,
 | `session-log` | Mid-session, before context is compacted. Records the decisions, corrections, open questions and findings from the recent stretch to one append-only file, and nothing else |
 | `merge-proxy` | When a person wants the agent to type a merge they have decided. For that session, on a repository whose remote is internal or absent, the agent may run and push a trunk merge after explaining the full plan and halting for approval of each one. Never on a GitHub or other internet remote |
 
-The three review skills read a lane-board tool this kit does not ship, so `scripts/link-skills.sh` installs them only when given `--all`.
+The three review skills read a lane-board tool this kit does not yet ship, so `scripts/link-skills.sh` installs them only when given `--all`.
 
 Three are procedures an agent may run on its own at a clean boundary. None sets `disable-model-invocation`, because each one reads or records and none decides anything. None of them satisfies `session-log` or `session-close`.
 

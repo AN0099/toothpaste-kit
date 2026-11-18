@@ -65,7 +65,7 @@ ls ~/.claude/skills ~/tpkit-workspace/.claude/skills
 **Install the whole set.** The skills name each other in their Scope
 Pointer sections, and a subset leaves those pointers leading nowhere.
 The one exception is optional: `daily-review`, `weekly-review` and
-`monthly-review` read a lane-board tool this kit does not ship, so
+`monthly-review` read a lane-board tool this kit does not yet ship, so
 `scripts/link-skills.sh` leaves them out unless you pass `--all`. Pass it
 once your workspace has such a tool.
 Claude Code chooses a skill by its frontmatter `description`;

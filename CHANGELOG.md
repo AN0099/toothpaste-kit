@@ -113,8 +113,8 @@ skill lives in that skill's own `CHANGELOG.md`.
   holds a dated gate count.
 - `scripts/link-skills.sh` leaves out `daily-review`, `weekly-review` and
   `monthly-review` unless given `--all`. All three read a lane-board tool the
-  kit does not ship, so a default install gave three skills that could not
-  run. The script prints a `skip` line for each, and the skills stay in
+  kit does not yet ship, so a default install gave three skills that could
+  not run. The script prints a `skip` line for each, and the skills stay in
   `skills/`. `README.md`, `docs/installing.md` and step 4 of
   `docs/quickstart.md` say so, and the installing guide tells a copy install
   to delete the three unless the workspace has a lane-board tool.
