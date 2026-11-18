@@ -67,6 +67,8 @@ Eight are procedures a person invokes. All eight set `disable-model-invocation`,
 | `session-log` | Mid-session, before context is compacted. Records the decisions, corrections, open questions and findings from the recent stretch to one append-only file, and nothing else |
 | `merge-proxy` | When a person wants the agent to type a merge they have decided. For that session, on a repository whose remote is internal or absent, the agent may run and push a trunk merge after explaining the full plan and halting for approval of each one. Never on a GitHub or other internet remote |
 
+The three review skills read a lane-board tool this kit does not yet ship, so `scripts/link-skills.sh` installs them only when given `--all`.
+
 Three are procedures an agent may run on its own at a clean boundary. None sets `disable-model-invocation`, because each one reads or records and none decides anything. None of them satisfies `session-log` or `session-close`.
 
 | Skill | Runs |
@@ -117,7 +119,7 @@ The gates call these, and each runs on its own as well:
 
 `auto-qa-tuner.py` proposes CI job timeouts from the repository's own run history.
 
-`link-skills.sh` symlinks `skills/` into your Claude skills directory instead of copying, so `git pull` updates them in place. Targets are relative where `ln -r` exists, so the links survive the tree being moved, and absolute otherwise; the script reports which it used.
+`link-skills.sh` symlinks `skills/` into your Claude skills directory instead of copying, so `git pull` updates them in place. It leaves out the three review skills unless given `--all`. Targets are relative where `ln -r` exists, so the links survive the tree being moved, and absolute otherwise; the script reports which it used.
 
 `reflow-md.py` unwraps hard-wrapped Markdown paragraphs to one line each. Markdown collapses single newlines, so a hard wrap changes nothing about how a document renders; what it does change is that the author's column width gets baked into the file and every reader inherits it. Fenced code, tables, front matter, headings, blockquotes, and list indentation are left alone. Use `--check` for a dry run; it exits 1 if any file would change, so it can serve as a gate. `--selftest` runs the bundled fixture in `reflow-md.test.md` against `reflow-md.expected.md` and exits nonzero on failure; run it after any change to the script.
 

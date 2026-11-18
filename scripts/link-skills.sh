@@ -14,6 +14,7 @@
 # Usage, from anywhere:
 #   scripts/link-skills.sh                 links into ~/.claude/skills
 #   scripts/link-skills.sh /path/to/skills links into that directory
+#   scripts/link-skills.sh --all [DIR]     also links the optional skills
 #   scripts/link-skills.sh --dry-run [DIR] prints the target directory and
 #                                          every link it would create or skip;
 #                                          writes nothing
@@ -24,6 +25,10 @@
 # Before writing anything, it prints the directory it will write to and every
 # link it will create or skip. --dry-run stops there and writes nothing.
 #
+# The optional skills, listed below, are left out unless --all is given. They
+# need a tool this kit does not yet ship: the three review skills read a
+# lane-board tool. A link already in place for one is left as it is either way.
+#
 # Re-runnable. Existing symlinks are replaced. A real directory of the same name
 # is left alone and reported, so a hand-edited local skill is never clobbered.
 #
@@ -32,6 +37,12 @@
 # and there the targets are absolute. The script says which it used.
 
 set -eu
+
+# Skills linked only with --all. A change here is a change to the note on
+# optional skills in README.md and docs/installing.md.
+optional='daily-review
+monthly-review
+weekly-review'
 
 if [ "${1:-}" = --selftest ]; then
     self=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/$(basename -- "$0")
@@ -45,7 +56,8 @@ if [ "${1:-}" = --selftest ]; then
     fails=0
     ok()  { echo "ok   $1"; }
     bad() { echo "FAIL $1"; fails=$((fails + 1)); }
-    want=$(cd "$root/skills" && for d in */; do [ -d "$d" ] && printf '%s\n' "${d%/}"; done)
+    want=$(cd "$root/skills" && for d in */; do [ -d "$d" ] && printf '%s\n' "${d%/}"; done \
+        | grep -vxF "$optional")
     n=$(printf '%s\n' "$want" | grep -c .)
     # A real directory where one skill's link would go: it must be left alone.
     keep=$(printf '%s\n' "$want" | head -1)
@@ -59,6 +71,20 @@ if [ "${1:-}" = --selftest ]; then
         else bad "$name is not a link to skills/$name"; fi
     done
     [ "$good" -eq $((n - 1)) ] && ok "each of $((n - 1)) skills links to its own skills/ directory" || bad "$good of $((n - 1)) skills linked correctly"
+    n_opt=$(printf '%s\n' "$optional" | grep -c .)
+    left=0
+    for name in $optional; do
+        [ -d "$root/skills/$name" ] || bad "optional skill $name has no skills/ directory"
+        [ ! -e "$tmp/dest/$name" ] && grep -q "^skip  $name (optional" "$tmp/out1" && left=$((left + 1))
+    done
+    [ "$left" -eq "$n_opt" ] && ok "the $n_opt optional skills are left out and reported" || bad "$left of $n_opt optional skills left out and reported"
+    if sh "$self" --all "$tmp/dest-all" > "$tmp/out-all" 2>&1; then
+        good=0
+        for name in $optional; do
+            [ -L "$tmp/dest-all/$name" ] && [ "$(CDPATH= cd -- "$tmp/dest-all/$name" && pwd -P)" = "$(CDPATH= cd -- "$root/skills/$name" && pwd -P)" ] && good=$((good + 1))
+        done
+        [ "$good" -eq "$n_opt" ] && ok "--all links the $n_opt optional skills" || bad "--all linked $good of $n_opt optional skills"
+    else bad "--all exited non-zero"; fi
     if [ ! -L "$tmp/dest/$keep" ] && [ "$(cat "$tmp/dest/$keep/local.md")" = mine ] && grep -q "^skip  $keep " "$tmp/out1"; then
         ok "a real directory of the same name is skipped, reported and left as it was"
     else bad "the real directory $keep was replaced or not reported"; fi
@@ -101,10 +127,12 @@ repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 src="$repo_root/skills"
 
 dry_run=0
+all=0
 dest=""
 for arg in "$@"; do
     case "$arg" in
         --dry-run) dry_run=1 ;;
+        --all) all=1 ;;
         -*) echo "error: unknown option $arg" >&2; exit 2 ;;
         *) dest=$arg ;;
     esac
@@ -116,6 +144,9 @@ if [ ! -d "$src" ]; then
     exit 1
 fi
 
+# is_optional NAME: NAME is on the list above and --all was not given.
+is_optional() { [ "$all" -eq 0 ] && printf '%s\n' "$optional" | grep -qxF "$1"; }
+
 echo "Target directory: $dest"
 plan_linked=0
 plan_skipped=0
@@ -123,7 +154,10 @@ for d in "$src"/*/; do
     [ -d "$d" ] || continue
     name=$(basename "$d")
     target="$dest/$name"
-    if [ -e "$target" ] && [ ! -L "$target" ]; then
+    if is_optional "$name"; then
+        echo "  would skip  $name (optional; --all links it)"
+        plan_skipped=$((plan_skipped + 1))
+    elif [ -e "$target" ] && [ ! -L "$target" ]; then
         echo "  would skip  $name (a real directory is already there)"
         plan_skipped=$((plan_skipped + 1))
     else
@@ -152,11 +186,18 @@ rm -f "$probe"
 
 linked=0
 skipped=0
+optional_n=0
 
 for d in "$src"/*/; do
     [ -d "$d" ] || continue
     name=$(basename "$d")
     target="$dest/$name"
+
+    if is_optional "$name"; then
+        echo "skip  $name (optional; --all links it)"
+        optional_n=$((optional_n + 1))
+        continue
+    fi
 
     if [ -e "$target" ] && [ ! -L "$target" ]; then
         echo "skip  $name (a real directory is already there)"
@@ -180,6 +221,9 @@ else
     echo "$linked linked (absolute targets, ln -r unavailable), $skipped skipped, into $dest"
 fi
 
+if [ "$optional_n" -gt 0 ]; then
+    echo "$optional_n optional skills not linked; --all links them."
+fi
 if [ "$skipped" -gt 0 ]; then
     echo "Skipped entries are real directories. Move or delete them, then re-run."
 fi
