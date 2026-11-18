@@ -29,7 +29,7 @@ so its effect varies, and when it varies you cannot tell whether the model misbe
 instruction was empty.
 
 Fix this by defining a small set of words that mean exactly one thing, and using them for the moves
-you make constantly. This project uses twenty-seven. The exact list matters far less than three
+you make constantly. This project uses twenty-eight. The exact list matters far less than three
 properties of it:
 
 - **Closed.** New words are added deliberately, not invented mid-conversation.

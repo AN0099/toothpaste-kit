@@ -53,7 +53,7 @@ Eight govern agent behavior continuously. An agent loads them on its own when th
 | `surface-regimes` | Detects whether a session is interactive, autonomous, or programmatic, and sets dials to match |
 | `skill-creation` | Naming, required structure, and checklists for adding a skill |
 | `skill-discovery` | Whether a recurring need is worth a skill, and finding one that already exists |
-| `commands` | Index for the twenty-seven-command vocabulary, with brevity codes |
+| `commands` | Index for the twenty-eight-command vocabulary, with brevity codes |
 
 Eight are procedures a person invokes. All eight set `disable-model-invocation`, so an agent cannot trigger them. That is the point in each case: a gate a model can invoke to satisfy itself is not a gate, and an agent should not decide on its own that a session is over or that a working day has started. `disable-model-invocation` is a Claude Code field that the Agent Skills specification does not define, so these eight pass the specification's own checker, skills-ref, only with that one line removed; the other eleven pass it as written (`scripts/skills-spec.sh`).
 

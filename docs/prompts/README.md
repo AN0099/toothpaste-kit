@@ -9,7 +9,7 @@ frontmatter, copied without change. The commands are listed with their brevity c
 
 [`skills/commands/SKILL.md`](../../skills/commands/SKILL.md)
 
-Index of the twenty-seven project commands with brevity codes and one-line summaries; resolves HELP and MAN. Does not hold the behavioral rules; working-preferences is the source of truth for each command.
+Index of the twenty-eight project commands with brevity codes and one-line summaries; resolves HELP and MAN. Does not hold the behavioral rules; working-preferences is the source of truth for each command.
 
 ## daily-dashboard
 

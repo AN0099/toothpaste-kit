@@ -2,8 +2,8 @@
 
 ## v5
 
-DEEPEN loses its brevity code, as `working-preferences` v8 records: twenty-seven commands, twenty-six
-codes. DEEPEN is written in full.
+JUDGE is added with `j`, and DEEPEN moves from `j` to `h`, as `working-preferences` v8 records:
+twenty-eight commands, twenty-eight codes.
 
 ## v4
 

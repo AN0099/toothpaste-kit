@@ -70,10 +70,10 @@ skill lives in that skill's own `CHANGELOG.md`.
   is installed.
 - `working-preferences` is cut to the general behavior every adopter gets
   (v8). The maintainer's own opinions moved to a new optional skill,
-  `house-preferences`: role framing, input syntax, reply cost, and the
-  reasons behind the brevity code and the context cadence. The brevity code
-  drops `j`, so DEEPEN has no code; Questions and Answers asks up to three
-  questions; the Format section is folded into it. `commands` (v5),
+  `house-preferences`: role framing, input syntax, reply cost, and the reasons
+  behind the brevity code and the context cadence. JUDGE joins the command
+  vocabulary with `j`, and DEEPEN moves to `h`; Questions and Answers asks up
+  to three questions; the Format section is folded into it. `commands` (v5),
   `daily-dashboard` (v3), `skill-creation` (v5) and `surface-regimes` (v6)
   follow.
 - `scripts/check-pr-body` checks headings, template comments and the

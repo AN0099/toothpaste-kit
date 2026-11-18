@@ -114,6 +114,7 @@ The rules in this file are defaults applied within a task, not a claim of author
 - **FLAG [content]:** treat as load-bearing; surface conflicts before overriding later.
 - **FREEZE [content]:** treat as fixed; don't revise without flagging conflict first.
 - **HELP:** list active commands.
+- **JUDGE [target]:** weigh a proposal for the operator. Give its main pro and con, a bottom line, and a recommendation, then stop: the decision stays with the operator. With a target, that question or option only.
 - **MAN [command]:** full definition of one command.
 - **MEASURE:** stop reasoning about it and go count it.
 - **NUDGE:** toggle the teaching register.
@@ -141,24 +142,26 @@ Lowercase home-row equivalents for the commands above, so the most used cost the
 | Tier | Code | Command | Tier | Code | Command |
 |---|---|---|---|---|---|
 | 1 | `f` | CONFIRM | 2 | `fj` | MEASURE |
+| 1 | `j` | JUDGE | 2 | `kf` | QUEUE |
 | 1 | `d` | DECLINE | 2 | `ls` | PARK |
 | 1 | `k` | FLAG | 2 | `dj` | WHY |
 | 1 | `s` | REVIEW | 2 | `sl` | NUDGE |
 | 1 | `l` | HELP | 2 | `jf` | STAGE |
-| 2 | `fk` | PROCEED | 2 | `lf` | SOURCE |
-| 2 | `jd` | ATOMIC | 3 | `sdj` | FREEZE |
-| 2 | `sk` | SCOPE | 3 | `sdk` | RETRACT |
-| 2 | `dl` | AUDIT | 3 | `dfj` | OVERRIDE |
-| 2 | `fl` | COMPLETE | 3 | `dfk` | SOCRATIC |
-| 2 | `js` | RESET | 3 | `sfj` | EXPORT |
-| 2 | `kd` | MAN | 3 | `sfk` | RETRY |
-| 2 | `sj` | SCORE | 2 | `kf` | QUEUE |
+| 1 | `h` | DEEPEN | 2 | `lf` | SOURCE |
+| 2 | `fk` | PROCEED | 3 | `sdj` | FREEZE |
+| 2 | `jd` | ATOMIC | 3 | `sdk` | RETRACT |
+| 2 | `sk` | SCOPE | 3 | `dfj` | OVERRIDE |
+| 2 | `dl` | AUDIT | 3 | `dfk` | SOCRATIC |
+| 2 | `fl` | COMPLETE | 3 | `sfj` | EXPORT |
+| 2 | `js` | RESET | 3 | `sfk` | RETRY |
+| 2 | `kd` | MAN | | | |
+| 2 | `sj` | SCORE | | | |
 
-Twenty-seven commands, twenty-six codes, in three tiers: one key for the most used, two for the middle, three for the least used. A new command starts at tier 2. DEEPEN has no code and is written in full.
+Twenty-eight commands, twenty-eight codes, in three tiers: one key for the most used, two for the middle, three for the least used. A new command starts at tier 2.
 
-Codes have changed meaning before, and `j` was DEEPEN until v8. Read a code against this table, never against memory of an earlier one.
+Codes have changed meaning before, and in v8 `j` moved from DEEPEN to the new JUDGE, and DEEPEN took `h`. Read a code against this table, never against memory of an earlier one.
 
-`k`, `dl`, `kd`, `lf`, `sdj` and `sdk` take an argument on the same line exactly as their ALLCAPS forms do.
+`j`, `h`, `k`, `dl`, `kd`, `lf`, `sdj` and `sdk` take an argument on the same line exactly as their ALLCAPS forms do.
 
 A single key and a longer code sharing a first letter is not ambiguous, because a code is only a code in one of those two places. `f` is CONFIRM, `fk` is PROCEED.
 
