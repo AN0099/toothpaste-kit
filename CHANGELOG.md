@@ -33,7 +33,6 @@ skill lives in that skill's own `CHANGELOG.md`.
   sees every other field. Its selftest runs deliberately broken cases and
   passes only when each is rejected with the message expected for it.
   `.github/workflows/containers.yml` runs it on linux/amd64 and linux/arm64.
-  The image is now `localhost/kit-verify:v8`.
 - `.github/workflows/tags.yml`: on every newly created tag, runs
   `scripts/check-branch-name --tag-new`, which requires the full `v1.2.3`
   shape with no leading zeros and a tag greater than every other `v` tag, and
@@ -47,8 +46,8 @@ skill lives in that skill's own `CHANGELOG.md`.
   verification image downloads both schemas from the commit each release tag
   points at, checked by digest, and the script checks the digests again. Its
   selftest rejects planted bad files, a schema with the wrong digest and a
-  missing tool, each only when its own rejection message appears. `.github/workflows/containers.yml` runs it on linux/amd64 and
-  linux/arm64. The image is now `localhost/kit-verify:v6`.
+  missing tool, each only when its own rejection message appears.
+  `.github/workflows/containers.yml` runs it on linux/amd64 and linux/arm64.
 - `.github/workflows/scorecard.yml` and an OpenSSF Scorecard badge in
   `README.md`. Scorecard runs weekly and on pushes to `main`, publishes its
   result for the badge and uploads it to code scanning. Both new actions are
@@ -57,6 +56,8 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- The verification image is now `localhost/kit-verify:v9`. Each entry that
+  changes a tool in it says which.
 - Six skills and the starter container page lose wording that only made sense
   in the tree they were written in: `session-close`'s description, the handoff
   file `redaction-gate` pointed at, `merge-proxy`'s list of one desk's reserved
@@ -149,15 +150,16 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Removed
 
+The gates are eighteen: gates 15, 17 and 21 are removed below, and the
+other gates keep their numbers, so those three are unused.
+
 - `scripts/check-qblock`, its 30 cases in `tests/qblock-cases/` and gate 15,
   which ran its selftest. The checker tested one installation's reply format
   rather than anything the kit ships, and its header named a private project.
-  The gates are now twenty; their numbers are unchanged, so 15 is unused.
 - `scripts/spdx-fragment.py`, `scripts/spdx-models.json` and gate 17, which
   ran the builder's selftest, with the pull request template's step that ran
   it. `spdx-models.json` shipped empty, so every fragment marked each model
-  `noAssertion`, and nothing read the fragments. The gates are now nineteen;
-  17 is unused.
+  `noAssertion`, and nothing read the fragments.
 - `scripts/cli_path.py`, whose one caller was `spdx-fragment.py`.
 - `.github/labeler.yml` and `.github/workflows/labeler.yml`, which labelled
   pull requests by path, and `.github/workflows/ai-fix.yml`, which answered
@@ -175,8 +177,7 @@ skill lives in that skill's own `CHANGELOG.md`.
   gate, which still runs them.
 - The CI timeout tuner: `scripts/auto-qa-tuner.py`,
   `.github/auto-qa-tuning.json`, `.github/workflows/auto-qa.yml` and gate 21
-  with its plant. The job timeouts it proposed stay. Gate numbers are
-  unchanged; the gates are eighteen.
+  with its plant. The job timeouts it proposed stay.
 - The coverage floors: `scripts/coverage-check.py`,
   `.coverage-thresholds.json`, the "Coverage floors in the verification image"
   step in `.github/workflows/containers.yml`, and coverage.py with its startup
@@ -185,7 +186,7 @@ skill lives in that skill's own `CHANGELOG.md`.
   wcwidth, pyparsing, html5rdf and packaging, which only it needed; no
   check used it. The image's README drops its row and the two SPDX rows
   (the model with its JSON-LD context, and the licence list), whose files
-  the image no longer fetches. The image is now `localhost/kit-verify:v9`.
+  the image no longer fetches.
 
 ### Fixed
 
@@ -203,20 +204,17 @@ skill lives in that skill's own `CHANGELOG.md`.
   the files it points to with `$ref` are looked up from there. These three gave
   a wrong location, so a checker could not find `event-base.json`. The kit's
   own two checkers ignore `$id`, so nothing had shown this.
-
 - `orchestration/`: stale claims and text specific to one installation.
   The README indexes `roles.md`; links to documents the repository does
-  not hold now name ones it does; the three event schemas carry
-  `$id` values with their `schemas/` directory, and a human agent no
-  longer needs `capability` or `regime`; usage quotas, a past incident,
+  not hold now name ones it does; a human agent no longer needs
+  `capability` or `regime`; usage quotas, a past incident,
   dated adoption notes and one setup's worked examples are gone from
   `routing-threshold.md`, `roles.md` and the ingestion specs; and
   `rounds.md` gives its mail channel and context thresholds as examples
   an installation sets.
 - `containers/verify/`: the CodeQL 2.27.4 bundle, the version GitHub's default
   setup now runs, so a local scan reports the alerts CI reports. The bundle is
-  pinned by digest for linux/amd64 and linux/arm64. The image is now
-  `localhost/kit-verify:v5`.
+  pinned by digest for linux/amd64 and linux/arm64.
 
 ## 0.6.0 (2026-11-10)
 
