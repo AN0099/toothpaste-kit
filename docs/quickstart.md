@@ -74,9 +74,10 @@ comments saying what goes in them. Leave them as they are for now.
 It prints its plan before writing anything; add `--dry-run` to see that
 plan without writing (docs/installing.md has the detail).
 
-**You should now see** the plan, then one `link` line per skill, then a
-summary line ending `0 skipped, into` and the workspace's `.claude/skills`
-path.
+**You should now see** the plan, then one `link` line per skill and a
+`skip` line for each of the three optional review skills, then a summary
+line ending `0 skipped, into` and the workspace's `.claude/skills` path,
+and a last line saying the optional skills were not linked.
 
 Each skill is now a symlink into the clone, so updating the clone updates
 the skills.

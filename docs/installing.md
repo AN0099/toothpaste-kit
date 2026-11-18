@@ -64,6 +64,10 @@ ls ~/.claude/skills ~/tpkit-workspace/.claude/skills
 
 **Install the whole set.** The skills name each other in their Scope
 Pointer sections, and a subset leaves those pointers leading nowhere.
+The one exception is optional: `daily-review`, `weekly-review` and
+`monthly-review` read a lane-board tool this kit does not ship, so
+`scripts/link-skills.sh` leaves them out unless you pass `--all`. Pass it
+once your workspace has such a tool.
 Claude Code chooses a skill by its frontmatter `description`;
 `skills/skill-discovery/SKILL.md` says how that resolution works.
 
@@ -87,6 +91,9 @@ Copy instead if you intend to edit the skills yourself:
 mkdir -p ~/tpkit-workspace/.claude/skills
 cp -R ~/toothpaste-kit/skills/* ~/tpkit-workspace/.claude/skills/
 ```
+
+The copy takes the three optional review skills too. Delete them from the
+target unless your workspace has a lane-board tool.
 
 A copy does not change when the clone does. Updating it means copying again
 over your edits, so keep edited skills under their own names. The script
