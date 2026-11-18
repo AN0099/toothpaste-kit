@@ -49,29 +49,22 @@ that a reader can go and form one.
 | 3.6 Dependency declaration | Present, and small by nature | `.github/dependabot.yml`, github-actions only. The repository ships no package manifest, so the surface is this small |
 | 3.7 Actions pinned by digest | Present | Every workflow that checks out the tree pins `actions/checkout` by the full commit SHA of its v7.0.1 tag, `3d3c42e5aac5ba805825da76410c181273ba90b1`, read from the upstream repository, with the version as a comment that Dependabot updates with the SHA. `scorecard.yml` pins `ossf/scorecard-action` and `github/codeql-action/upload-sarif` the same way, and `compliance.yml` pins `actions/setup-python` by the commit of its v7.1.0 tag, `6d4fd22b20465ccc0f7354476588e8df7c9ca0e0`. Gate 19 fails any action not pinned by a full commit SHA, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty. **`v0.1.0` shipped with `actions/checkout@v4`** and releases up to this change with `@v7`, both tags |
 
-### The software bill of materials
+### The action pin check
 
-`scripts/sbom.py` prints an SPDX 3.0.1 JSON-LD bill of materials for the tree,
-standard library only and fetching nothing. It lists every file git tracks that
-REUSE covers, with the copyright and licence REUSE would find for it: the
-file's own tags, a `.license` sidecar, or an annotation in `REUSE.toml`. It
-also lists every action a workflow in `.github/workflows/` uses, by the ref it
-is pinned to. Gate 19 runs it on the tree, so a file with no licence or no
-copyright, a licence with no text under `LICENSES/`, or an action not pinned
-by a full commit SHA fails CI. `KNOWN_TAG_PINS` in the script is where a
-recorded exception would go, and it is empty since row 3.7 closed, so the gate
-fails any tag pin. Before printing, the script checks its output's shape
-against the SPDX 3.0.1 model: types, required and allowed properties, unique
-IDs, references, vocabularies and package URLs. It does not expand the JSON-LD
-context or compare the files with what REUSE itself reports, which
-`scripts/compliance.sh` does.
+`scripts/sbom.py` reads every workflow in `.github/workflows/` and fails on
+any action not pinned by a full commit SHA, or a `docker://` action not pinned
+by a sha256 digest, standard library only and fetching nothing. Gate 19 runs
+it on the tree, so such a pin fails CI. `KNOWN_TAG_PINS` in the script is
+where a recorded exception would go, and it is empty since row 3.7 closed, so
+the gate fails any tag pin. Licence and copyright coverage is checked by
+`scripts/compliance.sh`, which runs REUSE.
 
 ## 4. Automated checks
 
 | Control | State | Evidence |
 |---|---|---|
 | 4.1 Mechanical gates in CI | Present | `.github/workflows/gates.yml`, calling `scripts/gates.sh`. The gates it runs are the ones its `run_all` function calls, and its header comment states what each covers |
-| 4.2 Those gates proved able to fail | Yes | `scripts/gates.sh --selftest` runs gates against planted positives, or runs a gate tool's own planted selftest, before the real run; the comment above `run_selftest` names which gates take which. The `gates` check runs that command on every pull request and push to `main`, so the latest run on `main` is the record of the result. This row held a dated count until 0.7.0, and the count went stale as the gates grew from seven to more than twenty |
+| 4.2 Those gates proved able to fail | Yes | `scripts/gates.sh --selftest` runs gates against planted positives, or runs a gate tool's own planted selftest, before the real run; the comment above `run_selftest` names which gates take which. The `gates` check runs that command on every pull request and push to `main`, so the latest run on `main` is the record of the result. This row held a dated count until 0.7.0, and the count went stale as the gates grew from seven to more than twenty, before 0.7.0 cut them to eighteen |
 | 4.3 Commit hygiene check | Present | `.github/workflows/commit-attribution.yml` rejects AI attribution trailers. `.github/workflows/dco.yml` fails a pull request containing a commit with no `Signed-off-by:` line for its author; bot accounts are exempt |
 | 4.4 Least-privilege workflow tokens | Present | Every workflow declares its own `permissions`: read-only, plus the writes a job needs, which are `pages.yml` deploying the site (`pages: write`, `id-token: write`) and `scorecard.yml` uploading its results (`security-events: write`). `commit-attribution.yml` declared none until 2026-09-18, when CodeQL's `actions/missing-workflow-permissions` found it. The gap had been recorded in this table before the scanner found it, and the record alone did not close it |
 | 4.5 Static analysis | Present for Python and Actions, absent for shell | CodeQL default setup, languages `python` and `actions`, threat model remote and local. First analysis 2026-09-18. The shell scripts in `scripts/` are unanalysed, which is the remaining gap in this row |

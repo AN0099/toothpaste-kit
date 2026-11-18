@@ -110,14 +110,10 @@ The gates call these, and each runs on its own as well:
 - `remote-level.sh`: classifies a repository by where its remotes point, as none, internal or external, and treats any host it cannot prove internal as external
 - `reorient`: prints where a workspace stands in one screen, for the start of a session and after a compaction; the observing half of the `orient` skill
 - `round-check.py`: validates review-round documents against their schemas in `orchestration/schemas/round/`
-- `sbom.py`: writes an SPDX 3.0.1 bill of materials for the tree, standard library only
+- `sbom.py`: checks that every action a workflow uses is pinned by a full commit SHA, standard library only
 - `blog.py`: builds the kit blog's pages and feed from `blog/posts/`; [the blog guide](docs/blog.md) covers it
 
 `schemas.sh` runs outside the gates suite, in the verification image: it validates `security-insights.yml`, `CITATION.cff`, this tree's JSON Schema files and the documents they govern with `check-jsonschema`, a standard tool that understands the whole JSON Schema format.
-
-`coverage-check.py` runs the gates selftest under coverage.py in the verification image and holds each Python script it runs at the floor set in `.coverage-thresholds.json`. A script the suite runs with no floor fails it.
-
-`auto-qa-tuner.py` proposes CI job timeouts from the repository's own run history.
 
 `link-skills.sh` symlinks `skills/` into your Claude skills directory instead of copying, so `git pull` updates them in place. It leaves out the three review skills unless given `--all`. Targets are relative where `ln -r` exists, so the links survive the tree being moved, and absolute otherwise; the script reports which it used.
 

@@ -81,8 +81,7 @@ skill lives in that skill's own `CHANGELOG.md`.
   when every file is already unwrapped. Before, it exited 0 either way, so a
   wrapped file passed any gate that read its status. Its selftest plants one
   of each.
-- `README.md` names three scripts it had left out: `sbom.py`, `blog.py` and
-  `coverage-check.py`.
+- `README.md` names two scripts it had left out: `sbom.py` and `blog.py`.
 - Every workflow pins `actions/checkout` by the commit SHA of its v7.0.1 tag
   instead of the `v7` tag, and `KNOWN_TAG_PINS` in `scripts/sbom.py` is empty,
   so gate 19 now fails any action pinned by tag.
@@ -129,6 +128,11 @@ skill lives in that skill's own `CHANGELOG.md`.
   `skills/`. `README.md`, `docs/installing.md` and step 4 of
   `docs/quickstart.md` say so, and the installing guide tells a copy install
   to delete the three unless the workspace has a lane-board tool.
+- `scripts/sbom.py` is cut to its action pin check: every action a workflow
+  uses must be pinned by a full commit SHA, and a `docker://` action by
+  digest, unless `KNOWN_TAG_PINS` records it. It no longer writes an SPDX bill
+  of materials or reads REUSE tags; `scripts/compliance.sh` checks licences
+  and copyright. Gate 19 runs it as before.
 
 ### Removed
 
@@ -154,6 +158,21 @@ skill lives in that skill's own `CHANGELOG.md`.
   each rule can fire; nothing outside it now checks its results.
 - `.github/workflows/ci.yml`. Its Linux job ran the same command on the same
   runner as `gates.yml`, and its macOS job is now in `gates.yml`.
+- `tests/e2e/`: its steps were already gate 18, the review-round records
+  gate, which still runs them.
+- The CI timeout tuner: `scripts/auto-qa-tuner.py`,
+  `.github/auto-qa-tuning.json`, `.github/workflows/auto-qa.yml` and gate 21
+  with its plant. The job timeouts it proposed stay. Gate numbers are
+  unchanged; the gates are eighteen.
+- The coverage floors: `scripts/coverage-check.py`,
+  `.coverage-thresholds.json`, the "Coverage floors in the verification image"
+  step in `.github/workflows/containers.yml`, and coverage.py with its startup
+  hook in the verification image.
+- pyshacl from the verification image, with rdflib, owlrl, prettytable,
+  wcwidth, pyparsing, html5rdf and packaging, which only it needed; no
+  check used it. The image's README drops its row and the two SPDX rows
+  (the model with its JSON-LD context, and the licence list), whose files
+  the image no longer fetches. The image is now `localhost/kit-verify:v9`.
 
 ### Fixed
 

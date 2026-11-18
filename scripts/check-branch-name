@@ -108,7 +108,7 @@ selftest() {
   }
   for n in main chore/branch-name-gate sync/toothpaste-kit-64b3c49 acmm/phase-1 \
            record/history docs/a fix/x1-y2 feat/abcdefghij-abcdefghij-abcdefghij-a feat/a.b \
-           ci/auto-qa-tuner quality/test-hooks-gate release/0.4.0 docs/v0.2.0-doi \
+           ci/pin-check quality/test-hooks-gate release/0.4.0 docs/v0.2.0-doi \
            docs/state-after-0.1.0 scripts/reorient-selftest-r81 skills/session-log-v3 test/x licence/apache-2.0; do
     expect 0 branch "$n"
   done

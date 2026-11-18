@@ -248,7 +248,8 @@ unverifiable clean result this project's own conventions reject.
 - **New-user fixes (pull request #86).** The README names every script, and `docs/installing.md`
   creates the skills directory and says which hook rules need editing.
 - **`scripts/sbom.py`, gate 19 (pull request #87).** An SPDX 3.0.1 bill of materials for the tree;
-  it fails on a file without licence or copyright and on an action not pinned by commit SHA.
+  it fails on a file without licence or copyright and on an action not pinned by commit SHA. Cut
+  before 0.7.0 to the action pin check alone.
 - **Mutation-tested selftests (pull request #88).** New selftest cases for nine scripts, each
   killing a mutant the old selftest let through.
 - **`containers/verify/` (pull request #89).** One pinned image holding every third-party checker.
@@ -263,16 +264,17 @@ unverifiable clean result this project's own conventions reject.
 - **Blog selftest, gate 20 (pull request #94).** `gates.sh` runs `scripts/blog.py --selftest`.
 - **Blog deploy (pull request #95).** `.github/workflows/pages.yml` publishes the blog to GitHub
   Pages at <https://kit.bridleworks.org/>.
-- **End-to-end tests (pull request #97).** `tests/e2e/run` runs the review-round workflow end to end
+- **End-to-end tests (pull request #97).** A script that ran the review-round workflow end to end
   on its own: `round-check.py`'s selftest, the schema cases, and every valid fixture round under
-  `examples/`. Closes #25.
-- **CI timeout tuner, gate 21 (pull request #98).** `gates.sh` runs `scripts/auto-qa-tuner.py`'s
-  54-case selftest, which only the weekly `auto-qa.yml` ran before, and `--selftest` plants a
-  tuner that never doubles a timeout, which must fail. The first of two pull requests for #27.
-- **Coverage floors (pull request #99).** `scripts/coverage-check.py` runs the gates selftest under
-  coverage.py in the verification image and holds each of the 13 Python scripts it runs at its floor in
-  `.coverage-thresholds.json` (77 to 99%); `containers.yml` runs it on linux/amd64 and linux/arm64.
-  Closes #27.
+  `examples/`. Closes #25. Removed before 0.7.0; gate 18 runs the same steps.
+- **CI timeout tuner, gate 21 (pull request #98).** `gates.sh` ran the tuner's 54-case selftest,
+  which only its weekly workflow ran before, and `--selftest` planted a tuner that never doubled a
+  timeout, which had to fail. The first of two pull requests for #27. Removed before 0.7.0, with
+  the tuner and its workflow.
+- **Coverage floors (pull request #99).** `scripts/coverage-check.py` ran the gates selftest under
+  coverage.py in the verification image and held each of the 13 Python scripts it ran at its floor in
+  `.coverage-thresholds.json` (77 to 99%); `containers.yml` ran it on linux/amd64 and linux/arm64.
+  Closes #27. Removed before 0.7.0, with its floors and the image's coverage.py.
 - **Faculty consultation (pull request #101).** `orchestration/protocol.md` and the relay template
   gain a reply format of eight plain Markdown headers for a Claude-tier agent consulting a faculty.
 - **Fork updates (pull request #102).** `docs/installing.md` covers updating a fork: the sync, own
