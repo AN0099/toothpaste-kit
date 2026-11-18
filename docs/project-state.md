@@ -415,10 +415,6 @@ unverifiable clean result this project's own conventions reject.
   extensions that were never audited against the original set.
 - Whether skills should declare version compatibility with each other, given how often they
   cross-reference by name.
-- Whether the two closing-section names `skill-creation` permits are too narrow. `surface-regimes`
-  closes with `# Failure-Mode Note` and `technical-documents` with `# Templates`. Both are more
-  informative than the generic names the checklist allows, which suggests the rule needs widening
-  rather than those two files needing renaming.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

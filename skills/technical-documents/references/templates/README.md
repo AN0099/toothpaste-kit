@@ -1,6 +1,6 @@
 # Templates
 
-Populated iteratively as real documents get produced, one template per document type actually authored, following doc-9's principle of iterating from observed use rather than writing speculative templates for document types that haven't come up yet.
+Populated as real documents get produced: one template per document type actually authored, iterating from observed use rather than writing speculative templates for document types that haven't come up yet.
 
 Each template, once added, should include: when to use it, when not to use it, dial-compatibility range, a structure sketch, and common anti-patterns for that specific document type.
 

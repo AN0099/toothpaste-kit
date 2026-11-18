@@ -52,6 +52,17 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- Six skills and the starter container page lose wording that only made sense
+  in the tree they were written in: `session-close`'s description, the handoff
+  file `redaction-gate` pointed at, `merge-proxy`'s list of one desk's reserved
+  actions, a private numbering in both templates READMEs, and
+  `skill-discovery`'s scale for a seven-skill family. `skill-creation` admits
+  `disable-model-invocation` as a third frontmatter key and no longer requires
+  a closing section by name. `session-log` reads its heading times from
+  `date`. `containers/starter/README.md` rewrites its six quickstart steps for
+  the container, and it and `docs/installing.md` name the Podman version the
+  build needs. The quickstart says the em dash rule is unenforced until a hook
+  is installed.
 - `scripts/check-pr-body` checks headings, template comments and the
   Provenance section only. Its wrapped-line and empty-box rules are removed,
   and with them its use of `scripts/reflow-md.py`. The `pr-body` job is

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v8
+
+The description, shown in the `/` list, drops "this PKD" and "the six files that must stay current":
+the kit defines neither, and the example workspace's manifest lists five. It now says the standing
+files your manifest lists. No change to the procedure.
+
 ## v7
 
 Phases 1 and 2 point to `examples/workspace/CLAUDE.md` for what a tree's provenance-layer and

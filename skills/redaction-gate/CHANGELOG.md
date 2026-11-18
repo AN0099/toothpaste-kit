@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v5
+
+Step 1 no longer points at a handoff file in a tree the kit does not ship for the inbound-direction
+question, which stays open. Step 2's credential shapes come from whatever patterns the tree already
+names, a `.gitignore` or a secret scanner's rules, where it assumed a `.gitignore` that lists them.
+Adds the closing `# Scope Pointer` section the other procedures have. No change to the procedure.
+
 ## v4
 
 The frontmatter description is shortened to fit the description gate (pull request #63). No change

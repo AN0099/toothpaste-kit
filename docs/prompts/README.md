@@ -63,7 +63,7 @@ Pre-publish redaction pass before content crosses a sensitivity tier outward (ve
 
 [`skills/session-close/SKILL.md`](../../skills/session-close/SKILL.md)
 
-Run the end-of-session capture procedure for this PKD. Sweeps the session for reasoning, decisions, and near misses that exist nowhere on disk, then updates the six files that must stay current. Invoke before ending any working session.
+Run the end-of-session capture procedure. Sweeps the session for reasoning, decisions, and near misses that exist nowhere on disk, then updates the standing files your manifest lists. Invoke before ending any working session.
 
 ## session-log
 

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v4
+
+The frontmatter rule admits `disable-model-invocation: true` as a third key on a procedure a person
+invokes, which eight shipped skills carry and `scripts/skills-spec.sh` lists; the rule said two keys
+only, so every person-invoked skill broke it. The closing cross-reference section is no longer
+required by name or position: three shipped skills close on other headings that do the same job, and
+`docs/project-state.md` carried the conflict as an open question, now closed.
+
 ## v3
 
 The frontmatter description is shortened to fit the description gate (pull request #63). No change
