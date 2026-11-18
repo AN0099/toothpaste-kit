@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v5
+
+Each entry's heading time is read from `date`, never written from memory, as `jot` and `touch`
+already require (`docs/partial-captures.md`).
+
 ## v4
 
 Where it says a tree's `CLAUDE.md` names the provenance layer, it now points to

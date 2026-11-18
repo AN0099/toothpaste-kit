@@ -59,7 +59,8 @@ rather than writing "none" five times.
 
 One dated file in the provenance layer, `session-<date>-<slug>.md`, created on the first capture of
 the day and appended to after that. Append, never rewrite: a later entry contradicting an earlier one
-is a correction worth having both halves of. Head each entry with the time.
+is a correction worth having both halves of. Head each entry with the time, read from `date`,
+never written from memory.
 
 **No em dash anywhere in the file, the headings included**, which is where one slips in. The kit
 bans the character in anything an agent writes. Join a date and a slug with a colon:

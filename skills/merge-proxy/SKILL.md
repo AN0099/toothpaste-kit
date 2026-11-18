@@ -47,8 +47,8 @@ What changes is who types it.
 - Force-push, `reset`, `rebase` of pushed history, branch deletion, tag
   deletion, or rewriting any commit already on a remote
 - A merge nobody approved, or a different merge from the one approved
-- Anything else reserved to a person: firewall, system services, `/etc`,
-  sudo, credentials, deletion of data
+- Anything else the repository's own rules reserve to a person, and any
+  use of credentials or deletion of data
 - Carrying over. Not to the next merge, not to the next session, not
   into memory, docs or any file as standing permission
 
@@ -125,10 +125,8 @@ re-explain. Never improvise a resolution that was not approved.
 
 - Re-run the step 2 checks on the real result before pushing, then push
 - Confirm the remote trunk now points at the new SHA
-- Record the merge where the repository records crossings (a
-  `SESSION-LOG.md` row, for example), attributed as approved by the
-  person and run by the agent, using the repository's seat suffixes if
-  it has them
+- Record the merge where the repository records crossings, attributed
+  as approved by the person and run by the agent
 - Report what ran, the SHAs, and anything that differed from the plan
 
 # Ending the Grant

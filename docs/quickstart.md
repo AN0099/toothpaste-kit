@@ -124,6 +124,9 @@ When it finishes, type this at the Claude Code prompt to list the folder:
 and a short slug, ending `.md`. It holds an entry headed with the time,
 recording the decision you typed.
 
+The skills ask for no em dash in what they write, and nothing enforces
+that yet: the installing guide's Hooks section installs the hook that does.
+
 ## Done
 
 The loop is running. Two more skills complete it: type `/session-close` at

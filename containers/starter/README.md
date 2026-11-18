@@ -8,7 +8,8 @@ and the directory you name is mounted read-write as the workspace.
 
 ## Build and run
 
-You need [Podman](https://podman.io/) on the host, nothing else. From your clone of the kit:
+You need [Podman](https://podman.io/) on the host, nothing else, in a version whose `build` accepts
+`ADD --checksum`: 6.1.4 does, 4.9.3 refuses it. From your clone of the kit:
 
 ```sh
 containers/starter/run ~/tpkit-try
@@ -43,14 +44,40 @@ containers/starter/run --network ~/tpkit-try
 
 ## The quickstart inside the container
 
-Step 2, the clone, is already done: the kit is `/kit`. Steps 3 and 4 become:
+Every step of the [quickstart](../../docs/quickstart.md) changes in the container. Start it with
+network, since steps 5 and 6 need it, and do each step as below in place of the page's:
 
 ```sh
-cp -R /kit/examples/workspace /workspace/tpkit-workspace
-cd /kit && ./scripts/link-skills.sh /workspace/tpkit-workspace/.claude/skills
+containers/starter/run --network ~/tpkit-try
 ```
 
-Step 5 needs `--network`; start `claude` in `/workspace/tpkit-workspace`.
+1. Run `claude --version` and `git --version`. The `ls` of the page's two paths does not apply:
+   the workspace is `/workspace/tpkit-workspace`, and `~` is a home directory inside the container.
+2. Skip it. The kit is already at `/kit`, mounted read-only, so your work cannot go inside it.
+3. Copy the workspace, then list it as the page does; it shows the same files.
+
+   ```sh
+   cp -R /kit/examples/workspace /workspace/tpkit-workspace
+   ls -A /workspace/tpkit-workspace /workspace/tpkit-workspace/.agents
+   ```
+
+4. Link the skills. The output is the page's.
+
+   ```sh
+   cd /kit && ./scripts/link-skills.sh /workspace/tpkit-workspace/.claude/skills
+   ```
+
+5. Run `cd /workspace/tpkit-workspace && claude`. The container keeps no home directory between
+   runs, so the theme and sign-in prompts come every time. With no browser in the container,
+   Claude Code prints a sign-in link: open it on the host and paste the code it gives back into
+   the container.
+6. Type this decision in place of the page's, since the workspace path differs here, then
+   `/session-log` and `! ls .agents/context` as the page says:
+
+   ```text
+   We decided to keep the workspace at /workspace/tpkit-workspace, outside the kit's
+   clone at /kit, so that updating the kit never touches our own files.
+   ```
 
 The skill links point at `/kit/skills`, so they resolve inside the container and not on the host.
 To use the workspace from Claude Code on the host later, copy the skills in instead of linking

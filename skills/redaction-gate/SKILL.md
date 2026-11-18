@@ -32,8 +32,8 @@ outward movement. Common destinations, all of which count:
 
 If the destination is inward (a vendor response arriving with something
 sensitive in it), stop and say so. Whether this gate covers the inbound
-direction is an open question in `agents/claude/lead-handoff.md`, not a settled
-rule, and it is not this skill's job to settle it unilaterally.
+direction is an open question, not a settled rule, and it is not this skill's
+job to settle it unilaterally.
 
 ## Step 2: Build the check corpus
 
@@ -45,8 +45,8 @@ Read the restricted tier and the sensitive-material inventory, and assemble:
 
 - Named entities: people, companies, working titles, product names
 - Identifiers: account names, hostnames, network topology, device names
-- Credential shapes: key prefixes, token formats, anything matching the
-  credential patterns already enumerated in `.gitignore`
+- Credential shapes: key prefixes, token formats, and any credential patterns
+  your tree already names, in a `.gitignore` or a secret scanner's rules
 - Reasoning fragments: strategic rationale that is restricted regardless of
   whether any name appears alongside it
 
@@ -126,6 +126,13 @@ If the pass found nothing, say that it found nothing and note what it could not
 check. A clean result from a mechanical pass is not clearance to send. Credential
 scanners in general miss a substantial share of what they are pointed at, so a
 passing scan is one input to the decision rather than the decision itself.
+
+# Scope Pointer
+
+- `daily-dashboard` and `session-close`: read and write local state and cross
+  no boundary. When a day's work will cross one, this gate is a separate
+  invocation.
+- `docs/standing-documents.md`: the tier scheme this procedure assumes.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

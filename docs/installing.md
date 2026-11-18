@@ -11,7 +11,8 @@ quickstart first unless you already know which alternative you want.
 To try the kit before installing anything on your machine, the starter
 container in [`containers/starter/`](../containers/starter/README.md) holds
 what the quickstart and the kit's scripts need, Claude Code included, and
-needs only Podman on the host. It mounts the kit read-only and a directory
+needs only Podman on the host, in a version whose `build` accepts
+`ADD --checksum` (6.1.4 does, 4.9.3 does not). It mounts the kit read-only and a directory
 you name as the workspace, so what you make stays on your machine. Skill
 links made inside it point into the container, so copy the skills instead
 when you move to an installed setup.

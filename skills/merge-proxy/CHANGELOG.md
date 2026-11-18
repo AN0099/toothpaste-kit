@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v3
+
+The list of what stays reserved to a person names the repository's own rules in place of one desk's
+list (firewall, system services, `/etc`, sudo), and the record step no longer names a
+`SESSION-LOG.md` row or seat suffixes, which belong to one tree. Credentials and deletion of data
+stay reserved. No change to the grant or its procedure.
+
 ## v2
 
 The frontmatter description is shortened to fit the description gate (pull request #63). No change

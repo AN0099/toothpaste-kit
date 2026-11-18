@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v7
+
+`references/templates/README.md` drops a reference to a private document numbering and no longer
+lists `postmortem-remediation.md`, which lives under `technical-documents`. No change to the skill.
+
 ## v6
 
 The frontmatter description is shortened to fit the description gate (pull request #63). No change
