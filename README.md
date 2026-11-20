@@ -17,7 +17,7 @@ Where to go, by what you came for.
 - [What this kit is](#what-this-kit-is), if you want the one-paragraph version
 - [What is here](#what-is-here), a directory-by-directory tour of the repository
   - [`skills/`](#skills), the nineteen skills in three classes
-  - [`docs/`](#docs), the documents the skills assume, and the eight writing and publishing standards
+  - [`docs/`](#docs), the documents the skills assume
   - [`examples/`](#examples), the workspace the quickstart copies and a practice review round
   - [`hooks/`](#hooks), example rules for the `hookify` plugin
   - [`scripts/`](#scripts), the gates and the tools they run

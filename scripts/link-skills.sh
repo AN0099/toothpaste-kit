@@ -176,13 +176,14 @@ omitted() {
 echo "Target directory: $dest"
 plan_linked=0
 plan_skipped=0
+plan_optional=0
 for d in "$src"/*/; do
     [ -d "$d" ] || continue
     name=$(basename "$d")
     target="$dest/$name"
     if is_optional "$name"; then
         echo "  would skip  $name (optional; --all links it)"
-        plan_skipped=$((plan_skipped + 1))
+        plan_optional=$((plan_optional + 1))
     elif omitted "$name"; then
         echo "  would omit  $name (--base)"
     elif [ -e "$target" ] && [ ! -L "$target" ]; then
@@ -193,7 +194,7 @@ for d in "$src"/*/; do
         plan_linked=$((plan_linked + 1))
     fi
 done
-echo "$plan_linked to link, $plan_skipped to skip"
+echo "$plan_linked to link, $plan_skipped to skip, $plan_optional optional left out"
 
 if [ "$dry_run" -eq 1 ]; then
     echo "dry-run: nothing written"
