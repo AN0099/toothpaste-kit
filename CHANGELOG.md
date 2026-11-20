@@ -190,6 +190,13 @@ other gates keep their numbers, so those three are unused.
 
 ### Fixed
 
+- `README.md`'s contents no longer promise eight writing and publishing
+  standards under `docs/`; they were removed before this release.
+- `containers/starter/README.md`: the first command block makes the workspace
+  directory before `run`, which refuses a directory that does not exist.
+- `scripts/link-skills.sh`: the plan's summary counts the optional skills on
+  their own, `N to link, M to skip, K optional left out`, so it agrees with
+  the result line's `0 skipped`.
 - `docs/project-state.md`: the open question on the registry format names the
   reviewer it needs by what they work in, in place of a private seat label.
 - `scripts/reflow-md.py` now joins a wrapped line that starts with an

@@ -12,6 +12,7 @@ You need [Podman](https://podman.io/) on the host, nothing else, in a version wh
 `ADD --checksum`: 6.1.4 does, 4.9.3 refuses it. From your clone of the kit:
 
 ```sh
+mkdir -p ~/tpkit-try
 containers/starter/run ~/tpkit-try
 ```
 
