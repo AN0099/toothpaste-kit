@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v9
+
+Phase 4 ends the report on what was done and what is still open, each stated plainly, and drops
+"The human makes the close call". The close stays the human's; the report no longer asks for it.
+No change to the procedure.
+
 ## v8
 
 The description, shown in the `/` list, drops "this PKD" and "the six files that must stay current":
