@@ -3,7 +3,16 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
-## Unreleased
+## 0.7.0 (2026-11-24)
+
+A MINOR release under `docs/releasing.md`. It carries out the cuts from a
+review of the whole project: the gates go from twenty-one to eighteen, the
+SPDX fragments, coverage floors, CI timeout tuner and pull request labeler
+leave, and the verification image drops what no check used.
+`working-preferences` splits into the general behavior every adopter gets and
+a new optional skill, `house-preferences`, so the kit has nineteen skills.
+`working-preferences` v8 is BREAKING, since `j` now means JUDGE and DEEPEN
+moves to `h`, which a MINOR bump may carry while MAJOR is 0.
 
 ### Added
 
@@ -142,6 +151,9 @@ skill lives in that skill's own `CHANGELOG.md`.
   `skills/`. `README.md`, `docs/installing.md` and step 4 of
   `docs/quickstart.md` say so, and the installing guide tells a copy install
   to delete the three unless the workspace has a lane-board tool.
+- `session-close` phase 4 ends the report on what was done and what is
+  still open, each stated plainly, and no longer closes with a line handing
+  the close to the human (v9).
 - `scripts/sbom.py` is cut to its action pin check: every action a workflow
   uses must be pinned by a full commit SHA, and a `docker://` action by
   digest, unless `KNOWN_TAG_PINS` records it. It no longer writes an SPDX bill
@@ -224,6 +236,31 @@ other gates keep their numbers, so those three are unused.
 - `containers/verify/`: the CodeQL 2.27.4 bundle, the version GitHub's default
   setup now runs, so a local scan reports the alerts CI reports. The bundle is
   pinned by digest for linux/amd64 and linux/arm64.
+
+### Known accessibility limitations
+
+- `docs/accessibility.md` is a working draft and a research position. The tooling in its sections 2
+  to 4 is not a deployed configuration.
+- The accessibility of produced artifacts beyond this repository's own Markdown, PDF/UA and the
+  document pipeline included, is not covered.
+- The blog's generated HTML and RSS feed have had no separate accessibility check.
+- This release makes no accessibility conformance or certification claim.
+
+### Skill revisions
+
+- `commands` v4 to v5.
+- `daily-dashboard` v2 to v3.
+- `document-standards` v6 to v7.
+- `house-preferences` v1, added.
+- `merge-proxy` v2 to v3.
+- `redaction-gate` v4 to v5.
+- `session-close` v7 to v9.
+- `session-log` v4 to v5.
+- `skill-creation` v3 to v5.
+- `skill-discovery` v2 to v3.
+- `surface-regimes` v5 to v6.
+- `technical-documents` v4 to v5.
+- `working-preferences` v7 to v8, BREAKING.
 
 ## 0.6.0 (2026-11-10)
 
