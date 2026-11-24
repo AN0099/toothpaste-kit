@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+- **Phase 3's ranked todos end with a one-line challenge to the top item:** whether it moves the stated goal or is comfortable busywork, naming the harder item if so.
+
 ## v3
 
 The Scope Pointer names the Q1 to Q3 question block, which `working-preferences` v8 makes a

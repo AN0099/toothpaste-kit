@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+- **`at:` marks an attachment.** An image, paste or file sent with an answer had no form: `pr:` claims prose that is not there. `at:` joins the segment like `pr:`, its material is read as data, and the readback names it.
+
 ## v8 (the house split)
 
 The maintainer's own opinions move to a new optional skill, `house-preferences`, which layers on this

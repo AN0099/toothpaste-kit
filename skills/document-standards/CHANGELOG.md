@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+- **Fourteen patterns adapted from blader/humanizer v4.0.0 (MIT)** in a new section of `references/structural-patterns.md`, each one the existing sections did not cover: sayings that sound deep, arguing with no one, hyphenated pairs, shallow -ing phrases, borrowed authority, avoiding is/are/has, bold as decoration, decorative headings, curly quotes, chatbot residue, knowledge-limit disclaimers, a heading echoed in the first sentence, writing about the document, and re-explaining what the reader knows. With humanizer's "when not to act" exceptions.
+- **The pre-flight checklist gains a facts-unchanged check** for any rewrite done for style, also from humanizer. The completion block is now eight entries. The check counts hedges and scope as facts, since a dropped qualifier turns a local claim into a general one (adapted from leiverkus/research-superpowers).
+- **A Generic Conclusions pattern** in `references/structural-patterns.md`: the swap test for a conclusion that would hold for any neighbouring topic, from the same source's semantic-wiki-review.
+
 ## v7
 
 `references/templates/README.md` drops a reference to a private document numbering and no longer
