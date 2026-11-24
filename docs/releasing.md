@@ -300,7 +300,12 @@ them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
   workflows and changes no interface. It is the first release under Apache 2.0;
   0.1.0 to 0.4.0 stay MIT. The 0.5.0 version DOI is `10.5281/zenodo.23716901`.
 - **0.6.0, cut 2026-11-10.** MINOR, because it adds gates, scripts, workflows
-  and two containers, and no skill revision is BREAKING.
+  and two containers, and no skill revision is BREAKING. The 0.6.0 version DOI
+  is `10.5281/zenodo.24122898`.
+- **0.7.0, cut 2026-11-24.** MINOR, because it adds one skill,
+  `house-preferences`, and removes gates, scripts and workflows.
+  `working-preferences` v8 is BREAKING, which a MINOR bump may carry while
+  MAJOR is 0.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja

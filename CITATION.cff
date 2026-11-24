@@ -27,8 +27,8 @@ keywords:
   - research-software
   - accessibility
 
-version: 0.6.0
-date-released: '2026-11-10'
+version: 0.7.0
+date-released: '2026-11-24'
 
 # These two were commented out until a release existed, because a file claiming
 # a released version that does not exist is worse than one claiming nothing.
