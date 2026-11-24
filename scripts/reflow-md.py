@@ -258,6 +258,23 @@ def selftest():
             else:
                 print(f'pass  --check on {name} file exits {want}')
 
+    # The write path: a wrapped file is rewritten in place, and an unreadable
+    # one is reported and fails the run without stopping the files after it.
+    with tempfile.TemporaryDirectory() as tmp:
+        wrapped = os.path.join(tmp, 'wrapped.md')
+        with open(wrapped, 'w', encoding='utf-8') as fh:
+            fh.write('a\nb\n')
+        got = process([os.path.join(tmp, 'missing.md'), wrapped],
+                      check=False, quiet=True)
+        with open(wrapped, encoding='utf-8') as fh:
+            rewritten = fh.read()
+        if got != 1 or rewritten != 'a b\n':
+            ok = False
+            print(f'FAIL  write path exited {got}, want 1, and left '
+                  f'{rewritten!r}, want {"a b" + chr(10)!r}', file=sys.stderr)
+        else:
+            print('pass  write path rewrites a file past an unreadable one')
+
     return 0 if ok else 1
 
 
