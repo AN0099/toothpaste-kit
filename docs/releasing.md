@@ -114,9 +114,10 @@ falls on every second Tuesday from that date.
 - **The Friday before is the cutoff.** No new scope enters the release. The
   release notes, citation fields and redaction result are assembled, and the
   maintainer decides to go to Monday's review, defer, split the scope, or
-  abandon it. Between the cutoff and the tag, branches and pull requests may
-  proceed; nothing merges into `main` except the release itself. The weekend is
-  buffer, never planned work.
+  abandon it. That decision comes before the release's pull request is opened,
+  because opening it says the release is going. Between the cutoff and the tag,
+  branches and pull requests may proceed; nothing merges into `main` except the
+  release itself. The weekend is buffer, never planned work.
 - **Monday is the final review** of the exact commit that will be tagged.
 - **Tuesday, late morning, is the release**: tag, GitHub release, Zenodo.
   Wednesday to Friday are for watching it and correcting it.
@@ -138,6 +139,10 @@ contributors to coordinate.
 
 Every step below is the maintainer's. An agent may prepare the edits and stage
 them; it does not commit, tag or push, and `GOVERNANCE.md` says why.
+
+The steps start after the cutoff decision in "Cadence" above. The release
+branch may be prepared earlier, but its pull request opens only once that
+decision is go.
 
 1. **Gates pass on the commit being tagged.**
 
