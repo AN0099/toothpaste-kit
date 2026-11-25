@@ -34,6 +34,22 @@ Making a new skill is covered by `skill-creation`, and deciding whether a need j
 | "ADR" / "design doc" | 6-8 | 4-5 | 5-7 |
 | "audit doc" / "compliance" | 8-9 | 5-6 | 5-6 |
 
+# Headers and Opening
+
+Postmortems, ADRs, change-management docs and handoff notes are often read only as far as the opening paragraph, plus a skim of the headers. Write both for that reader.
+
+**Open with the bottom line.** The first paragraph states the outcome: what failed and what fixed it, what was decided, what changes and when, what the next shift must act on. Context and history come after it. A reader who stops at the end of that paragraph has enough to act.
+
+**Headers state findings.** A reader who sees only the headers should come away with the document's main points. A topic label names a bin; a signpost header says what is in it. Illustrative pairs:
+
+| Signpost | Topic label |
+|---|---|
+| "Failover took 14 minutes because the health check timed out" | "Failover behavior" |
+| "Option B keeps the existing VLAN plan" | "Option analysis" |
+| "BGP flaps traced to an MTU mismatch on the new uplink" | "Root cause" |
+
+Headers a document type fixes for findability keep their fixed names: a postmortem's Timeline and Action Items, an ADR's Status, Context, Decision and Consequences. The signpost rule covers the headers the author chooses. Runbooks and SOPs are procedures, so their headers name the action ("Drain the node", "Rotate the key"), following `document-standards`' rule on step labels.
+
 # Templates
 
 `references/templates/`: technical document-type templates (runbook, ADR, postmortem, and so on), populated iteratively as real documents get produced. Empty at initial build. Apply `document-standards`' Three-Tier Threshold Framework independently once this folder grows toward the same limits.

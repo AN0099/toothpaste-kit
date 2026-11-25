@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+- **A Headers and Opening section** in `SKILL.md` for postmortems, ADRs, change-management docs and handoff notes: the first paragraph states the outcome, and author-chosen headers state findings so a reader who sees only the headers gets the main points. Fixed headers of a document type (an ADR's Status, Context, Decision, Consequences) are exempt, and runbook and SOP headers name the action (header test loosely adapted from Anthropic's deep-research skill).
+
 ## v5
 
 `references/templates/README.md` drops a reference to a private document numbering. No change to the
