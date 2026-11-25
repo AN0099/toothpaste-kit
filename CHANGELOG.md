@@ -56,6 +56,9 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Changed
 
+- `docs/releasing.md`: nothing for the next release merges into `main` during
+  the Wednesday to Friday watch after a release, so a patch can still be cut
+  from `main`.
 - The verification image is now `localhost/kit-verify:v9`. Each entry that
   changes a tool in it says which.
 - Six skills and the starter container page lose wording that only made sense

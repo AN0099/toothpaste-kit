@@ -121,6 +121,11 @@ falls on every second Tuesday from that date.
 - **Monday is the final review** of the exact commit that will be tagged.
 - **Tuesday, late morning, is the release**: tag, GitHub release, Zenodo.
   Wednesday to Friday are for watching it and correcting it.
+- **Nothing for the next release merges into `main` until the watch ends**
+  on Friday. Until then `main` holds only the release and its corrections, so
+  a PATCH correcting it can be cut from `main` as it stands. Work for the next
+  release waits on its own branch. Merged earlier, it would ride along in any
+  patch, or the patch would have to start from the tag instead.
 
 **A release is not owed because the date arrived.** Each published release mints
 a permanent Zenodo version DOI, so a review that finds nothing coherent to
