@@ -9,7 +9,7 @@
 Usage:
   scripts/round-check.py [--repo REPO_DIR] ROUND_DIR [ROUND_DIR ...]
   scripts/round-check.py --cases CASES_DIR
-  scripts/round-check.py --selftest
+  scripts/round-check.py --selftest [--require-roles]
 
 A round directory holds up to three JSON documents, named after their
 schemas in orchestration/schemas/round/: review-round.json,
@@ -27,6 +27,9 @@ case meets its schema and its directory passes as a round; each fail case is
 refused, by its schema or, planted into valid/valid-complete-round, by the
 cross-artifact checks.
 
+--require-roles makes --selftest fail when orchestration/roles.md is
+absent. Without it, a tree with no roles.md skips the role list comparison.
+
 Standard library only, as the gates are (CONTRIBUTING.md). This is not a
 general JSON Schema engine: it implements the draft-07 subset the round
 schemas use. Before validating anything it walks every schema and fails,
@@ -43,7 +46,9 @@ Exit status: 0 all documents valid, 1 a document failed, 2 usage or schema
 error.
 """
 
+import contextlib
 import copy
+import io
 import json
 import os
 import re
@@ -780,7 +785,7 @@ def check_round(round_dir, schemas, repo=None):
     return problems
 
 
-def selftest():
+def selftest(require_roles=False):
     """Each keyword must reject a planted bad instance and accept a good one."""
     root = {
         "definitions": {"rev": {"type": "string", "pattern": "^[0-9a-f]{40}$"}},
@@ -907,9 +912,12 @@ def selftest():
     repo_failed, repo_cases = selftest_repo() if fixture_present else (0, 0)
     failed += repo_failed
     cross_cases += repo_cases
-    roles_failed, roles_cases = selftest_roles()
+    roles_failed, roles_cases = selftest_roles(require_roles)
     failed += roles_failed
     cross_cases += roles_cases
+    req_failed, req_cases = selftest_require_roles()
+    failed += req_failed
+    cross_cases += req_cases
     edge_failed, edge_cases = selftest_edges()
     failed += edge_failed
     cross_cases += edge_cases
@@ -1300,11 +1308,16 @@ def selftest_repo():
     return failed, cases
 
 
-def selftest_roles():
+def selftest_roles(require_roles=False):
     """The four copies of the role list agree with orchestration/roles.md,
-    and a fifth role planted in roles.md is caught."""
+    and a fifth role planted in roles.md is caught. With require_roles, a
+    missing roles.md fails instead of skipping."""
     path = os.path.join(REPO_ROOT, "orchestration", "roles.md")
     if not os.path.exists(path):
+        if require_roles:
+            print("selftest FAIL: --require-roles: no orchestration/roles.md in this tree,"
+                  " so the role lists cannot be compared")
+            return 1, 1
         print("selftest skip: no orchestration/roles.md in this tree, so the role lists are not compared")
         return 0, 0
     with open(path, encoding="utf-8") as f:
@@ -1319,6 +1332,30 @@ def selftest_roles():
     if planted == text or not role_list_problems(planted, schemas):
         print("selftest FAIL: a fifth role planted in roles.md was not caught")
         failed += 1
+    return failed, 2
+
+
+def selftest_require_roles():
+    """In a tree with no roles.md, the role check fails with --require-roles
+    and skips without it."""
+    global REPO_ROOT
+    failed = 0
+    saved = REPO_ROOT
+    with tempfile.TemporaryDirectory(prefix="round-check-roles.") as tmp:
+        REPO_ROOT = tmp
+        try:
+            for require, want_failed, want_line in ((True, 1, "selftest FAIL: --require-roles"),
+                                                    (False, 0, "selftest skip: no orchestration/roles.md")):
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    got_failed, _ = selftest_roles(require)
+                if got_failed != want_failed or want_line not in out.getvalue():
+                    flag = "with" if require else "without"
+                    print(f"selftest FAIL: no roles.md {flag} --require-roles gave {got_failed} failure(s)"
+                          f" and {out.getvalue().strip()!r}")
+                    failed += 1
+        finally:
+            REPO_ROOT = saved
     return failed, 2
 
 
@@ -1647,8 +1684,8 @@ def selftest_answer_key(plant):
 
 
 def main(argv):
-    if argv == ["--selftest"]:
-        return selftest()
+    if argv in (["--selftest"], ["--selftest", "--require-roles"]):
+        return selftest(require_roles=len(argv) == 2)
     cases_dir, repo = None, None
     if len(argv) >= 3 and argv[0] == "--repo":
         repo, argv = argv[1], argv[2:]
