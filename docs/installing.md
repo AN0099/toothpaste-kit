@@ -177,27 +177,37 @@ gh repo sync "$me/toothpaste-kit" --source AN0099/toothpaste-kit --branch main
 git -C ~/toothpaste-kit checkout main
 git -C ~/toothpaste-kit pull --ff-only
 git -C ~/toothpaste-kit rebase main my-work
+git -C ~/toothpaste-kit push --force-with-lease origin my-work
 ~/toothpaste-kit/scripts/link-skills.sh ~/tpkit-workspace/.claude/skills
 ```
 
-Do not pass `--force` to `gh repo sync` unless your own commits are safe on a
-branch, since it overwrites your fork's `main`. Rerun `link-skills.sh` after each
+The rebase rewrites `my-work`, so a plain push of it is refused; the push with
+`--force-with-lease` updates your fork's copy, and refuses if that copy holds a
+commit your clone has not fetched. Do not pass `--force` to `gh repo sync`
+unless your own commits are on a branch pushed to your fork, since it
+overwrites your fork's `main`. Rerun `link-skills.sh` after each
 update, for the same reason as above. The commands leave `my-work` checked out,
 so the linked skills are yours plus the kit's. To hear about releases, choose Watch, then
 Custom, then Releases on the kit's GitHub page.
 
 **If your own commits are on `main`,** the sync refuses. Move them to a branch
-first. This keeps every commit on `my-work` and then resets `main`:
+first. This keeps every commit on `my-work`, pushes it to your fork, and only
+then resets `main`. It replaces the block above for this update:
 
 ```sh
 git -C ~/toothpaste-kit remote add upstream https://github.com/AN0099/toothpaste-kit.git
 git -C ~/toothpaste-kit fetch upstream
 git -C ~/toothpaste-kit checkout main
 git -C ~/toothpaste-kit branch my-work
+git -C ~/toothpaste-kit push origin my-work
 git -C ~/toothpaste-kit reset --hard upstream/main
 git -C ~/toothpaste-kit push --force-with-lease origin main
 git -C ~/toothpaste-kit rebase main my-work
+git -C ~/toothpaste-kit push --force-with-lease origin my-work
+~/toothpaste-kit/scripts/link-skills.sh ~/tpkit-workspace/.claude/skills
 ```
+
+Run `remote add` only once; later updates use the block above.
 
 **A conflict during the rebase** means the kit changed a file you changed too.
 This is likely if you edited a skill and your fork is several releases behind.

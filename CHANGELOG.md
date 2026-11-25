@@ -193,6 +193,9 @@ other gates keep their numbers, so those three are unused.
 
 ### Fixed
 
+- `docs/installing.md`, Updating a fork: both blocks now push `my-work` to the
+  fork after the rebase, and the block for commits on `main` pushes them before
+  it resets `main`, so the fork holds them throughout.
 - `README.md`'s contents no longer promise eight writing and publishing
   standards under `docs/`; they were removed before this release.
 - `containers/starter/README.md`: the first command block makes the workspace
