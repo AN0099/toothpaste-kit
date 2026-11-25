@@ -193,6 +193,10 @@ other gates keep their numbers, so those three are unused.
 
 ### Fixed
 
+- `scripts/round-check.py --selftest --require-roles` fails when
+  `orchestration/roles.md` is missing instead of skipping the role list
+  comparison, and gate 18 now passes that flag. Without the flag the
+  selftest still skips. Fixes issue 111.
 - `README.md`'s contents no longer promise eight writing and publishing
   standards under `docs/`; they were removed before this release.
 - `containers/starter/README.md`: the first command block makes the workspace
