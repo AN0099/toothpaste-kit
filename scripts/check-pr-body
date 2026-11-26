@@ -32,7 +32,7 @@ import re
 import sys
 import tempfile
 
-TEMPLATE = pathlib.Path(".github/pull_request_template.md")
+TEMPLATE = pathlib.Path(__file__).resolve().parent.parent / ".github/pull_request_template.md"
 PROVENANCE = re.compile(
     r"<details>\s*<summary>Provenance</summary>(.*?)</details>", re.S)
 YES_TICKED = re.compile(r"^- \[[xX]\] Yes\b", re.M)
@@ -153,6 +153,15 @@ def selftest():
         ok_main = rcs == [0, 1, 0, 2]
         print(f"{'ok  ' if ok_main else 'FAIL'}  main exit codes" + ("" if ok_main else f": got {rcs}"))
         ok = ok and ok_main
+        # The template is found from the script's own tree, whatever the working directory.
+        saved_cwd = os.getcwd()
+        os.chdir(d)
+        try:
+            ok_cwd = TEMPLATE.is_file()
+        finally:
+            os.chdir(saved_cwd)
+        print(f"{'ok  ' if ok_cwd else 'FAIL'}  template found from another directory")
+        ok = ok and ok_cwd
     print("check-pr-body selftest:", "passed" if ok else "FAILED")
     return 0 if ok else 1
 
