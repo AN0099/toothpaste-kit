@@ -193,6 +193,10 @@ other gates keep their numbers, so those three are unused.
 
 ### Fixed
 
+- `scripts/check-pr-body` finds the pull request template from the script's own tree, so it
+  runs from any directory; it failed with FileNotFoundError outside the repository root.
+- `CONTRIBUTING.md` gains "Submitting a pull request": fork, push the branch to the fork,
+  and open the pull request against `main` with a checked body.
 - `scripts/round-check.py --selftest --require-roles` fails when
   `orchestration/roles.md` is missing instead of skipping the role list
   comparison, and gate 18 now passes that flag. Without the flag the

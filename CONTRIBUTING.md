@@ -127,6 +127,33 @@ Three layers enforce this, and only the third binds:
 
 Human co-author trailers are fine and expected. The rule is about tools.
 
+### Submitting a pull request
+
+You push to your own fork and open the pull request from there; only the maintainer pushes to this repository.
+
+1. Fork the repository on GitHub, then clone your fork and enable the hooks:
+
+   ```sh
+   git clone https://github.com/<you>/toothpaste-kit.git
+   cd toothpaste-kit
+   git config core.hooksPath .githooks
+   ```
+
+2. Make the change on a branch whose name passes `scripts/check-branch-name` (see "Branch and tag names"), commit with `-s`, and run `./scripts/gates.sh --selftest`.
+3. Push the branch to your fork:
+
+   ```sh
+   git push origin HEAD:refs/heads/<prefix>/<words>
+   ```
+
+4. Open the pull request against `main`. Write the body from `.github/pull_request_template.md` into a file, check it with `scripts/check-pr-body <file>`, then create the pull request, on GitHub's page or with:
+
+   ```sh
+   gh pr create --repo AN0099/toothpaste-kit --base main --head <you>:<prefix>/<words> --body-file <file>
+   ```
+
+CI runs the same gates on the pull request, and the maintainer reviews and merges it.
+
 ## Licence and sign-off
 
 Contributions are licensed under the Apache License 2.0, the project's licence ([`LICENSE`](LICENSE)). No contributor licence agreement, copyright assignment or indemnity is asked of you.
