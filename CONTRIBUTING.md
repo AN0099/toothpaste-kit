@@ -76,6 +76,18 @@ One directory per skill under `skills/`, containing `SKILL.md` and an optional `
 
 The description decides when the skill loads, so it should state what the skill covers and what it does not, with a pointer to whichever skill handles the excluded part. Skills reference each other by name, so renaming one means updating every reference. Run `grep -rn '<old-name>' skills/` before you call it done.
 
+## Changing a skill's interface
+
+A skill's interface is the six elements `docs/releasing.md` lists under "A skill's interface": its identity, when it is selected, the files it reads or writes, the vocabulary a person types or reads, the names other skills point at, and what it guarantees. A change that removes, renames, narrows or reverses any of them is an interface change. Adding to the interface, rewording, and reordering the procedure are not.
+
+Announce an interface change, and keep the old form working through the next release, as `docs/releasing.md`, "Deprecation", requires: announced in one release, still working in the next, removable in the one after. Add an entry under a `### Deprecated` heading in `CHANGELOG.md` that names:
+
+- the skill;
+- the old form and the new form;
+- the release that removes the old form.
+
+`docs/releasing.md`, "Deprecation", says what else the announcement carries, an entry in the skill's own `CHANGELOG.md` and a notice in its `SKILL.md`, and names the cases that skip the window. Releases follow the cadence in `docs/releasing.md`, "Cadence". When the old form is removed, label the change BREAKING with a one-line migration, as "A skill's interface" in the same file says.
+
 ## Orchestration
 
 `orchestration/protocol.md` and the JSON schemas in `orchestration/schemas/` define the message contract between agents. Changing a field means changing the schema, the protocol document, and `taxonomy.md` together, since they are read by separate agents that will not notice a partial update.

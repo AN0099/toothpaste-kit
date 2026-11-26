@@ -53,6 +53,11 @@ skill lives in that skill's own `CHANGELOG.md`.
   result for the badge and uploads it to code scanning. Both new actions are
   pinned by commit SHA, which row 3.7 of `docs/security-posture.md` needed
   first; section 5 no longer lists the badge as absent.
+- `CONTRIBUTING.md`, "Changing a skill's interface": an interface change is
+  announced under a Deprecated heading, the old form working through the next
+  release,
+  naming the skill, the old and new form and the release that removes the old
+  form, with `docs/releasing.md` cited for the definition and the cadence.
 
 ### Changed
 
