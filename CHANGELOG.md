@@ -202,6 +202,12 @@ other gates keep their numbers, so those three are unused.
   runs from any directory; it failed with FileNotFoundError outside the repository root.
 - `CONTRIBUTING.md` gains "Submitting a pull request": fork, push the branch to the fork,
   and open the pull request against `main` with a checked body.
+- `CONTRIBUTING.md`, "Submitting a pull request", now bases work and the pull request on the
+  newest `sync/staging-*` branch, or `main` when none exists, says when a change adds a
+  `CHANGELOG.md` line, and says CI runs the compliance check; "Commits and pull requests" says
+  an agent edits and stages while a person commits, signs off and pushes. `README.md` says the
+  same about forks and the base branch. `scripts/check-branch-name --list` prints the allowed
+  prefixes, and `CONTRIBUTING.md` names it in place of pointing into the script.
 - `scripts/round-check.py --selftest --require-roles` fails when
   `orchestration/roles.md` is missing instead of skipping the role list
   comparison, and gate 18 now passes that flag. Without the flag the

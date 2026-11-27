@@ -175,7 +175,7 @@ To ask questions of the repository without packing it, [DeepWiki](https://deepwi
 
 ## Contributing
 
-Read `CONTRIBUTING.md`. It covers the rules that apply to every change, the structure a skill has to follow, how a commit is signed off, and how it records which tool helped.
+Read `CONTRIBUTING.md`. It covers the rules that apply to every change, the structure a skill has to follow, how a commit is signed off, and how it records which tool helped. Without push access, you fork the repository and push to the fork; work is based on the newest `sync/staging-*` branch when one exists and on `main` when none does, and the pull request targets that same branch. `CONTRIBUTING.md`, "Submitting a pull request", has the steps.
 
 The lowest-friction first contribution is a surface descriptor in `orchestration/registry/`. It adds support for a vendor this project does not cover yet, cannot break anyone else's traffic, and needs no knowledge of the rest of the protocol. `orchestration/registry/README.md` has the format.
 
