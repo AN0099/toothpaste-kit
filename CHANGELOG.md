@@ -31,7 +31,8 @@ skill lives in that skill's own `CHANGELOG.md`.
   pattern. `technical-documents` gains a Headers and Opening section. `working-preferences`
   gains bounded loops and an `at:` segment marking an attachment, which `docs/glossary.md`
   lists in the answer grammar. `daily-dashboard` ends its ranked todos with a one-line
-  challenge to the top item, and `session-log` ends a correction with a "So next time:" line. Each skill's `CHANGELOG.md` has the detail and the sources.
+  challenge to the top item, and `session-log` ends a correction with a "So next time:" line.
+  Each skill's `CHANGELOG.md` has the detail and the sources.
 
 ### Fixed
 
