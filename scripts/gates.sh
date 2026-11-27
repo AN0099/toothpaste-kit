@@ -395,7 +395,7 @@ gate_review_rounds() {
   fi
   # Quiet on success, whole on failure: the selftest's own lines name the
   # case that did not behave.
-  if ! out=$(python3 scripts/round-check.py --selftest 2>&1); then
+  if ! out=$(python3 scripts/round-check.py --selftest --require-roles 2>&1); then
     printf '%s\n' "$out"
     gate_bad "review-round records: round-check selftest"
     return
@@ -895,6 +895,7 @@ PY2
     for t in rr-bad rr-ok; do
       mkdir -p "$tmp/$t/scripts" "$tmp/$t/orchestration/schemas" "$tmp/$t/examples"
       cp scripts/round-check.py "$tmp/$t/scripts/"
+      cp orchestration/roles.md "$tmp/$t/orchestration/"
       cp -R orchestration/schemas/round "$tmp/$t/orchestration/schemas/"
       cp -R examples/review-round/schema-cases/valid/valid-complete-round "$tmp/$t/examples/r"
     done
@@ -922,6 +923,7 @@ PY
     for t in rc-bad rc-ok; do
       mkdir -p "$tmp/$t/scripts" "$tmp/$t/orchestration/schemas" "$tmp/$t/examples"
       cp scripts/round-check.py "$tmp/$t/scripts/"
+      cp orchestration/roles.md "$tmp/$t/orchestration/"
       cp -R orchestration/schemas/round "$tmp/$t/orchestration/schemas/"
       cp -R examples/review-round/schema-cases "$tmp/$t/examples/cases"
     done

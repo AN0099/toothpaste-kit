@@ -36,6 +36,7 @@
 #        scripts/check-branch-name --tag NAME      the same, for a tag
 #        scripts/check-branch-name --tag-new NAME  a tag, above every other tag;
 #                                                  exit 2 if the tags cannot be read
+#        scripts/check-branch-name --list          print the allowed prefixes, one per line
 #        scripts/check-branch-name --selftest      prove the rule both ways
 
 set -u
@@ -63,6 +64,10 @@ check_branch() {
     return 1
   fi
   return 0
+}
+
+list_prefixes() {
+  printf '%s\n' $PREFIXES
 }
 
 check_tag() {
@@ -158,6 +163,8 @@ selftest() {
   else
     echo "FAIL  --tag-new: the scratch directory could not be made"; fail=1
   fi
+  # --list prints each prefix on its own line.
+  list_prefixes | grep -qx feat || { echo "FAIL  --list does not print 'feat' on a line of its own"; fail=1; }
   # The ruleset repeats PREFIXES because GitHub cannot call this script.
   # Fail if the two lists have drifted apart.
   ruleset="$(dirname "$0")/../.github/rulesets/branch-names.json"
@@ -185,8 +192,9 @@ selftest() {
 
 case "${1:-}" in
   --selftest) selftest; exit $? ;;
+  --list) [ $# -eq 1 ] || { echo "usage: $0 --list" >&2; exit 2; }; list_prefixes; exit 0 ;;
   --tag) [ $# -eq 2 ] || { echo "usage: $0 --tag NAME" >&2; exit 2; }; check_tag "$2"; exit $? ;;
   --tag-new) [ $# -eq 2 ] || { echo "usage: $0 --tag-new NAME" >&2; exit 2; }; check_tag_new "$2"; exit $? ;;
-  ''|-*) echo "usage: $0 NAME | --tag NAME | --tag-new NAME | --selftest" >&2; exit 2 ;;
+  ''|-*) echo "usage: $0 NAME | --tag NAME | --tag-new NAME | --list | --selftest" >&2; exit 2 ;;
   *) [ $# -eq 1 ] || { echo "usage: $0 NAME" >&2; exit 2; }; check_branch "$1"; exit $? ;;
 esac
