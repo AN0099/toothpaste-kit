@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- **Phase 3's ranked todos end with a one-line challenge to the top item:** whether it moves the stated goal or is comfortable busywork, naming the harder item if so.
+- **Phase 3's ranked todos end with a one-line challenge to the top item:** whether it moves the goal the standing files state or is comfortable busywork, offering the harder item as a candidate in the last Phase 4 question if so.
 
 ## v3
 
