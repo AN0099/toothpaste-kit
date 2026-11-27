@@ -3,6 +3,51 @@
 Repo-level log. Records changes to what the kit contains. Design reasoning for an individual
 skill lives in that skill's own `CHANGELOG.md`.
 
+## Unreleased
+
+### Added
+
+- `CONTRIBUTING.md`, "Changing a skill's interface": an interface change is
+  announced under a Deprecated heading, the old form working through the next
+  release, naming the skill, the old and new form and the release that removes
+  the old form, with `docs/releasing.md` cited for the definition and the
+  cadence.
+- `CONTRIBUTING.md` gains "Submitting a pull request": fork, push the branch to the fork,
+  and open the pull request against `main` with a checked body.
+- `scripts/check-branch-name --list` prints the allowed prefixes, and `CONTRIBUTING.md` names
+  it in place of pointing into the script.
+
+### Changed
+
+- `docs/releasing.md`: nothing for the next release merges into `main` during
+  the Wednesday to Friday watch after a release, so a patch can still be cut
+  from `main`.
+- `docs/releasing.md`: a release's pull request opens only after the cutoff
+  decision (go, defer, split or abandon), since opening it says the release is
+  going.
+- `scripts/reflow-md.py`'s selftest covers writing a file, not only `--check`.
+- `document-standards` gains a Findings and Sources section, fourteen writing patterns adapted
+  from humanizer, a facts-unchanged check in its pre-flight checklist and a Generic Conclusions
+  pattern. `technical-documents` gains a Headers and Opening section. `working-preferences`
+  gains bounded loops and an `at:` segment marking an attachment, which `docs/glossary.md`
+  lists in the answer grammar. `daily-dashboard` ends its ranked todos with a one-line
+  challenge to the top item, and `session-log` ends a correction with a "So next time:" line.
+  Each skill's `CHANGELOG.md` has the detail and the sources.
+
+### Fixed
+
+- `scripts/check-pr-body` finds the pull request template from the script's own tree, so it
+  runs from any directory; it failed with FileNotFoundError outside the repository root.
+- `CONTRIBUTING.md`, "Submitting a pull request", now bases work and the pull request on the
+  newest `sync/staging-*` branch, or `main` when none exists, says when a change adds a
+  `CHANGELOG.md` line, and says CI runs the compliance check; "Commits and pull requests" says
+  an agent edits and stages while a person commits, signs off and pushes. `README.md` says the
+  same about forks and the base branch.
+- `scripts/round-check.py --selftest --require-roles` fails when
+  `orchestration/roles.md` is missing instead of skipping the role list
+  comparison, and gate 18 now passes that flag. Without the flag the
+  selftest still skips. Fixes issue 111.
+
 ## 0.7.0 (2026-11-24)
 
 A MINOR release under `docs/releasing.md`. It carries out the cuts from a

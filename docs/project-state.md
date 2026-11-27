@@ -3,7 +3,7 @@
 Current status of toothpaste-kit. For what the project is and how to use it, start with
 `README.md`.
 
-Last updated 2026-11-18.
+Last updated 2026-11-27.
 
 ## Live
 
@@ -208,7 +208,31 @@ unverifiable clean result this project's own conventions reject.
 
 ## Unreleased
 
-What `main` holds since 0.6.0, by pull request. `CHANGELOG.md` has the detail.
+What `sync/staging-0.8.0` holds since 0.7.0, by pull request. `CHANGELOG.md` has the detail.
+
+- **Cutoff before the release pull request (pull request #149).** `docs/releasing.md` opens a
+  release's pull request only after the go, defer, split or abandon decision.
+- **`reflow-md.py` write path (pull request #150).** Its selftest covers writing a file, not only
+  `--check`.
+- **Post-release watch (pull request #151).** Nothing for the next release merges into `main` from
+  Wednesday to Friday after a release, so a patch can still be cut from `main`.
+- **Skill practices (pull requests #152 and #153, and commit `058b6f1`).** Research notes, headers
+  and bounded loops are adopted, and the `working-preferences` CHANGELOG drops incident
+  provenance. `058b6f1`, committed to the branch directly with no pull request, adds writing
+  patterns to `document-standards`, an `at:` segment to `working-preferences`, a busywork
+  challenge to `daily-dashboard` and a "So next time:" line to `session-log`.
+- **Gate 18 role check (pull request #154).** `scripts/round-check.py --require-roles` fails when
+  `orchestration/roles.md` is absent, and gate 18 passes the flag. Fixes issue 111.
+- **First pull request path (pull requests #156 and #158).** `CONTRIBUTING.md` covers the fork, the
+  base branch, the `CHANGELOG.md` line, the compliance check and who commits;
+  `scripts/check-pr-body` runs from any directory and `scripts/check-branch-name --list` prints the
+  allowed prefixes.
+- **Skill interface changes (pull request #157).** `CONTRIBUTING.md` says how a change to a
+  skill's interface is announced and how long the old form keeps working.
+
+## In v0.7.0
+
+What 0.7.0 added to 0.6.0, by pull request. `CHANGELOG.md` has the detail.
 
 - **Orchestration files (pull requests #108 and #109).** `orchestration/` drops stale claims and
   text specific to one installation, and four of its files take lowercase names.

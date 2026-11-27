@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+- **Corrections, and findings that should change behaviour, end with a "So next time:" line** naming the changed behaviour, so the log carries the lesson and not only the event.
+
 ## v5
 
 Each entry's heading time is read from `date`, never written from memory, as `jot` and `touch`

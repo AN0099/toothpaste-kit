@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+- **`at:` marks an attachment.** An image, paste or file sent with an answer had no form: `pr:` claims prose that is not there. `at:` joins the segment like `pr:`, its material is read as data, and the readback names it.
+- **Bounded loops** in Artifact Workflow: a tool-call budget set before an investigation and reported on reaching it, at most one follow-up round, and each run's output kept separate from earlier runs' (loosely adapted from Anthropic's deep-research skill).
+- **Searches widen from the likely locations.** Bounded loops also covers searching: start where the target is likely to be, widen one step at a time, and stop a broad search once a narrower one has made it redundant.
+
 ## v8 (the house split)
 
 The maintainer's own opinions move to a new optional skill, `house-preferences`, which layers on this

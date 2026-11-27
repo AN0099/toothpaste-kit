@@ -64,7 +64,7 @@ Checks that need a tool from outside this repository run from a separate script,
 ./scripts/compliance.sh --selftest
 ```
 
-Today it runs `reuse lint`, which checks that every file declares a copyright and a licence in the form the [REUSE specification](https://reuse.software/spec-3.3/) sets out. Install the linter with `pipx install reuse==6.2.0`, the version `.github/workflows/compliance.yml` pins. Without it, the script fails and names the missing tool; `--allow-missing` reports the check as not run instead, never as passed. CI installs it and fails on any missing declaration. To run the check without installing anything, use the verification container: `containers/verify/verify . ./scripts/compliance.sh --selftest`, described in [`containers/README.md`](containers/README.md).
+Today it runs `reuse lint`, which checks that every file declares a copyright and a licence in the form the [REUSE specification](https://reuse.software/spec-3.3/) sets out. Install the linter with `pipx install reuse==6.2.0`, the version `.github/workflows/compliance.yml` pins. Without it, the script fails and names the missing tool; `--allow-missing` reports the check as not run instead, never as passed. CI installs it and fails on any missing declaration. To run the check without installing anything, use the verification container: `containers/verify/verify . ./scripts/compliance.sh --selftest`, described in [`containers/README.md`](containers/README.md). CI runs the same check, `./scripts/compliance.sh --require --selftest`, on every pull request (`.github/workflows/compliance.yml`), so running it yourself before you open one is optional: it only finds a missing declaration sooner.
 
 The two metadata files that declare a published schema, `security-insights.yml` and `CITATION.cff`, are validated against it by `./scripts/schemas.sh`. The schemas are in the verification image, not this tree, so run it there: `containers/verify/verify . ./scripts/schemas.sh --selftest`. It also checks this tree's seven JSON Schema files and the documents they govern, so run it after changing a schema under `orchestration/` or a review-round example.
 
@@ -76,6 +76,18 @@ One directory per skill under `skills/`, containing `SKILL.md` and an optional `
 
 The description decides when the skill loads, so it should state what the skill covers and what it does not, with a pointer to whichever skill handles the excluded part. Skills reference each other by name, so renaming one means updating every reference. Run `grep -rn '<old-name>' skills/` before you call it done.
 
+## Changing a skill's interface
+
+A skill's interface is the six elements `docs/releasing.md` lists under "A skill's interface": its identity, when it is selected, the files it reads or writes, the vocabulary a person types or reads, the names other skills point at, and what it guarantees. A change that removes, renames, narrows or reverses any of them is an interface change. Adding to the interface, rewording, and reordering the procedure are not.
+
+Announce an interface change, and keep the old form working through the next release, as `docs/releasing.md`, "Deprecation", requires: announced in one release, still working in the next, removable in the one after. Add an entry under a `### Deprecated` heading in `CHANGELOG.md` that names:
+
+- the skill;
+- the old form and the new form;
+- the release that removes the old form.
+
+`docs/releasing.md`, "Deprecation", says what else the announcement carries, an entry in the skill's own `CHANGELOG.md` and a notice in its `SKILL.md`, and names the cases that skip the window. Releases follow the cadence in `docs/releasing.md`, "Cadence". When the old form is removed, label the change BREAKING with a one-line migration, as "A skill's interface" in the same file says.
+
 ## Orchestration
 
 `orchestration/protocol.md` and the JSON schemas in `orchestration/schemas/` define the message contract between agents. Changing a field means changing the schema, the protocol document, and `taxonomy.md` together, since they are read by separate agents that will not notice a partial update.
@@ -84,7 +96,7 @@ The description decides when the skill loads, so it should state what the skill 
 
 A branch name is public the moment it is pushed, and copies of public push events persist outside the forge, so deleting a branch does not take its name back. Choose every name; never push one a tool made up. The same holds for a tag, a pull request title, a commit subject and a file name: words from a request never become one unchosen. Only branch and tag names are checked mechanically.
 
-- A branch is `main` or `<prefix>/<words>`: a prefix from the list in `scripts/check-branch-name`, a slash, then lowercase `a-z` and `0-9` joined by single hyphens or dots, 40 characters at most. `docs/fix-typo` and `release/0.5.0` pass.
+- A branch is `main` or `<prefix>/<words>`: a prefix from those `scripts/check-branch-name --list` prints, a slash, then lowercase `a-z` and `0-9` joined by single hyphens or dots, 40 characters at most. `docs/fix-typo` and `release/0.5.0` pass.
 - A tag is `v<major>.<minor>.<patch>`, as `docs/releasing.md` sets out, with no leading zero in any number (`v0.10.0` passes, `v0.05.0` does not), and greater than every tag before it.
 - Names the forge suggests, such as `<user>-patch-1` or a branch titled from an issue, are refused. The Dependabot app is exempt: the branch ruleset lets it create any branch, and the `branch-name` job exempts it on its own `dependabot/` prefix only.
 
@@ -94,7 +106,7 @@ Check a name before you push it:
 scripts/check-branch-name docs/fix-typo
 ```
 
-`scripts/check-branch-name` is the one definition. `.githooks/pre-push` runs it before anything leaves your machine, enabled by the same `git config core.hooksPath .githooks` as the commit hook below; the `branch-name` job in `.github/workflows/gates.yml` runs it on a pull request's branch; and the rulesets in `.github/rulesets/`, once the maintainer has applied them, refuse at the forge a branch outside the allowed prefixes and a tag not starting `v`; case, characters and length are checked only by the hook and the job. `.github/workflows/tags.yml` runs `scripts/check-branch-name --tag-new` on every newly created tag, which also requires the tag to be greater than every other tag, and fails the run on a tag that fails or was moved. It never deletes a tag: a refused one stays until the maintainer removes it, as `docs/releasing.md` says, and `release-tags.json`, once applied, refuses moving or deleting a `v` tag. Push one tag at a time: two tags pushed together each see the other. The workflow runs after the tag is public, so it is the backstop and the hook is the check before publication. The rulesets cannot call a script, so `branch-names.json` repeats the prefix list, and gate 13 fails if the two differ. An agent pushes only with an explicit destination, `git push origin HEAD:refs/heads/<prefix>/<words>`; `hooks/hookify.branch-name-guard.local.md` is the example rule that holds it to that.
+`scripts/check-branch-name` is the one definition. `.githooks/pre-push` runs it before anything leaves your machine, enabled by the same `git config core.hooksPath .githooks` as the commit hook below; the `branch-name` job in `.github/workflows/gates.yml` runs it on a pull request's branch; and the rulesets in `.github/rulesets/`, once the maintainer has applied them, refuse at the forge a branch outside the allowed prefixes and a tag not starting `v`; case, characters and length are checked only by the hook and the job. `.github/workflows/tags.yml` runs `scripts/check-branch-name --tag-new` on every newly created tag, which also requires the tag to be greater than every other tag, and fails the run on a tag that fails or was moved. It never deletes a tag: a refused one stays until the maintainer removes it, as `docs/releasing.md` says, and `release-tags.json`, once applied, refuses moving or deleting a `v` tag. Push one tag at a time: two tags pushed together each see the other. The workflow runs after the tag is public, so it is the backstop and the hook is the check before publication. The rulesets cannot call a script, so `branch-names.json` repeats the prefix list, and gate 13 fails if the two differ. Every push names its destination, `git push origin HEAD:refs/heads/<prefix>/<words>`; a contributor without push access to this repository forks it, and `origin` is then the fork, as "Submitting a pull request" sets out. `hooks/hookify.branch-name-guard.local.md` is the example rule that holds an agent session to that form.
 
 ## Commits and pull requests
 
@@ -113,6 +125,8 @@ For example, `Assisted-by: claude-opus-5-5 via claude-code/2.1.308`. Take each v
 
 No `Co-Authored-By` line naming an AI, no session links, and no generated-with footers. A co-author line claims an authorship a tool cannot certify, and the `Signed-off-by:` line is yours alone (see "Licence and sign-off"). The hook checks the forms in `tests/attribution-cases.tsv`; any other line crediting a tool is a review item.
 
+**An agent edits and stages; a person commits, signs off and pushes.** If an agent drafted the change, the commit is yours: the agent never runs `git commit` or `git push` for you, and never adds a `Signed-off-by:` line, because the sign-off is your certification under "Licence and sign-off" and a tool cannot give it. The trailers above are how your commit records the agent's part. `GOVERNANCE.md`, "What is not delegated", and `AGENTS.md` have the detail.
+
 Three layers enforce this, and only the third binds:
 
 1. If you use Claude Code, `.claude/settings.json` in this repo sets `attribution` to empty and disables the session link. Nothing to remember.
@@ -126,6 +140,42 @@ Three layers enforce this, and only the third binds:
 3. The `commit-attribution` workflow runs the same `commit-msg` hook on every commit in a pull request, with its sign-off check off since the `dco` workflow holds that, so the two cannot disagree. It is the layer that binds: it is set as a required status check in the ruleset on `main`, as read from the rulesets API on 2026-10-30. On a fork, it binds only once that fork's maintainer sets the same; without that setting it reports a failure and blocks nothing. Where it is required, a branch that reaches review with a trailer in its history needs those messages rewritten and the branch force-pushed.
 
 Human co-author trailers are fine and expected. The rule is about tools.
+
+### Submitting a pull request
+
+A contributor without push access to this repository, which is everyone but the maintainer, forks it, pushes to the fork and opens the pull request from there.
+
+1. Fork the repository on GitHub, clone your fork, add this repository as `upstream` so you branch from its current state, and enable the hooks:
+
+   ```sh
+   git clone https://github.com/<you>/toothpaste-kit.git
+   cd toothpaste-kit
+   git remote add upstream https://github.com/AN0099/toothpaste-kit.git
+   git fetch upstream
+   git config core.hooksPath .githooks
+   ```
+
+2. Choose the base branch. Work is based on the newest `sync/staging-*` branch when one exists, and on `main` when none does. List them:
+
+   ```sh
+   git branch -r --list 'upstream/sync/staging-*'
+   ```
+
+   Take the one with the highest version, or `upstream/main` if the list is empty, and branch from it: `git switch -c <prefix>/<words> <base>`.
+3. Make the change on a branch whose name passes `scripts/check-branch-name` (see "Branch and tag names"). A change to what the kit contains adds one line to `CHANGELOG.md` under `## Unreleased`, under the heading its kind takes: `### Added`, `### Changed`, `### Removed` or `### Fixed`. A change to a skill is recorded in that skill's own `CHANGELOG.md` instead, and a change to tests or CI only adds no line. Commit with `-s` (a person commits; see "Commits and pull requests"), and run `./scripts/gates.sh --selftest`.
+4. Push the branch to your fork:
+
+   ```sh
+   git push origin HEAD:refs/heads/<prefix>/<words>
+   ```
+
+5. Open the pull request against the base branch from step 2. Write the body from `.github/pull_request_template.md` into a file, check it with `scripts/check-pr-body <file>`, then create the pull request, on GitHub's page or with:
+
+   ```sh
+   gh pr create --repo AN0099/toothpaste-kit --base <base> --head <you>:<prefix>/<words> --body-file <file>
+   ```
+
+CI runs the same gates on the pull request, and the maintainer reviews and merges it.
 
 ## Licence and sign-off
 
@@ -141,11 +191,11 @@ git commit -s
 
 `-s` adds a `Signed-off-by:` line with your `user.name` and `user.email`. It is your certification, not a cryptographic signature (that is `-S`), and not acceptance: a signed-off contribution is still reviewed, and may be declined. The `dco` workflow fails a pull request containing a commit with no `Signed-off-by:` line for its author's email. Bot accounts are exempt.
 
-To add a missing sign-off, amend the last commit, or rebase every commit on the branch onto `main`, then force-push the branch:
+To add a missing sign-off, amend the last commit, or rebase every commit on the branch onto its base branch (`<base>`, step 2 of "Submitting a pull request"), then force-push the branch:
 
 ```sh
 git commit --amend -s --no-edit
-git rebase --signoff main
+git rebase --signoff <base>
 ```
 
 **If someone other than you may own the work**, such as an employer or a client, say so in the pull request. Review pauses until that owner's authorization is documented, since your sign-off cannot stand in for it.

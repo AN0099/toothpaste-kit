@@ -71,6 +71,27 @@ Either way, say which path you took. "Generating against placeholders for [X] an
 the reader can correct before acting on it. Shipping the same document without that line leaves
 them to discover the gap themselves, usually later than they would have chosen.
 
+# Findings and Sources
+
+Any document that reports what was found (research notes, an AUDIT, a postmortem timeline, a comparison of options) keeps three kinds of statement apart, and the reader must be able to tell which kind a sentence is without guessing:
+
+- **Findings**, each with its source beside it: a link, a file and line, a command and its output. A conflict between sources is itself a finding, with both sides cited.
+- **Inferences**, the conclusions drawn from the findings, labeled as inferences and naming the findings they rest on.
+- **Gaps**, the questions the sources did not answer. A claim with no source moves here; it does not stay among the findings behind a softer verb. "No reliable source found for X" is a result, and the reader needs it.
+
+In notes and working material, use the three as headings under each question, after a takeaway of one or two sentences. Finished prose keeps the separation in its wording instead: a cited sentence, an inference that names its basis, a gap stated once.
+
+## Weighing a Source
+
+Check a source before it supports a finding:
+
+- **Confirmed or speculative.** A forecast, a "could" or "may", or a story told in the future tense reports what someone expects, and the document reports it as that.
+- **Original or relayed.** Prefer the primary source (vendor advisory, RFC, changelog, the log itself) to an aggregator or a summary of it. A relayed claim cites the original if it can be found, and says it is relayed if not.
+- **Signs of a weak source:** unnamed sources behind a passive verb, authority asserted without a name, general qualifiers with no specifics, repetition of a report nobody confirmed.
+- **Recency.** For anything that changes (versions, prices, policies), a current source outranks remembered knowledge.
+
+Two sources that disagree are reported as a disagreement, never resolved silently by picking one. A source's hedges travel with its claim, as the facts-unchanged check in the pre-flight list already requires.
+
 # Pre-flight Checklist
 
 Run before shipping any document:
@@ -81,9 +102,10 @@ Run before shipping any document:
 - Fake-precise numbers only if real or explicitly labeled as example.
 - One copy register maintained throughout; no mixing technical, editorial, and marketing tone in the same document.
 - Every claim traces to something real, stated, or explicitly marked as illustrative.
+- After any rewrite for style, every fact, name, number, date, quote, citation and claim of the draft is still present and unchanged, its hedges ("probably", "suggests") and its scope (one site, one sample, one release) included. A dropped qualifier turns a local or tentative claim into a general one. Compare the two side by side; a style pass that drops or shifts a fact has broken the document, however well it reads. Adapted from blader/humanizer (MIT), the hedges and scope from leiverkus/research-superpowers.
 - Scoring rubric run (below), threshold met.
 
-State the completion at delivery as a short block, one entry per item above, each marked done or explicitly marked skipped with a reason. A block rather than a single line, because seven items compressed into one sentence become a claim that the checks happened, which is the very thing the completion statement exists to evidence. A mechanical check that already left a visible trace, a grep that ran in the transcript, can cite that trace instead of restating it. Don't leave checklist execution to be inferred from what happens to be visible in the response.
+State the completion at delivery as a short block, one entry per item above, each marked done or explicitly marked skipped with a reason. A block rather than a single line, because eight items compressed into one sentence become a claim that the checks happened, which is the very thing the completion statement exists to evidence. A mechanical check that already left a visible trace, a grep that ran in the transcript, can cite that trace instead of restating it. Don't leave checklist execution to be inferred from what happens to be visible in the response.
 
 # Scoring Rubric
 

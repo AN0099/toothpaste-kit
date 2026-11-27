@@ -104,6 +104,33 @@ forward, or it carries the thread from the last sentence.
 
 "Step 1 / Step 2," "Stage 1 / Stage 2," "Phase 01 / Phase 02" used as the label itself. The actual step content is the label; if progression must be shown, use the verb-noun directly ("Install," "Configure," "Ship").
 
+## Patterns Adapted from humanizer
+
+Each entry below covers a pattern the sections above did not, adapted from blader/humanizer v4.0.0 (MIT), which draws on Wikipedia's "Signs of AI writing". Rewritten in this file's form; the examples there are not copied.
+
+- **Sayings that sound deep.** "At its core," "the real question is," "what really matters," "the heart of the matter." An ordinary point dressed as a hidden truth. Replace the saying with the specific point.
+- **Arguing with no one.** "To be clear," "I'm not saying," "this isn't about," "some might say." An objection or option the text never raised, usually left over from a draft. Remove the rebuttal along with its target.
+- **Hyphenated pairs everywhere.** Compound modifiers stacked for weight ("data-driven, outcome-focused, user-centric"). Keep one only when it is the precise term.
+- **Shallow -ing phrases.** "Highlighting," "underscoring," "reflecting," "fostering," "showcasing" bolted onto a plain fact to make it sound deeper. Keep the fact; drop the phrase unless the source supports what it claims.
+- **Borrowed authority.** "Experts agree," "studies show," "industry observers note" with no source the reader can follow. Name the source or drop the claim.
+- **Avoiding is, are and has.** "Serves as," "stands as," "functions as," "boasts," "features" in place of a plain verb. Write is, are, has.
+- **Bold as decoration.** Bold scattered over phrases in running prose that carry no more weight than their neighbours. Bold marks what a skimming reader must not miss, and little else. A bold term that names the item a list entry defines, as in this list, is a label and stays.
+- **Decorative headings.** A heading over a two-line section, or a heading per paragraph. A heading earns its place when a reader would jump to it.
+- **Curly quotation marks** in plain text, code, or Markdown where straight quotes are the convention. Use straight quotes; leave curly ones inside quoted third-party text.
+- **Chatbot residue.** "I hope this helps," "great question," "let me know if." "Certainly" as an opener is under Sentence Starters to Avoid. A document is not a reply.
+- **Knowledge-limit disclaimers.** "As of my last update," "I cannot verify," or a date stated as known with no source ("released in early 2025"). State what is known and its source, or mark the gap once.
+- **A heading repeated in the first sentence.** "## Installation" followed by "This section covers installation." Start with the content.
+- **Writing about the document instead of its subject.** What the text replaced, how it was assembled, a legend the reader can already see. Previous versions belong in change logs; how it was made belongs in provenance (the two-layer rule, `docs/document-layers.md`).
+- **Re-explaining what the reader knows.** Defining terms the stated audience uses daily. Set by the AUDIENCE_LEVEL dial, not by habit.
+
+## Generic Conclusions
+
+A conclusion that would hold just as well for a neighbouring topic: swap the system, the release or the team and the sentence is still true ("a complex picture emerges," "plays an important role," "further work is needed"). Nothing could make it wrong, so it tells the reader nothing. Fix: name the specific finding and what it rests on, or cut the sentence. Adapted from leiverkus/research-superpowers' semantic-wiki-review.
+
+## When Not to Act
+
+These exceptions apply to the humanizer patterns and the Generic Conclusions pattern above. Leave a watched phrase alone inside a quotation, a title, a proper name, or a passage that discusses the phrase rather than uses it. A quoted third-party source keeps its wording.
+
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
 

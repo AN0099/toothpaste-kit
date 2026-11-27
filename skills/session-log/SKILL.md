@@ -45,13 +45,15 @@ Five questions. Answer only the ones with something to answer, and skip the rest
 rather than writing "none" five times.
 
 1. **Decisions and the alternative rejected.** The choice, the reason, and what was turned down.
-2. **Corrections.** Anything stated as fact that turned out to be wrong, and what corrected it.
+2. **Corrections.** Anything stated as fact that turned out to be wrong, what corrected it, and a
+   "So next time:" line naming the changed behaviour.
 3. **Open questions.** Raised and unresolved. Include who or what is blocking.
 4. **Findings the tree does not hold.** Something established this stretch by evidence, about the
    harness, the tooling, or the environment, that no file in the store records and no file would
    have produced. A correction is the tree being wrong about something; this is the tree never
    having known it. These are the most expensive things to rediscover and the easiest to lose,
-   because they arrive as a side effect of doing something else and never look like output.
+   because they arrive as a side effect of doing something else and never look like output. Where
+   a finding should change what an agent does, end it with a "So next time:" line too.
 5. **Where the work stands.** One paragraph a future session can restart from. Name the next
    concrete action, not the goal.
 
