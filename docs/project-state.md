@@ -216,8 +216,11 @@ What `sync/staging-0.8.0` holds since 0.7.0, by pull request. `CHANGELOG.md` has
   `--check`.
 - **Post-release watch (pull request #151).** Nothing for the next release merges into `main` from
   Wednesday to Friday after a release, so a patch can still be cut from `main`.
-- **Skill practices (pull requests #152 and #153).** Research notes, headers and bounded loops are
-  adopted, and the `working-preferences` CHANGELOG drops incident provenance.
+- **Skill practices (pull requests #152 and #153, and commit `058b6f1`).** Research notes, headers
+  and bounded loops are adopted, and the `working-preferences` CHANGELOG drops incident
+  provenance. `058b6f1`, committed to the branch directly with no pull request, adds writing
+  patterns to `document-standards`, an `at:` segment to `working-preferences`, a busywork
+  challenge to `daily-dashboard` and a "So next time:" line to `session-log`.
 - **Gate 18 role check (pull request #154).** `scripts/round-check.py --require-roles` fails when
   `orchestration/roles.md` is absent, and gate 18 passes the flag. Fixes issue 111.
 - **First pull request path (pull requests #156 and #158).** `CONTRIBUTING.md` covers the fork, the

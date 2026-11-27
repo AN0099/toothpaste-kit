@@ -95,6 +95,18 @@ one, the citation carries enough to retrieve the document independently.
   <https://www.contributor-covenant.org/>. **Referenced by:**
   `CODE_OF_CONDUCT.md`, which is adapted from it in substance rather than
   reproduced.
+- **[DEEP-RESEARCH]** Anthropic, "deep-research" skill, distributed with Claude's built-in
+  skills; no public source page. **Referenced by:** `document-standards` (Findings and
+  Sources), `technical-documents` (Headers and Opening) and `working-preferences` (bounded
+  loops), each loosely adapted.
+- **[HUMANIZER]** blader, "humanizer", version 4.0.0, MIT licence.
+  <https://github.com/blader/humanizer>. **Referenced by:**
+  `skills/document-standards/references/structural-patterns.md`, whose patterns adapted from
+  it are rewritten rather than copied, and the facts-unchanged check in `document-standards`.
+- **[RESEARCH-SUPERPOWERS]** leiverkus, "research-superpowers".
+  <https://github.com/leiverkus/research-superpowers>. **Referenced by:**
+  `document-standards`'s facts-unchanged check and its Generic Conclusions pattern, both
+  loosely adapted.
 - **[ZENODO]** Zenodo, CERN. <https://zenodo.org/>. Mints the DOI from a
   GitHub release webhook, and issues a concept DOI covering all versions
   alongside a per-version DOI. **Referenced by:** `docs/releasing.md`.
