@@ -7,6 +7,51 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Added
 
+- `CONTRIBUTING.md`, "Changing a skill's interface": an interface change is
+  announced under a Deprecated heading, the old form working through the next
+  release, naming the skill, the old and new form and the release that removes
+  the old form, with `docs/releasing.md` cited for the definition and the
+  cadence.
+
+### Changed
+
+- `docs/releasing.md`: nothing for the next release merges into `main` during
+  the Wednesday to Friday watch after a release, so a patch can still be cut
+  from `main`.
+- `docs/releasing.md`: a release's pull request opens only after the cutoff
+  decision (go, defer, split or abandon), since opening it says the release is
+  going.
+
+### Fixed
+
+- `scripts/check-pr-body` finds the pull request template from the script's own tree, so it
+  runs from any directory; it failed with FileNotFoundError outside the repository root.
+- `CONTRIBUTING.md` gains "Submitting a pull request": fork, push the branch to the fork,
+  and open the pull request against `main` with a checked body.
+- `CONTRIBUTING.md`, "Submitting a pull request", now bases work and the pull request on the
+  newest `sync/staging-*` branch, or `main` when none exists, says when a change adds a
+  `CHANGELOG.md` line, and says CI runs the compliance check; "Commits and pull requests" says
+  an agent edits and stages while a person commits, signs off and pushes. `README.md` says the
+  same about forks and the base branch. `scripts/check-branch-name --list` prints the allowed
+  prefixes, and `CONTRIBUTING.md` names it in place of pointing into the script.
+- `scripts/round-check.py --selftest --require-roles` fails when
+  `orchestration/roles.md` is missing instead of skipping the role list
+  comparison, and gate 18 now passes that flag. Without the flag the
+  selftest still skips. Fixes issue 111.
+
+## 0.7.0 (2026-11-24)
+
+A MINOR release under `docs/releasing.md`. It carries out the cuts from a
+review of the whole project: the gates go from twenty-one to eighteen, the
+SPDX fragments, coverage floors, CI timeout tuner and pull request labeler
+leave, and the verification image drops what no check used.
+`working-preferences` splits into the general behavior every adopter gets and
+a new optional skill, `house-preferences`, so the kit has nineteen skills.
+`working-preferences` v8 is BREAKING, since `j` now means JUDGE and DEEPEN
+moves to `h`, which a MINOR bump may carry while MAJOR is 0.
+
+### Added
+
 - `skills/house-preferences`, the maintainer's own layer over
   `working-preferences`. The kit now has nineteen skills.
 - `scripts/link-skills.sh --base` links every skill except
@@ -53,17 +98,9 @@ skill lives in that skill's own `CHANGELOG.md`.
   result for the badge and uploads it to code scanning. Both new actions are
   pinned by commit SHA, which row 3.7 of `docs/security-posture.md` needed
   first; section 5 no longer lists the badge as absent.
-- `CONTRIBUTING.md`, "Changing a skill's interface": an interface change is
-  announced under a Deprecated heading, the old form working through the next
-  release,
-  naming the skill, the old and new form and the release that removes the old
-  form, with `docs/releasing.md` cited for the definition and the cadence.
 
 ### Changed
 
-- `docs/releasing.md`: nothing for the next release merges into `main` during
-  the Wednesday to Friday watch after a release, so a patch can still be cut
-  from `main`.
 - The verification image is now `localhost/kit-verify:v9`. Each entry that
   changes a tool in it says which.
 - Six skills and the starter container page lose wording that only made sense
@@ -150,6 +187,9 @@ skill lives in that skill's own `CHANGELOG.md`.
   `skills/`. `README.md`, `docs/installing.md` and step 4 of
   `docs/quickstart.md` say so, and the installing guide tells a copy install
   to delete the three unless the workspace has a lane-board tool.
+- `session-close` phase 4 ends the report on what was done and what is
+  still open, each stated plainly, and no longer closes with a line handing
+  the close to the human (v9).
 - `scripts/sbom.py` is cut to its action pin check: every action a workflow
   uses must be pinned by a full commit SHA, and a `docker://` action by
   digest, unless `KNOWN_TAG_PINS` records it. It no longer writes an SPDX bill
@@ -198,20 +238,6 @@ other gates keep their numbers, so those three are unused.
 
 ### Fixed
 
-- `scripts/check-pr-body` finds the pull request template from the script's own tree, so it
-  runs from any directory; it failed with FileNotFoundError outside the repository root.
-- `CONTRIBUTING.md` gains "Submitting a pull request": fork, push the branch to the fork,
-  and open the pull request against `main` with a checked body.
-- `CONTRIBUTING.md`, "Submitting a pull request", now bases work and the pull request on the
-  newest `sync/staging-*` branch, or `main` when none exists, says when a change adds a
-  `CHANGELOG.md` line, and says CI runs the compliance check; "Commits and pull requests" says
-  an agent edits and stages while a person commits, signs off and pushes. `README.md` says the
-  same about forks and the base branch. `scripts/check-branch-name --list` prints the allowed
-  prefixes, and `CONTRIBUTING.md` names it in place of pointing into the script.
-- `scripts/round-check.py --selftest --require-roles` fails when
-  `orchestration/roles.md` is missing instead of skipping the role list
-  comparison, and gate 18 now passes that flag. Without the flag the
-  selftest still skips. Fixes issue 111.
 - `README.md`'s contents no longer promise eight writing and publishing
   standards under `docs/`; they were removed before this release.
 - `containers/starter/README.md`: the first command block makes the workspace
@@ -246,6 +272,31 @@ other gates keep their numbers, so those three are unused.
 - `containers/verify/`: the CodeQL 2.27.4 bundle, the version GitHub's default
   setup now runs, so a local scan reports the alerts CI reports. The bundle is
   pinned by digest for linux/amd64 and linux/arm64.
+
+### Known accessibility limitations
+
+- `docs/accessibility.md` is a working draft and a research position. The tooling in its sections 2
+  to 4 is not a deployed configuration.
+- The accessibility of produced artifacts beyond this repository's own Markdown, PDF/UA and the
+  document pipeline included, is not covered.
+- The blog's generated HTML and RSS feed have had no separate accessibility check.
+- This release makes no accessibility conformance or certification claim.
+
+### Skill revisions
+
+- `commands` v4 to v5.
+- `daily-dashboard` v2 to v3.
+- `document-standards` v6 to v7.
+- `house-preferences` v1, added.
+- `merge-proxy` v2 to v3.
+- `redaction-gate` v4 to v5.
+- `session-close` v7 to v9.
+- `session-log` v4 to v5.
+- `skill-creation` v3 to v5.
+- `skill-discovery` v2 to v3.
+- `surface-regimes` v5 to v6.
+- `technical-documents` v4 to v5.
+- `working-preferences` v7 to v8, BREAKING.
 
 ## 0.6.0 (2026-11-10)
 

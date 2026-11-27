@@ -162,10 +162,12 @@ prevent.
 Present what was recorded and what was checked. Do not claim the session is
 closed. No completion claim counts as fact until verified by a party other than
 the one making it, and self-audit is explicitly excluded as a verification
-method. The human makes the close call.
+method.
 
-State plainly anything you could not complete and why, rather than leaving it
-implied by omission.
+End the report on what was done and what is still open, each stated plainly,
+including anything you could not complete and why, rather than leaving it
+implied by omission. Do not close with a line handing the close to the human:
+the close is theirs, and the report does not ask for it.
 
 # Scope Pointer
 
