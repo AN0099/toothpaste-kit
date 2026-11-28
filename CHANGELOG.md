@@ -13,12 +13,20 @@ skill lives in that skill's own `CHANGELOG.md`.
   the old form, with `docs/releasing.md` cited for the definition and the
   cadence.
 - `CONTRIBUTING.md` gains "Submitting a pull request": fork, push the branch to the fork,
-  and open the pull request against `main` with a checked body.
+  and open the pull request against the base branch that section names, with a checked body.
 - `scripts/check-branch-name --list` prints the allowed prefixes, and `CONTRIBUTING.md` names
   it in place of pointing into the script.
 
 ### Changed
 
+- `GOVERNANCE.md` gains a Hive section: Hive, a GitHub App, may label, comment, file issues
+  and open pull requests from its own branches, and never merges. "What is not delegated"
+  names it beside Dependabot, and the review date is 2026-11-27.
+- `README.md`, "What is here", names `tests/`, `containers/`, `blog/`, `LICENSES/`, the dot
+  directories, `REUSE.toml`, `security-insights.yml` and `corrections.jsonl`.
+- `CONTRIBUTING.md`, "Questions", names Discussions and the issue forms. `SECURITY.md` names
+  the `redaction-gate` fix by the skill changelog entry that records it, and says the project
+  has no private release channel.
 - `docs/releasing.md`: nothing for the next release merges into `main` during
   the Wednesday to Friday watch after a release, so a patch can still be cut
   from `main`.

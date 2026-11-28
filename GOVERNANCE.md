@@ -3,7 +3,7 @@
 How decisions get made here. "One maintainer decides" is a
 governance model and an unwritten one is indistinguishable from no model at all.
 
-Last reviewed 2026-09-17.
+Last reviewed 2026-11-27.
 
 ## Who decides
 
@@ -54,13 +54,27 @@ passes, the reviewer runs it.
   other people pin to.
 - **Anything that publishes**, including a push to this repository's remote.
   Automated agents contribute by editing and staging; a person commits and
-  pushes. The one automated party that pushes is Dependabot, which pushes its
-  own update branches under `.github/dependabot.yml` and opens a pull request
-  for each; a person merges each of those pull requests.
+  pushes. Two automated parties push, each only to branches of its own:
+  Dependabot, under `.github/dependabot.yml`, and Hive, below. Each opens a
+  pull request for its branch, and a person merges each of those pull requests.
 
 This project is developed with AI agents doing a large share of the editing.
 The boundary between an agent preparing a change and a person publishing it is
 the main control that keeps review meaningful.
+
+## Hive
+
+Hive is a GitHub App, `hivecommons-hive`, installed on this repository. Its
+agents read the code and report what they find. It may label issues and pull
+requests, comment, file issues, and open pull requests from its own branches.
+Its standing reports go to the pinned issue "Hive Advisory Report".
+
+**Hive never merges.** A Hive pull request is reviewed and merged by the
+maintainer like any other, as the list above requires. Its labels (`stage/`,
+`role/`, `author/`, `merge-method/` and `hive/`) describe Hive's own pipeline,
+which includes an automerge lane. Because a merge here is never delegated, a
+label such as `role/trusted` or `stage/100-merge-queue` records Hive's view of
+a pull request and grants it nothing.
 
 ## Succession
 
