@@ -54,6 +54,11 @@ skill lives in that skill's own `CHANGELOG.md`.
   `orchestration/roles.md` is missing instead of skipping the role list
   comparison, and gate 18 now passes that flag. Without the flag the
   selftest still skips. Fixes issue 111.
+- `scripts/skills-spec.sh` fails a directory under `skills/` with no `SKILL.md`, and a
+  frontmatter line other than its delimiters that holds `---`, which skills-ref 0.1.1 reads as
+  the end of the frontmatter. A validation failure no longer hides a missing listed skill, its
+  scratch directories go on an interrupt, and the selftest plants each case. The coverage comment
+  names which skills-ref checks the selftest plants. Closes #127.
 
 ## 0.7.0 (2026-11-24)
 

@@ -13,11 +13,14 @@
 # that name and description are present, the name's length, case and
 # characters and that it matches its directory, the description's and
 # compatibility's lengths, and that no top-level field is outside the six the
-# specification defines. It does NOT read a skill's body, its scripts or its
+# specification defines. The selftest plants a name in capitals, a missing
+# description and an unknown field; the other skills-ref checks are taken on
+# the tool's word. It does NOT read a skill's body, its scripts or its
 # references, and it checks no rule this kit adds; scripts/gates.sh holds
-# those. skills-ref 0.1.1 ends the frontmatter at the first --- anywhere in
-# it, inside a value too, so a field after such a --- is not checked; no
-# skill here has one.
+# those. Two checks are this script's own: every directory under skills/
+# holds a SKILL.md, and no frontmatter line but its two delimiters holds ---,
+# since skills-ref 0.1.1 ends the frontmatter at the first --- anywhere in it
+# and would not check a field after one.
 #
 # One exception, stated rather than hidden. The eight skills a person invokes
 # set disable-model-invocation, a Claude Code field the specification does not
@@ -36,9 +39,11 @@
 #                                            planted bad name, a missing
 #                                            description, an unknown field, a
 #                                            listing error each way, a copy
-#                                            that lost more than the field line
-#                                            and a missing tool, each for its
-#                                            reason
+#                                            that lost more than the field
+#                                            line, a directory with no
+#                                            SKILL.md, a --- inside the
+#                                            frontmatter and a missing tool,
+#                                            each for its reason
 #
 # Run it in the verification container, which holds the tool:
 #   containers/verify/verify . ./scripts/skills-spec.sh --selftest
@@ -60,6 +65,14 @@ done
 
 ref=${SKILLS_REF:-agentskills}
 skills_dir=${SKILLS_DIR:-skills}
+
+# One scratch root for the whole run, removed on exit and on an interrupt, so
+# a scratch directory made inside a command substitution goes with it.
+work=
+trap 'rm -rf "$work"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+work=$(mktemp -d) || { printf 'skills-spec: no scratch directory\n'; exit 1; }
 
 # The skills a person invokes, which set the Claude Code field. A change here
 # is a change to the table of those skills in README.md.
@@ -107,24 +120,39 @@ has_field() {
     fm && $0 == "---" { exit } fm && $0 == f { hit = 1; exit } END { exit !hit }' "$1"
 }
 
+# dashes FILE: a frontmatter line other than its opening and closing ---
+# lines holds ---.
+dashes() {
+  awk 'NR == 1 && $0 == "---" { fm = 1; next }
+    fm && $0 == "---" { exit } fm && index($0, "---") { hit = 1; exit } END { exit !hit }' "$1"
+}
+
 # strip FILE: FILE with the field's line removed from the frontmatter only.
 strip() {
   awk -v f="$claude_field" 'NR == 1 && $0 == "---" { fm = 1; print; next }
     fm && $0 == "---" { fm = 0 } fm && $0 == f { next } { print }' "$1"
 }
 
-# validate_all DIR: every DIR/*/SKILL.md passes skills-ref, the listed ones as
-# a stripped copy. Prints each failure and the count checked.
+# validate_all DIR: every directory under DIR holds a SKILL.md that passes
+# skills-ref, the listed ones as a stripped copy, and every listed skill is
+# there. Prints each failure and the count checked.
 validate_all() {
   tool_ok "$ref" || return 1
-  t=$(mktemp -d) || { printf 'skills-spec: no scratch directory\n'; return 1; }
+  t=$(mktemp -d "$work/v.XXXXXX") || { printf 'skills-spec: no scratch directory\n'; return 1; }
   vbad=0
   n=0
   copies=0
-  for f in "$1"/*/SKILL.md; do
-    [ -f "$f" ] || continue
-    d=$(dirname "$f"); name=$(basename "$d")
+  for d in "$1"/*/; do
+    [ -d "$d" ] || continue
+    d=${d%/}; name=$(basename "$d"); f=$d/SKILL.md
     n=$((n + 1))
+    if [ ! -f "$f" ]; then
+      printf 'skills-spec: %s has no SKILL.md\n' "$name"; vbad=1; continue
+    fi
+    if dashes "$f"; then
+      printf 'skills-spec: %s: a frontmatter line other than its delimiters holds ---, which skills-ref 0.1.1 reads as the end of the frontmatter\n' "$name"
+      vbad=1; continue
+    fi
     if listed "$name"; then
       if ! has_field "$f"; then
         printf 'skills-spec: %s is listed as a Claude Code skill but does not set the exact line %s\n' "$name" "$claude_field"
@@ -152,6 +180,7 @@ validate_all() {
   rm -rf "$t"
   [ "$n" -gt 0 ] || { printf 'skills-spec: no skills found under %s\n' "$1"; return 1; }
   printf '  checked %s skills, %s of them as a copy without %s\n' "$n" "$copies" "$claude_field"
+  list_present "$1" || vbad=1
   return "$vbad"
 }
 
@@ -173,57 +202,74 @@ fixture() {
   mkdir -p "$1/$2" && printf -- '---\n%s\n---\n\n# Body\n' "$3" > "$1/$2/SKILL.md"
 }
 
+# listed_tree DIR: DIR holds every listed skill, clean, so a plant fails for
+# its own reason and not because a listed skill is missing.
+listed_tree() {
+  for name in $claude_only; do
+    fixture "$1" "$name" "name: $name
+description: A listed skill.
+$claude_field" || return 1
+  done
+}
+
 selftest_run() {
   check_start "skills-spec selftest"
-  s=$(mktemp -d) || { check_bad "skills-spec selftest: no scratch directory"; return; }
+  s=$(mktemp -d "$work/s.XXXXXX") || { check_bad "skills-spec selftest: no scratch directory"; return; }
   plant_bad=0
-  # A clean pass first, a plain skill and a listed one, or a rejected plant
+  # A clean pass first, a plain skill and the listed ones, or a rejected plant
   # proves nothing.
+  listed_tree "$s/ok"
   fixture "$s/ok" plain 'name: plain
 description: A plain skill.'
-  fixture "$s/ok" session-log "name: session-log
-description: A listed skill.
-$claude_field"
   if ! validate_all "$s/ok" >/dev/null 2>&1; then
     printf 'PLANT FAIL  a clean tree was rejected, so a rejected plant proves nothing\n'
     check_bad "skills-spec selftest"; rm -rf "$s"; return
   fi
+  listed_tree "$s/case"
   fixture "$s/case" Bad-Name 'name: Bad-Name
 description: A name in capitals.'
   plant "a name in capitals" "Skill name 'Bad-Name' must be lowercase" "$s/case"
+  listed_tree "$s/desc"
   fixture "$s/desc" nodesc 'name: nodesc'
   plant "a missing description" 'Missing required field in frontmatter: description' "$s/desc"
+  listed_tree "$s/field"
   fixture "$s/field" extra 'name: extra
 description: An unknown field.
 planted: true'
   plant "an unknown field" 'Unexpected fields in frontmatter: planted' "$s/field"
+  listed_tree "$s/second"
   fixture "$s/second" session-log "name: session-log
 description: A listed skill with a second unknown field.
 $claude_field
 planted: true"
   plant "a listed skill with a second unknown field" 'Unexpected fields in frontmatter: planted' "$s/second"
+  listed_tree "$s/unlisted"
   fixture "$s/unlisted" unlisted "name: unlisted
 description: Sets the field, not listed.
 $claude_field"
   plant "the field on a skill not listed" 'unlisted sets disable-model-invocation: true and is not listed' "$s/unlisted"
+  listed_tree "$s/stale"
   fixture "$s/stale" session-log 'name: session-log
 description: Listed, does not set the field.'
   plant "a listed skill without the field" 'session-log is listed as a Claude Code skill but does not set' "$s/stale"
+  listed_tree "$s/twice"
   fixture "$s/twice" session-log "name: session-log
 description: The field written twice, so the copy loses two lines.
 $claude_field
 $claude_field"
   plant "a copy that differs by more than the field line" 'the copy differs by 2 lines' "$s/twice"
-  # The list against the tree: the clean tree holds one of the eight.
-  if pout=$(list_present "$s/ok" 2>&1); then
-    printf 'PLANT FAIL  a listed skill with no directory was accepted\n'; plant_bad=1
-  else
-    case "$pout" in
-      *"daily-dashboard is listed but $s/ok/daily-dashboard/SKILL.md does not exist"*)
-        printf 'PLANT ok    a listed skill with no directory is rejected\n' ;;
-      *) printf 'PLANT FAIL  a listed skill with no directory was rejected without its message\n'; plant_bad=1 ;;
-    esac
-  fi
+  # The list against the tree, through validate_all, so the wiring is tested.
+  listed_tree "$s/gone"; rm -r "$s/gone/daily-dashboard"
+  plant "a listed skill with no directory" "daily-dashboard is listed but $s/gone/daily-dashboard/SKILL.md does not exist" "$s/gone"
+  listed_tree "$s/readme"; mkdir "$s/readme/readme-only" && printf '# Not a skill\n' > "$s/readme/readme-only/README.md"
+  plant "a directory holding only README.md" 'readme-only has no SKILL.md' "$s/readme"
+  listed_tree "$s/lower"; mkdir "$s/lower/lower" && printf -- '---\nname: lower\ndescription: Lowercase file name.\n---\n' > "$s/lower/lower/skill.md"
+  plant "a directory holding only a lowercase skill.md" 'lower has no SKILL.md' "$s/lower"
+  listed_tree "$s/dash"
+  fixture "$s/dash" dash 'name: dash
+description: A --- b
+planted: true'
+  plant "a --- inside the frontmatter" 'dash: a frontmatter line other than its delimiters holds ---' "$s/dash"
   # A missing tool fails the whole script and names it.
   mout=$(env SKILLS_REF=skills-spec-selftest-not-installed sh "$self" 2>&1); mcode=$?
   case "$mcode:$mout" in
@@ -237,7 +283,7 @@ $claude_field"
 [ "$selftest" -eq 0 ] || selftest_run
 
 check_start "skills against the Agent Skills specification, skills-ref 0.1.1"
-if validate_all "$skills_dir" && list_present "$skills_dir"; then check_ok "skills"; else check_bad "skills"; fi
+if validate_all "$skills_dir"; then check_ok "skills"; else check_bad "skills"; fi
 
 printf '\n%s of %s checks passed\n' "$pass_n" "$total"
 if [ "$fail" -ne 0 ]; then
