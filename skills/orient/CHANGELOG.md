@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v5
+
+Phase 1 runs `scripts/reorient` from the kit clone as `docs/quickstart.md` lays it out, naming the
+workspace as `"$PWD"`, since the example workspace has no `scripts/` of its own. A tree with its own
+copy still runs that copy. No change to the procedure. Part of #171.
+
 ## v4
 
 Phase 1's pointer to prior art names `scripts/` and `bin/`, and `just --summary` only where the tree has a
