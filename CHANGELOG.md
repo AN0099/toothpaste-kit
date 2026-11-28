@@ -36,6 +36,9 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Fixed
 
+- `docs/installing.md`, Updating a fork: both blocks now push `my-work` to the
+  fork after the rebase, and the block for commits on `main` pushes them before
+  it resets `main`, so the fork holds them throughout.
 - `scripts/check-pr-body` finds the pull request template from the script's own tree, so it
   runs from any directory; it failed with FileNotFoundError outside the repository root.
 - `CONTRIBUTING.md`, "Submitting a pull request", now bases work and the pull request on the
