@@ -43,6 +43,8 @@ skill lives in that skill's own `CHANGELOG.md`.
   it resets `main`, so the fork holds them throughout.
 - `scripts/check-pr-body` finds the pull request template from the script's own tree, so it
   runs from any directory; it failed with FileNotFoundError outside the repository root.
+- The `pr-body` workflow passes a Dependabot pull request on a `dependabot/` branch, as the
+  branch-name check does, since Dependabot writes its body from release notes, not the template.
 - `CONTRIBUTING.md`, "Submitting a pull request", now bases work and the pull request on the
   newest `sync/staging-*` branch, or `main` when none exists, says when a change adds a
   `CHANGELOG.md` line, and says CI runs the compliance check; "Commits and pull requests" says

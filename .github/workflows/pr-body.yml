@@ -27,6 +27,16 @@ jobs:
           persist-credentials: false
 
       # The body is read from the event file, never pasted into the command,
-      # so text in a pull request body cannot inject shell.
+      # so text in a pull request body cannot inject shell. Dependabot writes
+      # its body from release notes, not from the template, so its own
+      # branches are exempt for the Dependabot account alone, as in the
+      # gates workflow's branch-name job.
       - name: Check the pull request body
-        run: python3 scripts/check-pr-body --event
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          case "$ACTOR:$HEAD_REF" in
+            'dependabot[bot]:dependabot/'*) echo "Dependabot pull request, exempt"; exit 0 ;;
+          esac
+          python3 scripts/check-pr-body --event
