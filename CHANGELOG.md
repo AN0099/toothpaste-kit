@@ -50,6 +50,10 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Fixed
 
+- `docs/quickstart.md` step 1 links a reader with an existing clone or another folder to the
+  subsection after step 2, and "Done" says when to type `/orient` and the `reorient` command it
+  runs; the stub gate's comment in `scripts/gates.sh` says the script's default paths are
+  relative to the working directory. Fixes #171.
 - `docs/quickstart.md` says the default `link-skills.sh` run links every skill but the optional
   review skills, names them and what they need, and names the loop's two checkpoints, a first
   logged turn and a closed session, with what each leaves on disk. Fixes #170 and #176.

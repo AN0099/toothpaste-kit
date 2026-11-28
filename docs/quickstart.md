@@ -32,7 +32,8 @@ ls ~/toothpaste-kit ~/tpkit-workspace
 **You should now see** a version number from each of the first two, and
 `No such file or directory` for both paths in the third. If either path
 exists, stop: the steps below create both, and this page does not cover
-installing over an existing copy.
+installing over an existing copy. If you already have a clone, or must work
+in another folder, follow [the subsection after step 2](#if-you-already-have-a-clone-or-must-work-in-a-given-folder) instead.
 
 ## 2. Clone the kit
 
@@ -162,6 +163,11 @@ The loop has two checkpoints, and you have passed the first.
   reasoning to `.agents/context/`, and updates the standing files `index.md`
   lists, moving each thread that closed from `.agents/threads-flagged.md` to
   `.agents/threads-resolved.md`.
+
+Type `/orient` when you return to a session, or after Claude Code compacts
+the conversation. It runs `~/toothpaste-kit/scripts/reorient "$PWD"` from
+the workspace, which reports where the workspace stands and ends with a
+`COVERAGE` block naming what it read and what it deliberately did not.
 
 Type `/daily-dashboard` at the start of the next session; it reads those
 files back. [The installing guide](installing.md) covers updating and

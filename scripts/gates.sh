@@ -795,7 +795,8 @@ PY
   plant_rejected $bad $? "frontmatter gate, description as installed"
 
   # A stub the document does not describe, against a stub it does.
-  # The script takes no paths, so each planted tree has the repository's layout.
+  # The script's default paths are relative to the working directory, so each
+  # planted tree has the repository's layout.
   stubs="$PWD/scripts/check-workspace-stubs.py"
   for t in st-bad st-ok; do
     mkdir -p "$tmp/$t/docs" "$tmp/$t/examples/workspace/.agents"
