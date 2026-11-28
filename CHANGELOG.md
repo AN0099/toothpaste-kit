@@ -59,6 +59,17 @@ skill lives in that skill's own `CHANGELOG.md`.
   the end of the frontmatter. A validation failure no longer hides a missing listed skill, its
   scratch directories go on an interrupt, and the selftest plants each case. The coverage comment
   names which skills-ref checks the selftest plants. Closes #127.
+- `scripts/schemas.sh` finds schema files among the files git tracks, `.JSON` included, and
+  counts a file only when its top-level object declares `"$schema"`, so an ignored local file,
+  an escaped key and a `"$schema"` that is only a value are each read correctly. The draft-07
+  test reads that top-level value too. An expected failure in `schema-cases/cases.json` must
+  print the validator error its new `error` field names, not any failure. The scratch directory
+  goes on an interrupt, a termination or a hangup, and an unused filter is dropped. The selftest
+  plants a draft-04 schema, an empty registry, a tree git does not track, and each listing,
+  draft-07 and `error` case above. Part of #125.
+- `event-base.json` and the three review-round schemas drop their `$id`, which named a wrong
+  location, as the other three schemas already had; a `$ref` added to one later now resolves
+  beside the file. Part of #125.
 
 ## 0.7.0 (2026-11-24)
 
