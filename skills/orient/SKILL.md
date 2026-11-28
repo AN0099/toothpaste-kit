@@ -20,9 +20,12 @@ commands and reads all their output. This runs one.
 ## Phase 1: Observe, with the tool that already exists
 
 ```sh
-scripts/reorient          # from the workspace root, or name it: scripts/reorient ROOT
-scripts/reorient --fetch  # when remote state matters
+~/toothpaste-kit/scripts/reorient "$PWD"          # from the workspace root
+~/toothpaste-kit/scripts/reorient --fetch "$PWD"  # when remote state matters
 ```
+
+`~/toothpaste-kit` is the kit clone where `docs/quickstart.md` puts it, beside the workspace; put
+your own clone's path there. Where the tree has its own copy of the tool, run that copy instead.
 
 One command. Read its output. **Do not go looking for more.** It ends with a `COVERAGE` block
 naming what it read and what it deliberately did not; if something you need is outside that block,

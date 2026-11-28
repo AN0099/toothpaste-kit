@@ -24,15 +24,20 @@ says, whether its comments are accurate, or whether `CLAUDE.md` names the
 right paths. A table row whose first cell has no backticked name (such as
 "Procedures") is skipped, and a name containing `*` is a pattern, not a file.
 
-Usage: scripts/check-workspace-stubs.py, from the repository root. It takes no
-arguments: both paths are fixed, relative to the working directory, so the
-selftest in scripts/gates.sh runs it from inside a planted tree.
-Exits 1 on any finding, 2 if either input is missing.
+Usage: scripts/check-workspace-stubs.py [WORKSPACE [TABLE]]
+WORKSPACE defaults to examples/workspace and TABLE, the document holding "The
+document set" table, to docs/standing-documents.md, both relative to the
+working directory, so a run with no arguments checks this repository from its
+root. --selftest checks one passing and one failing workspace in a temporary
+tree, passing both paths as arguments.
+Exits 1 on any finding or a failed selftest, 2 if either input is missing.
 """
 
 import os
 import re
+import subprocess
 import sys
+import tempfile
 
 # Described in the table, deliberately not stubbed.
 EXEMPT = {
@@ -72,8 +77,37 @@ DOC = "docs/standing-documents.md"
 ROOT = "examples/workspace"
 
 
-def main():
-    doc, root = DOC, ROOT
+def selftest():
+    with tempfile.TemporaryDirectory() as tmp:
+        doc = os.path.join(tmp, "table.md")
+        with open(doc, "w", encoding="utf-8") as f:
+            f.write("## The document set\n\n| Document | Role |\n|---|---|\n"
+                    "| `index.md` | Manifest |\n| `notes.md` | Notes |\n")
+        for name in ("ok", "bad"):
+            os.makedirs(os.path.join(tmp, name, ".agents"))
+            with open(os.path.join(tmp, name, "index.md"), "w", encoding="utf-8") as f:
+                f.write("- `.agents/notes.md`\n")
+            open(os.path.join(tmp, name, ".agents", "notes.md"), "w").close()
+        open(os.path.join(tmp, "bad", ".agents", "undescribed.md"), "w").close()
+        # Run from the temporary tree, where neither default path exists, so a
+        # run that ignored its arguments would exit 2 rather than pass.
+        fails = 0
+        for name, want in (("ok", 0), ("bad", 1)):
+            got = subprocess.run(
+                [sys.executable, os.path.abspath(__file__), os.path.join(tmp, name), doc],
+                cwd=tmp, capture_output=True).returncode
+            ok = got == want
+            print(f"{'ok  ' if ok else 'FAIL'} {name} workspace exits {got}, wants {want}")
+            fails += not ok
+    print("check-workspace-stubs: selftest " + ("passed" if not fails else f"FAILED ({fails})"))
+    return 1 if fails else 0
+
+
+def main(argv):
+    if argv[:1] == ["--selftest"]:
+        return selftest()
+    root = argv[0] if len(argv) > 0 else ROOT
+    doc = argv[1] if len(argv) > 1 else DOC
     if not os.path.isfile(doc) or not os.path.isdir(root):
         print(f"::error::missing input: {doc} or {root}")
         return 2
@@ -103,4 +137,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))

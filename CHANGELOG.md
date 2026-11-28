@@ -16,6 +16,10 @@ skill lives in that skill's own `CHANGELOG.md`.
   and open the pull request against the base branch that section names, with a checked body.
 - `scripts/check-branch-name --list` prints the allowed prefixes, and `CONTRIBUTING.md` names
   it in place of pointing into the script.
+- `scripts/check-workspace-stubs.py` takes the workspace and the standing-documents table as
+  optional arguments, defaulting to today's paths, and gains a `--selftest`; `docs/quickstart.md`
+  gains a subsection after step 2 for an existing clone or a given folder, which refuses to copy
+  over a destination that exists. Fixes #172 and #173.
 
 ### Changed
 
@@ -46,6 +50,9 @@ skill lives in that skill's own `CHANGELOG.md`.
 
 ### Fixed
 
+- `docs/quickstart.md` says the default `link-skills.sh` run links every skill but the optional
+  review skills, names them and what they need, and names the loop's two checkpoints, a first
+  logged turn and a closed session, with what each leaves on disk. Fixes #170 and #176.
 - `docs/installing.md`, Updating a fork: both blocks now push `my-work` to the
   fork after the rebase, and the block for commits on `main` pushes them before
   it resets `main`, so the fork holds them throughout.
