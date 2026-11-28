@@ -33,6 +33,8 @@ skill lives in that skill's own `CHANGELOG.md`.
   lists in the answer grammar. `daily-dashboard` ends its ranked todos with a one-line
   challenge to the top item, and `session-log` ends a correction with a "So next time:" line.
   Each skill's `CHANGELOG.md` has the detail and the sources.
+- `scorecard.yml` pins `ossf/scorecard-action` v2.6.0 and `github/codeql-action/upload-sarif`
+  v4.39.4, each by the commit SHA of its tag, from Dependabot pull requests 160 and 159.
 
 ### Fixed
 
