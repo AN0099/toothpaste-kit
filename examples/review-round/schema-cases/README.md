@@ -6,8 +6,10 @@ Documents checked one at a time against one round schema each, from
 - `cases.json`: the list the runner reads. Each case names a `file`, the `schema` it is checked
   against, whether it should `pass` or `fail`, and the `matrixRow` it covers in the validation
   matrix, the table under [What a schema decides, and what the validator decides](../../../orchestration/schemas/round/README.md#what-a-schema-decides-and-what-the-validator-decides).
-  A case for a rule outside the matrix has `matrixRow` null and says why in `reason`. A file not
-  listed in `cases.json` is not run.
+  A case for a rule outside the matrix has `matrixRow` null and says why in `reason`. A `fail`
+  case also gives `error`, the text `check-jsonschema` prints for the rule it breaks, which
+  `scripts/schemas.sh` requires in the failure; `reason` is for a reader and is not matched. A
+  file not listed in `cases.json` is not run.
 - `valid/`: complete rounds that must pass, one directory per matrix row.
 - `invalid/`: documents that must fail, one directory per rule they break, named for the rule.
 

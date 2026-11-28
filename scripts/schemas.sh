@@ -10,11 +10,12 @@
 # check-jsonschema.
 #
 # Also checks this tree's own JSON Schema draft-07 files with check-jsonschema,
-# a full validator: every file declaring "$schema" against the draft-07
-# metaschema, then the documents each one governs. The registry's vendor files,
-# the review-round examples and every row of schema-cases/cases.json are real
-# documents; the expected failures must fail on validation, not on a schema
-# that cannot load. request.json, response.json and event-base.json have no
+# a full validator: every tracked .json file whose top level declares "$schema"
+# against the draft-07 metaschema, then the documents each one governs. The
+# registry's vendor files, the review-round examples and every row of
+# schema-cases/cases.json are real documents; an expected failure must fail on
+# validation, not on a schema that cannot load, and must print the error its
+# row names. request.json, response.json and event-base.json have no
 # documents in this tree, so this script builds a sample of each, which shows
 # that each loads and that the $refs a sample reaches resolve, and nothing
 # about a $ref no sample reaches, a required field no plant drops, or a
@@ -69,6 +70,14 @@ dir=${SCHEMAS_DIR:-/opt/schemas}
 cue=${SCHEMAS_CUE:-cue}
 cjs=${SCHEMAS_CJS:-check-jsonschema}
 
+# One scratch root for the whole run, removed on exit, an interrupt included.
+work=
+trap 'rm -rf "$work"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
+work=$(mktemp -d) || { printf 'schemas: no scratch directory\n'; exit 1; }
+
 # The pinned schemas: file name in $dir, sha256. The same digests are in the
 # Containerfile's ADD lines; a new schema version changes both.
 si_schema=security-insights-2.2.0.cue
@@ -122,13 +131,36 @@ validate_cff() {
     && "$cjs" --schemafile "$1/$cff_schema" "$2"
 }
 
-# coverage_ok ROOT: the JSON files under ROOT that declare "$schema" are exactly
-# the list above. It reads *.json only.
+# top_schema: reads NUL-separated paths on stdin and prints each one named
+# *.json, in any case, whose top level declares "$schema", then a tab and that
+# value. JSON is parsed, so a "$schema" deeper in or only as a value does not
+# count, and an escaped key does. A *.json file that is not JSON fails, naming it.
+top_schema() {
+  python3 -c 'import json, sys
+bad = 0
+for p in sys.stdin.read().split("\0"):
+    if not p.lower().endswith(".json"):
+        continue
+    try:
+        with open(p, encoding="utf-8") as f:
+            d = json.load(f)
+    except (OSError, ValueError) as e:
+        print(f"schemas: {p} is not readable JSON: {e}", file=sys.stderr); bad = 1; continue
+    if isinstance(d, dict) and "$schema" in d:
+        print(p + "\t" + str(d["$schema"]))
+sys.exit(bad)'
+}
+
+# coverage_ok ROOT: the files git tracks under ROOT that top_schema reports are
+# exactly the list above. Untracked and ignored files are not read, so a
+# contributor's local settings never count, and a new schema counts only once it
+# is added with git add.
 coverage_ok() {
-  # .venv, venv and node_modules are ignored by .gitignore and may hold vendored
-  # schemas; the verification container copies the whole checkout.
-  found=$(cd "$1" && find . \( -name .git -o -name .venv -o -name venv -o -name node_modules \) -prune \
-    -o -name '*.json' -exec grep -l '"\$schema"' {} + | sed 's|^\./||' | sort)
+  git -C "$1" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
+    || { printf 'schemas: %s is not a git work tree, so its files cannot be listed\n' "$1"; return 1; }
+  found=$(cd "$1" && git ls-files -z | top_schema) \
+    || { printf 'schemas: the schema-declaring files under %s cannot be listed\n' "$1"; return 1; }
+  found=$(printf '%s\n' "$found" | cut -f1 | sed '/^$/d' | sort)
   listed=$(printf '%s\n' "$json_schemas" | sort)
   [ "$found" = "$listed" ] || {
     printf 'schemas: the files declaring "$schema" differ from the list in this script.\nFound:\n%s\n' "$found"
@@ -136,13 +168,17 @@ coverage_ok() {
   }
 }
 
-# metaschema_ok FILE...: each file declares draft-07 and is valid draft-07.
-# check-jsonschema picks the metaschema from the file's own $schema, so a file
-# moved to another draft would be checked against that draft.
+# metaschema_ok FILE...: each file's top-level "$schema" is draft-07, and the
+# file is valid draft-07. check-jsonschema picks the metaschema from that
+# top-level $schema, so a file moved to another draft would be checked against
+# that draft.
 metaschema_ok() {
+  decl=$(printf '%s\0' "$@" | top_schema) || return 1
   for f in "$@"; do
-    grep -Eq '"\$schema": *"http://json-schema.org/draft-07/schema#?"' "$f" || {
-      printf 'schemas: %s does not declare draft-07\n' "$f"; return 1; }
+    case "$(printf '%s\n' "$decl" | awk -F '\t' -v f="$f" '$1 == f { print $2 }')" in
+      http://json-schema.org/draft-07/schema|http://json-schema.org/draft-07/schema#) ;;
+      *) printf 'schemas: %s does not declare draft-07\n' "$f"; return 1 ;;
+    esac
   done
   tool_ok "$cjs" && "$cjs" --check-metaschema "$@"
 }
@@ -152,11 +188,13 @@ doc_ok() {
   tool_ok "$cjs" && "$cjs" --schemafile "$1" "$2"
 }
 
-# registry_ok: every vendor file matches the descriptor schema.
+# registry_ok DIR: DIR holds at least one vendor file, and each matches the
+# descriptor schema. DIR is orchestration/registry; the selftest names another.
 registry_ok() {
   rc=0 n=0
-  for f in orchestration/registry/*.json; do
-    [ "$f" = "$registry_schema" ] && continue
+  for f in "$1"/*.json; do
+    [ -e "$f" ] || continue
+    [ "$(basename "$f")" = "$(basename "$registry_schema")" ] && continue
     n=$((n + 1))
     doc_ok "$registry_schema" "$f" || rc=1
   done
@@ -167,7 +205,7 @@ registry_ok() {
 # examples_ok: each review-round example, by file name, matches its schema.
 examples_ok() {
   docs=$(find examples/review-round \( -name review-round.json -o -name review-report.json -o -name operator-decision.json \) \
-    -not -path '*/schema-cases/*' -not -path '*/templates/*' | sort)
+    -not -path '*/schema-cases/*' | sort)
   [ -n "$docs" ] || { printf 'schemas: no review-round examples found\n'; return 1; }
   rc=0
   for f in $docs; do
@@ -176,22 +214,32 @@ examples_ok() {
   return "$rc"
 }
 
-# cases_ok DIR: each row of DIR/cases.json gives the result it expects, and an
-# expected failure is a validation failure rather than a schema that cannot load.
+# cases_ok DIR: each row of DIR/cases.json gives the result it expects. An
+# expected failure is a validation failure rather than a schema that cannot
+# load, and prints the row's "error", the validator's own text for the rule the
+# row breaks; "reason" is prose for a reader and is not matched.
 cases_ok() {
   tool_ok "$cjs" || return 1
   rows=$(python3 -c 'import json, sys
 for c in json.load(open(sys.argv[1]))["cases"]:
-    print(c["expect"], c["schema"], c["file"])' "$1/cases.json") || { printf 'schemas: %s/cases.json cannot be read\n' "$1"; return 1; }
+    print(c["expect"], c["schema"], c["file"], c.get("error", ""))' "$1/cases.json") || { printf 'schemas: %s/cases.json cannot be read\n' "$1"; return 1; }
   [ -n "$rows" ] || { printf 'schemas: %s/cases.json has no rows\n' "$1"; return 1; }
   rc=0
-  while read -r want schema file; do
+  while read -r want schema file error; do
     out=$("$cjs" --schemafile "$round_schemas/$schema.json" "$1/$file" 2>&1); code=$?
     case "$want:$code" in
       pass:0) ;;
       fail:1)
         case "$out" in
-          *"$rejected"*) ;;
+          *"$rejected"*)
+            if [ -z "$error" ]; then
+              printf 'schemas: %s is an expected failure with no "error" in its row\n' "$file"; rc=1
+            else
+              case "$out" in
+                *"$error"*) ;;
+                *) printf 'schemas: %s failed without its error "%s":\n%s\n' "$file" "$error" "$out"; rc=1 ;;
+              esac
+            fi ;;
           *) printf 'schemas: %s failed for another reason:\n%s\n' "$file" "$out"; rc=1 ;;
         esac ;;
       *) printf 'schemas: %s expected %s, exit %s\n%s\n' "$file" "$want" "$code" "$out"; rc=1 ;;
@@ -218,12 +266,12 @@ print(json.dumps(doc))' "$1" "${2:-}"
 
 # messages_ok: a built sample of each message kind matches its schema.
 messages_ok() {
-  mt=$(mktemp -d) || { printf 'schemas: no scratch directory\n'; return 1; }
+  mt=$work/messages
+  mkdir -p "$mt" || { printf 'schemas: no scratch directory\n'; return 1; }
   rc=0
   for kind in event-base request response; do
     sample "$kind" > "$mt/$kind.json" && doc_ok "orchestration/schemas/$kind.json" "$mt/$kind.json" || rc=1
   done
-  rm -rf "$mt"
   return "$rc"
 }
 
@@ -242,6 +290,23 @@ plant() {
   fi
 }
 
+# accept NAME CMD...: a control, the command must pass. A plant rejected beside
+# a control that also fails proves nothing.
+accept() {
+  an=$1; shift
+  if aout=$("$@" 2>&1); then
+    printf 'PLANT ok    %s is accepted\n' "$an"
+  else
+    printf 'PLANT FAIL  %s was rejected:\n%s\n' "$an" "$aout"; plant_bad=1
+  fi
+}
+
+# tracked_root NAME: a git tree at $s/NAME holding a copy of orchestration/,
+# every file added, so coverage_ok reads it as it reads a checkout.
+tracked_root() {
+  mkdir "$s/$1" && cp -R orchestration "$s/$1/" && git -C "$s/$1" init -q && git -C "$s/$1" add -A
+}
+
 # missing_tool VAR NAME: the whole script, with VAR set to a command that is not
 # installed, exits 1 and names it.
 missing_tool() {
@@ -254,12 +319,13 @@ missing_tool() {
 
 selftest_run() {
   check_start "schemas selftest"
-  s=$(mktemp -d) || { check_bad "schemas selftest: no scratch directory"; return; }
+  s=$work/selftest
+  mkdir "$s" || { check_bad "schemas selftest: no scratch directory"; return; }
   plant_bad=0
   # A clean pass first, or a rejected plant proves nothing.
   if ! validate_si "$dir" security-insights.yml >/dev/null 2>&1 || ! validate_cff "$dir" CITATION.cff >/dev/null 2>&1; then
     printf 'PLANT FAIL  a clean file was rejected, so a rejected plant proves nothing\n'
-    check_bad "schemas selftest"; rm -rf "$s"; return
+    check_bad "schemas selftest"; return
   fi
   # A field the schema does not define, and a value its pattern refuses.
   { cat security-insights.yml; printf 'planted-unknown-field: true\n'; } > "$s/si-field.yml"
@@ -280,7 +346,7 @@ selftest_run() {
   # A schema that is not the pinned one, though the file still matches it.
   if ! { mkdir "$s/schemas" && cp "$dir/$si_schema" "$dir/$cff_schema" "$s/schemas/" \
     && printf '\n' >> "$s/schemas/$si_schema" && printf '\n' >> "$s/schemas/$cff_schema"; }; then
-    check_bad "schemas selftest: copying the schemas failed"; rm -rf "$s"; return
+    check_bad "schemas selftest: copying the schemas failed"; return
   fi
   plant "a Security Insights schema with the wrong digest" "$si_schema has sha256" \
     validate_si "$s/schemas" security-insights.yml
@@ -289,12 +355,43 @@ selftest_run() {
   # A missing tool fails the whole script and names it, for each tool.
   missing_tool SCHEMAS_CUE schemas-selftest-not-installed
   missing_tool SCHEMAS_CJS schemas-selftest-not-installed
-  # The draft-07 checks. A schema the list does not name, and one that is not
-  # valid draft-07.
-  mkdir "$s/root" && cp -R orchestration "$s/root/" && printf '{"$schema": "x"}\n' > "$s/root/orchestration/planted.json"
-  plant "a schema-declaring file not in the list" 'differ from the list' coverage_ok "$s/root"
+  # The draft-07 checks. The schema list: a tracked tree as it is, then a
+  # schema-declaring file the list does not name, as *.json, as *.JSON and with
+  # its key escaped, then files that must not count: "$schema" only deeper in,
+  # only as a value, and in an untracked file.
+  if ! tracked_root clean; then check_bad "schemas selftest: building a tracked tree failed"; return; fi
+  accept "a tracked tree holding only the listed schemas" coverage_ok "$s/clean"
+  mkdir "$s/untracked-tree" && cp -R orchestration "$s/untracked-tree/"
+  plant "a tree git does not track" 'is not a git work tree' coverage_ok "$s/untracked-tree"
+  for planted in planted.json planted.JSON; do
+    tracked_root "root-$planted" && printf '{"$schema": "x"}\n' > "$s/root-$planted/orchestration/$planted" \
+      && git -C "$s/root-$planted" add -A
+    plant "a schema-declaring $planted not in the list" 'differ from the list' coverage_ok "$s/root-$planted"
+  done
+  tracked_root escaped && printf '{"\\u0024schema": "x"}\n' > "$s/escaped/orchestration/planted.json" && git -C "$s/escaped" add -A
+  plant "a schema-declaring file with its key escaped" 'differ from the list' coverage_ok "$s/escaped"
+  tracked_root nocount && printf '{"a": {"$schema": "x"}, "b": "$schema"}\n' > "$s/nocount/orchestration/inner.json" \
+    && git -C "$s/nocount" add -A && printf '{"$schema": "x"}\n' > "$s/nocount/orchestration/untracked.json"
+  accept "a \"\$schema\" only deeper in, only as a value, or untracked" coverage_ok "$s/nocount"
+  # The draft-07 declaration: version 4 at the top, version 4 at the top with a
+  # version 7 deeper in, and a space before the colon, which must still pass.
+  sed 's|"\$schema": "http://json-schema.org/draft-07/schema#"|"$schema": "http://json-schema.org/draft-04/schema#"|' \
+    orchestration/schemas/request.json > "$s/draft-04.json"
+  plant "a schema declaring draft-04" 'does not declare draft-07' metaschema_ok "$s/draft-04.json"
+  python3 -c 'import json, sys
+d = json.load(open(sys.argv[1])); d["definitions"] = {"inner": {"$schema": "http://json-schema.org/draft-07/schema#"}}
+json.dump(d, open(sys.argv[2], "w"))' "$s/draft-04.json" "$s/draft-04-inner-07.json"
+  plant "a draft-04 schema with a draft-07 \$schema deeper in" 'does not declare draft-07' metaschema_ok "$s/draft-04-inner-07.json"
+  sed 's|"\$schema":|"$schema" :|' orchestration/schemas/request.json > "$s/spaced.json"
+  accept "a draft-07 schema with a space before the colon" metaschema_ok "$s/spaced.json"
   sed 's/"title": "RequestEvent"/"title": 7/' orchestration/schemas/request.json > "$s/not-draft-07.json"
   plant "a schema that is not valid draft-07" "7 is not of type 'string'" metaschema_ok "$s/not-draft-07.json"
+  # A registry with no vendor file: one holding only the descriptor schema, and
+  # one with no JSON file at all, whose glob matches nothing.
+  mkdir "$s/registry-empty" && cp "$registry_schema" "$s/registry-empty/"
+  plant "a registry with no vendor file" 'no registry vendor files found' registry_ok "$s/registry-empty"
+  mkdir "$s/registry-none"
+  plant "a registry with no JSON file at all" 'no registry vendor files found' registry_ok "$s/registry-none"
   # A document of each set. The first reaches event-base.json through a $ref
   # across directories, and the two samples through a $ref beside them.
   sed 's/"interface": "[^"]*"/"interface": "planted"/' orchestration/registry/anthropic.json > "$s/registry.json"
@@ -307,16 +404,20 @@ selftest_run() {
   done
   # A row whose expected result is wrong, and an expected failure caused by a
   # schema that cannot load, which an exit code alone would pass.
-  cp -R "$cases_dir" "$s/flipped" && cp -R "$cases_dir" "$s/noload"
+  cp -R "$cases_dir" "$s/flipped" && cp -R "$cases_dir" "$s/noload" \
+    && cp -R "$cases_dir" "$s/wrongerror" && cp -R "$cases_dir" "$s/noerror"
   python3 -c 'import json, sys
-for d, field, old, new in ((sys.argv[1], "expect", "pass", "fail"), (sys.argv[2], "schema", None, "no-such-schema")):
+for d, field, old, new in ((sys.argv[1], "expect", "pass", "fail"), (sys.argv[2], "schema", None, "no-such-schema"),
+                           (sys.argv[3], "error", None, "a planted error the validator never prints"),
+                           (sys.argv[4], "error", None, "")):
     t = json.load(open(d + "/cases.json"))
     row = [c for c in t["cases"] if c["expect"] == ("pass" if old else "fail")][0]
     row[field] = new
-    json.dump(t, open(d + "/cases.json", "w"))' "$s/flipped" "$s/noload"
+    json.dump(t, open(d + "/cases.json", "w"))' "$s/flipped" "$s/noload" "$s/wrongerror" "$s/noerror"
   plant "a case expecting the wrong result" 'expected fail, exit 0' cases_ok "$s/flipped"
   plant "an expected failure from a schema that cannot load" 'failed for another reason' cases_ok "$s/noload"
-  rm -rf "$s"
+  plant "an expected failure without the error its row names" 'failed without its error' cases_ok "$s/wrongerror"
+  plant "an expected failure with no error in its row" 'with no "error" in its row' cases_ok "$s/noerror"
   if [ "$plant_bad" -eq 0 ]; then check_ok "schemas selftest"; else check_bad "schemas selftest"; fi
 }
 
@@ -336,7 +437,7 @@ check_start "the 7 schemas declare and pass the draft-07 metaschema"
 if metaschema_ok $json_schemas; then check_ok "metaschema"; else check_bad "metaschema"; fi
 
 check_start "orchestration/registry/*.json against surface-descriptor.schema.json"
-if registry_ok; then check_ok "registry"; else check_bad "registry"; fi
+if registry_ok orchestration/registry; then check_ok "registry"; else check_bad "registry"; fi
 
 check_start "the review-round examples against their schemas"
 if examples_ok; then check_ok "review-round examples"; else check_bad "review-round examples"; fi

@@ -60,49 +60,56 @@
       "schema": "review-report",
       "expect": "fail",
       "matrixRow": "missing-check-status",
-      "reason": "checks[0] has no status."
+      "reason": "checks[0] has no status.",
+      "error": "$.checks[0]: 'status' is a required property"
     },
     {
       "file": "invalid/missing-check-status/review-report-status-unlisted.json",
       "schema": "review-report",
       "expect": "fail",
       "matrixRow": "missing-check-status",
-      "reason": "checks[0].status is not one of passed, failed, not-run, blocked."
+      "reason": "checks[0].status is not one of passed, failed, not-run, blocked.",
+      "error": "$.checks[0].status: 'skipped' is not one of ['passed', 'failed', 'not-run', 'blocked']"
     },
     {
       "file": "invalid/self-verification/review-report-self-reproduced.json",
       "schema": "review-report",
       "expect": "fail",
       "matrixRow": "self-verification",
-      "reason": "The report marks its own finding reproduced by its own reviewer role. A report can hold only the initial unverified state; the cross-document half (decision verifier equal to report reviewer) is the validator's."
+      "reason": "The report marks its own finding reproduced by its own reviewer role. A report can hold only the initial unverified state; the cross-document half (decision verifier equal to report reviewer) is the validator's.",
+      "error": "$.findings[0].verification.status: 'unverified' was expected"
     },
     {
       "file": "invalid/missing-verification-evidence/operator-decision-reproduced-without-evidence.json",
       "schema": "operator-decision",
       "expect": "fail",
       "matrixRow": "missing-verification-evidence",
-      "reason": "f1 is reproduced with an empty evidence list."
+      "reason": "f1 is reproduced with an empty evidence list.",
+      "error": "$.verification.findings[0].evidence: [] should be non-empty"
     },
     {
       "file": "invalid/reviewed-wrong-revision/operator-decision-mismatch-normal-decision.json",
       "schema": "operator-decision",
       "expect": "fail",
       "matrixRow": "reviewed-wrong-revision",
-      "reason": "Alignment is mismatched but the decision is request-revision; only abstain or rerun are open."
+      "reason": "Alignment is mismatched but the decision is request-revision; only abstain or rerun are open.",
+      "error": "$.decision.status: 'request-revision' is not one of ['abstain', 'rerun']"
     },
     {
       "file": "invalid/reviewed-wrong-revision/operator-decision-unresolved-called-matched.json",
       "schema": "operator-decision",
       "expect": "fail",
       "matrixRow": "reviewed-wrong-revision",
-      "reason": "The reviewed revision is unresolved (null) but alignment says matched."
+      "reason": "The reviewed revision is unresolved (null) but alignment says matched.",
+      "error": "$.alignment.reportReviewedRevision: None is not of type 'string'"
     },
     {
       "file": "invalid/decision-not-by-operator/operator-decision-made-by-lead.json",
       "schema": "operator-decision",
       "expect": "fail",
       "matrixRow": null,
-      "reason": "Semantic rule, not a matrix row: decision.madeBy.role must be operator."
+      "reason": "Semantic rule, not a matrix row: decision.madeBy.role must be operator.",
+      "error": "$.decision.madeBy.role: 'operator' was expected"
     }
   ]
 }
