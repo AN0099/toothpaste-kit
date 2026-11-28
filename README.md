@@ -144,6 +144,21 @@ The protocol for passing work between agents on different surfaces.
 | `orchestration/registry/` | One surface descriptor per vendor, and the schema they follow |
 | `orchestration/templates/` | Templates for a relay message and a handoff note |
 
+### Other directories and files
+
+| Path | Holds |
+|---|---|
+| `tests/` | `tests/run`, which runs the test suite, and the case tables two gates read |
+| `containers/` | Images that hold every tool the kit needs: one to try the kit, one to run its checks |
+| `blog/` | The kit blog's posts, which `scripts/blog.py` builds into pages and a feed |
+| `LICENSES/` | The licence text that each file's SPDX line names |
+| `REUSE.toml` | Licence and copyright for files that cannot carry an SPDX header |
+| `security-insights.yml` | The project's security metadata, in the OpenSSF Security Insights format |
+| `corrections.jsonl` | Empty on purpose: it fixes the name and format of a correction record, whose real records stay in each user's own workspace ([ACMM notes](docs/acmm.md)) |
+| `.githooks/` | The `commit-msg` and `pre-push` hooks, enabled per clone with `git config core.hooksPath .githooks` |
+| `.claude/` | Claude Code settings that turn off its attribution lines, and the session summary format |
+| `.cursor/` | A Cursor rule pointing at `AGENTS.md` |
+
 ## Installing the skills
 
 First time: follow the [quickstart](docs/quickstart.md). It is one path, six steps, ending with a session log on disk.

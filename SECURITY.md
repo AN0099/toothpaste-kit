@@ -10,8 +10,9 @@ What does apply:
 - **A gate that fails open.** `redaction-gate` and the hook rules exist to stop content from
   crossing a boundary. A pattern that silently misses a case it claims to catch is the highest
   severity defect this project can have, because the failure is invisible to the person relying on
-  it. The v3 fix to `redaction-gate` is the worked example: the published skill was weaker than
-  its own documentation for a period, and anyone running it had less protection than they believed.
+  it. The fix recorded as v3 in `skills/redaction-gate/CHANGELOG.md` is the worked example: the
+  published skill was weaker than its own documentation for a period, and anyone running it had
+  less protection than they believed.
 - **A skill or hook that leaks.** A rule whose body, error text, or example quotes material it was
   meant to keep out.
 - **A script defect with a destructive path.** `scripts/` writes to files. A bug that corrupts input
@@ -33,8 +34,8 @@ channel, so send enough to establish that a defect exists and expect the detail 
 private advisory.
 
 Do not open a public issue for anything in the first category above. A pattern gap is directly
-actionable by anyone who reads it, and this project has no release channel through which to ship a
-fix ahead of disclosure.
+actionable by anyone who reads it, and this project has no private release channel through which
+to ship a fix ahead of disclosure.
 
 Include what you were doing, what you expected the control to do, and what it did instead. A
 reproduction that a maintainer can run is worth more than a description.

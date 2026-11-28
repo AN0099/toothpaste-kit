@@ -230,7 +230,7 @@ Practical test before you commit a doc: could a contributor who has never spoken
 
 ## Questions
 
-Ask. A question costs less than a wrong assumption acted on.
+Ask in [Discussions](https://github.com/AN0099/toothpaste-kit/discussions), or open an issue with one of the forms under [New issue](https://github.com/AN0099/toothpaste-kit/issues/new/choose): Defect, Finding or disagreement, or Registry addition. A question costs less than a wrong assumption acted on.
 
 <!--
 SPDX-FileCopyrightText: 2026 Aidan Naveja
